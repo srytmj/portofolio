@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" font-family="'Space Grotesk',sans-serif">
+  <rect width="1600" height="1000" fill="#101010"/>
+  <g stroke="#ffffff" stroke-opacity="0.06"><path d="M0 250H1600M0 500H1600M0 750H1600"/></g>
+  <polyline points="80,720 260,640 440,660 620,520 800,560 980,400 1160,300 1340,340 1520,220"
+    fill="none" stroke="#e8e8e8" stroke-opacity="0.6" stroke-width="3"/>
+  <polyline points="80,820 260,800 440,780 620,800 800,700 980,720 1160,640 1340,660 1520,600"
+    fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2" stroke-dasharray="6 8"/>
+  <text x="80" y="180" fill="#ffffff" fill-opacity="0.85" font-size="72" font-weight="700" letter-spacing="-2">METRICS</text>
+  <text x="84" y="230" fill="#8a8a8a" font-size="24" letter-spacing="5">CPU · MEMORY · REQUEST LATENCY</text>
+</svg>

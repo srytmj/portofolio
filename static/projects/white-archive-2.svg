@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" font-family="'Space Grotesk',sans-serif">
+  <rect width="1600" height="1000" fill="#101010"/>
+  <g stroke="#ffffff" stroke-opacity="0.05">
+    <path d="M0 200H1600M0 400H1600M0 600H1600M0 800H1600"/>
+  </g>
+  <g fill="#ffffff" fill-opacity="0.1">
+    <rect x="120" y="140" width="1360" height="90" rx="8"/>
+    <rect x="120" y="270" width="640" height="520" rx="8"/>
+  </g>
+  <g fill="none" stroke="#dcdcdc" stroke-opacity="0.45" stroke-width="2">
+    <path d="M820 320 L1180 320 L1180 520 L1460 520"/>
+    <path d="M820 420 L1000 420 L1000 700 L1460 700"/>
+    <circle cx="820" cy="320" r="8"/><circle cx="820" cy="420" r="8"/>
+    <circle cx="1460" cy="520" r="8"/><circle cx="1460" cy="700" r="8"/>
+  </g>
+  <text x="120" y="900" fill="#ffffff" fill-opacity="0.85" font-size="86" font-weight="700" letter-spacing="-3">PIPELINE VIEW</text>
+</svg>

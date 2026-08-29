@@ -1,0 +1,93 @@
+@import 'tailwindcss';
+
+@theme {
+  /* fontpair.co — Epilogue (structural / display) + Baskervville (prose) */
+  --font-sans: 'Epilogue', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Epilogue', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Baskervville', ui-serif, Georgia, 'Times New Roman', serif;
+
+  --color-ink-0: #000000;
+  --color-ink-1: #0a0a0a;
+  --color-ink-2: #141414;
+  --color-ink-3: #1f1f1f;
+  --color-ash-1: #3a3a3a;
+  --color-ash-2: #6b6b6b;
+  --color-ash-3: #9a9a9a;
+  --color-paper: #f4f4f4;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+}
+
+/* Prose reads in the serif; everything structural (headings, nav, labels,
+   buttons, the uppercase micro-type) is Epilogue. */
+body {
+  font-family: var(--font-serif);
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+nav,
+button,
+label,
+th,
+[class*='uppercase'] {
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: #fff;
+  color: #000;
+}
+
+/* Thin monochrome scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}

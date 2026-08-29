@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" font-family="'Space Grotesk',sans-serif">
+  <rect width="1600" height="1000" fill="#0b0b0b"/>
+  <g fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="2">
+    <rect x="640" y="120" width="320" height="180" rx="10"/>
+    <line x1="800" y1="300" x2="800" y2="380"/>
+    <line x1="300" y1="380" x2="1300" y2="380"/>
+  </g>
+  <g fill="#ffffff" fill-opacity="0.12">
+    <rect x="200" y="400" width="200" height="140" rx="8"/>
+    <rect x="460" y="400" width="200" height="140" rx="8"/>
+    <rect x="720" y="400" width="200" height="140" rx="8"/>
+    <rect x="980" y="400" width="200" height="140" rx="8"/>
+    <rect x="1240" y="400" width="160" height="140" rx="8"/>
+  </g>
+  <g fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2">
+    <line x1="300" y1="380" x2="300" y2="400"/><line x1="560" y1="380" x2="560" y2="400"/>
+    <line x1="820" y1="380" x2="820" y2="400"/><line x1="1080" y1="380" x2="1080" y2="400"/>
+    <line x1="1320" y1="380" x2="1320" y2="400"/>
+  </g>
+  <text x="200" y="760" fill="#ffffff" fill-opacity="0.9" font-size="120" font-weight="700" letter-spacing="-4">HOMELAB</text>
+  <text x="204" y="820" fill="#8a8a8a" font-size="26" letter-spacing="6">REVERSE PROXY · 15 SERVICES · MONITORING</text>
+</svg>
