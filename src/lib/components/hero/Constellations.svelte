@@ -22,7 +22,8 @@
    *   paused?: boolean,
    *   reducedMotion?: boolean,
    *   onQuality?: () => void,
-   *   onDowngrade?: (t: 'static') => void
+   *   onDowngrade?: (t: 'static') => void,
+   *   onActive?: (name: string | null) => void
    * }}
    */
   let {
@@ -32,16 +33,26 @@
     paused = false,
     reducedMotion = false,
     onQuality,
-    onDowngrade
+    onDowngrade,
+    onActive
   } = $props();
 
   const ctx = useThrelte();
   const full = tier === 'full';
   const R = 100;
 
+  // Full tier only: name the figure the pointer is revealing, and give one
+  // "signature" figure a steady glow when the sky is idle.
+  const labelsOn = full && !reducedMotion;
+  const SIGNATURE_ID = 'Cap'; // Capricornus
+
   const { constellations, linesGeometry, starsGeometry } = buildConstellations(R);
   const bgGeometry = buildBackgroundStars(full ? 16000 : 7000, R * 0.985);
   const rankOrder = [...constellations].sort((a, b) => a.rank - b.rank).map((c) => c.index);
+
+  const signatureIdx = full
+    ? (constellations.find((c) => c.id === SIGNATURE_ID)?.index ?? -1)
+    : -1;
 
   // Shared reveal state — one array feeds both materials.
   const progress = new Float32Array(MAX_CONST);
@@ -49,6 +60,7 @@
   const uTime = { value: 0 };
   const uPixelRatio = { value: dpr };
   const uReducedMotion = { value: reducedMotion ? 1 : 0 };
+  const uSignatureGlow = { value: 0 };
 
   const linesMat = new THREE.ShaderMaterial({
     vertexShader: linesVertexShader,
@@ -67,6 +79,8 @@
       uTime,
       uPixelRatio,
       uReducedMotion,
+      uSignature: { value: signatureIdx },
+      uSignatureGlow,
       uSize: { value: full ? 1 : 0.9 }
     },
     transparent: true,
@@ -115,6 +129,7 @@
   const smooth = new THREE.Vector2();
   let hasPointer = false;
   let active = -1;
+  let reportedActive = -2; // last index sent to onActive (-2 = nothing sent)
   let t = 0;
   let eased = 1;
 
@@ -236,6 +251,10 @@
 
     if (paused) {
       sky.visible = false;
+      if (labelsOn && reportedActive !== -2) {
+        reportedActive = -2;
+        onActive?.(null);
+      }
       return;
     }
 
@@ -259,15 +278,28 @@
       active = pick();
     }
 
+    // full tier: name the figure under the pointer (fires only on change)
+    if (labelsOn && active !== reportedActive) {
+      reportedActive = active;
+      onActive?.(active >= 0 ? constellations[active].name : null);
+    }
+
     // ease every constellation toward its target reveal
+    let maxP = 0;
     for (let i = 0; i < MAX_CONST; i++) {
       const goal = i === active ? 1 : 0;
       const rate = goal > progress[i] ? 0.05 : 0.09;
       progress[i] += (goal - progress[i]) * rate;
       if (progress[i] < 1e-4) progress[i] = 0;
+      if (progress[i] > maxP) maxP = progress[i];
     }
 
     eased += (shrink - eased) * 0.1;
+
+    // signature idle glow — subtle, and only while nothing is revealing and the
+    // hero still owns the screen
+    uSignatureGlow.value =
+      signatureIdx >= 0 ? 0.11 * (1 - Math.min(1, maxP)) * Math.min(1, eased) : 0;
     sky.visible = eased > 0.02;
     if (!sky.visible) return;
 

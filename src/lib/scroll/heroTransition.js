@@ -1,5 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ease } from '$lib/motion.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -35,7 +36,7 @@ export function createHeroTransition(cfg) {
         const p = self.progress;
         onProgress(p);
         overlayEl.style.opacity = String(Math.max(0, 1 - p * 1.6));
-        overlayEl.style.transform = `translateY(${p * -30}px)`;
+        overlayEl.style.transform = `translateY(${p * -20}px)`;
       }
     });
     return () => st.kill();
@@ -61,23 +62,19 @@ export function createHeroTransition(cfg) {
       }
     });
 
-    // Blur / fade / lift the whole overlay (name + sub-line together) so they
-    // dissolve as one; the name additionally spreads its letters.
+    // Fade + lift the whole overlay (name + sub-line together) so it dissolves
+    // as one. No scale — on a large left-aligned headline the shrink read as a
+    // glitch rather than a transition.
     tl.to(
       overlayEl,
       {
         opacity: 0,
-        y: gentle ? -26 : -44,
-        scale: 0.94,
-        filter: gentle ? 'blur(6px)' : 'blur(14px)',
-        ease: 'power2.in'
+        y: gentle ? -18 : -28,
+        filter: gentle ? 'blur(5px)' : 'blur(9px)',
+        ease: ease.in
       },
       0
     );
-
-    if (!gentle) {
-      tl.to(nameEl, { letterSpacing: '0.5em', ease: 'power2.in' }, 0);
-    }
   });
 
   // Pin spacer changes document height — recalc every trigger once it's laid out.

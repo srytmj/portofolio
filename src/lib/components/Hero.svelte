@@ -1,10 +1,15 @@
 <script>
   import { onMount, tick } from 'svelte';
+  import { gsap } from 'gsap';
   import HeroCanvas from './HeroCanvas.svelte';
   import HeroName from './HeroName.svelte';
   import StaticHero from './StaticHero.svelte';
   import { identity } from '$lib/content/site.js';
+  import { ease, dur } from '$lib/motion.js';
   import { detectTier, prefersReducedMotion } from '$lib/utils/device.js';
+
+  /** @type {{ heroReady?: boolean }} */
+  let { heroReady = true } = $props();
 
   let tier = $state('static');
   let reducedMotion = $state(false);
@@ -14,6 +19,15 @@
   // Threlte scene as a plain prop. `dormant` frees the GPU once past the hero.
   let shrink = $state(1);
   let dormant = $state(false);
+
+  // Name of the constellation the pointer is revealing (full tier only).
+  // `displayName` lingers through the fade-out so the text never blanks first.
+  let activeName = $state(null);
+  let displayName = $state('');
+  $effect(() => {
+    if (activeName) displayName = activeName;
+  });
+  const showLabel = $derived(!!activeName && shrink > 0.6);
 
   /** @type {HTMLElement} */ let section;
   /** @type {HTMLElement} */ let pinInner;
@@ -26,7 +40,28 @@
   onMount(() => {
     tier = detectTier();
     reducedMotion = prefersReducedMotion();
+    // Hold the supporting lines back so they can arrive after the name.
+    if (!reducedMotion) gsap.set(overlay?.querySelectorAll('[data-reveal]') ?? [], { autoAlpha: 0 });
     mounted = true;
+  });
+
+  // Fade the role line then the trivia in, once the hero is actually on screen
+  // (either straight away, or when the opening sequence hands over).
+  let revealed = false;
+  $effect(() => {
+    if (!heroReady || !mounted || revealed) return;
+    revealed = true;
+    const targets = overlay?.querySelectorAll('[data-reveal]');
+    if (!targets?.length) return;
+    if (reducedMotion) {
+      gsap.set(targets, { autoAlpha: 1, y: 0 });
+      return;
+    }
+    gsap.fromTo(
+      targets,
+      { autoAlpha: 0, y: 12 },
+      { autoAlpha: 1, y: 0, duration: dur.lg, ease: ease.out, stagger: 0.22, delay: 0.15 }
+    );
   });
 
   // (Re)build the scroll choreography whenever the effective mode changes —
@@ -77,24 +112,40 @@
           {shrink}
           paused={dormant}
           onDowngrade={() => (tier = 'static')}
+          onActive={(n) => (activeName = n)}
         />
       {/key}
     {:else}
       <StaticHero />
     {/if}
 
-    <!-- Readability scrim: darkens the dust field directly behind the text. -->
+    <!-- Readability scrim: darkens the dust field behind the text, offset left
+         to sit under the asymmetric headline. -->
     <div
       class="pointer-events-none absolute inset-0 z-[5]"
-      style="background: radial-gradient(ellipse 58% 42% at 50% 50%, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.4) 42%, rgba(0,0,0,0) 70%);"
+      style="background: radial-gradient(ellipse 64% 48% at 34% 50%, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.42) 44%, rgba(0,0,0,0) 72%);"
     ></div>
+
+    <span
+      class="pointer-events-none absolute left-[8vw] top-10 z-10 text-label tracking-[0.35em] text-white/40 sm:left-[9vw]"
+      style="font-family: 'Space Mono', ui-monospace, monospace;"
+      aria-hidden="true">01</span
+    >
 
     <div
       bind:this={overlay}
-      class="pointer-events-none relative z-10 flex flex-col items-center px-6 text-center"
+      class="pointer-events-none absolute inset-0 z-10 flex flex-col justify-center gap-12 px-[8vw] sm:px-[9vw] lg:flex-row lg:items-center lg:justify-between lg:gap-16"
     >
-      <div bind:this={nameWrap}>
-        <HeroName title={identity.role} line={identity.pitch} />
+      <div bind:this={nameWrap} class="shrink-0">
+        <HeroName display={identity.display} role={identity.role} />
+      </div>
+      <div
+        data-reveal
+        class="flex max-w-[42ch] flex-col gap-2.5 border-t border-white/15 pt-4 font-serif text-caption italic leading-[1.6] text-white/45 lg:self-center lg:text-right"
+      >
+        {#each identity.trivia as line}
+          <p class="text-balance">{line}</p>
+        {/each}
       </div>
     </div>
 
@@ -116,6 +167,15 @@
         <path d="M6 9l6 6 6-6" />
       </svg>
     </a>
+
+    <!-- Name of the constellation currently revealing (full tier only). -->
+    <span
+      aria-hidden="true"
+      class="pointer-events-none absolute bottom-7 right-7 z-10 font-serif text-caption italic text-white/55 transition-opacity duration-500"
+      class:opacity-0={!showLabel}
+    >
+      {displayName}
+    </span>
   </div>
 </section>
 

@@ -1,49 +1,20 @@
 <script>
-  import '../app.css';
   import { onMount } from 'svelte';
-  import { identity } from '$lib/content/site.js';
-  import SideNav from '$lib/components/SideNav.svelte';
+  import '../app.css';
   let { children } = $props();
 
-  let activeId = $state('');
-
-  const sectionIds = ['about', 'skills', 'portfolio', 'contact'];
-
   onMount(() => {
-    let stopSmooth = () => {};
-    let alive = true;
-    import('$lib/scroll/smoothScroll.js').then(({ initSmoothScroll }) => {
-      if (alive) stopSmooth = initSmoothScroll();
-    });
-
-    const docTop = (el) => el.getBoundingClientRect().top + window.scrollY;
-
-    const onScroll = () => {
-      const probe = window.scrollY + window.innerHeight * 0.4;
-      let current = '';
-      for (const id of sectionIds) {
-        const el = document.getElementById(id);
-        if (el && docTop(el) <= probe) current = id;
-      }
-      activeId = current;
-    };
-
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-
-    return () => {
-      alive = false;
-      stopSmooth();
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-    };
+    // Hydration is done and any opening-sequence overlay is already painted —
+    // lift the first-paint cover (see app.html).
+    const bc = document.getElementById('boot-cover');
+    if (bc) {
+      bc.style.opacity = '0';
+      setTimeout(() => bc.remove(), 350);
+    }
   });
 </script>
 
 <svelte:head>
-  <title>{identity.title}</title>
-  <meta name="description" content={identity.tagline} />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
   <link
@@ -52,8 +23,4 @@
   />
 </svelte:head>
 
-<SideNav {activeId} />
-
-<main id="top">
-  {@render children()}
-</main>
+{@render children()}

@@ -10,10 +10,10 @@
   use:sectionAnim
   class="relative flex min-h-[100svh] flex-col justify-center py-28 sm:py-36"
 >
-  <div data-skew class="mx-auto w-full max-w-6xl px-6 sm:px-10">
+  <div data-skew class="wrap">
     <header class="relative mb-14 pb-4">
       <h2
-        class="overflow-hidden pb-1 text-2xl font-semibold uppercase tracking-tight sm:text-3xl"
+        class="overflow-hidden pb-1 text-h2 font-semibold uppercase tracking-tight"
       >
         <span data-anim-title class="block">{title}</span>
       </h2>

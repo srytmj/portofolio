@@ -1,5 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ease, dur, stagger } from '$lib/motion.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -51,39 +52,39 @@ export function sectionAnim(node) {
   const show = () => {
     gsap.to(titles, {
       yPercent: 0,
-      duration: 0.9,
-      stagger: 0.08,
-      ease: 'power4.out',
+      duration: dur.lg,
+      stagger: stagger.base,
+      ease: ease.out,
       overwrite: true
     });
     gsap.to(items, {
       opacity: 1,
       y: 0,
-      duration: 0.9,
-      stagger: 0.08,
-      ease: 'power3.out',
+      duration: dur.lg,
+      stagger: stagger.base,
+      ease: ease.out,
       overwrite: true
     });
     if (line)
-      gsap.to(line, { scaleX: 1, duration: 1.1, ease: 'power3.inOut', overwrite: true });
+      gsap.to(line, { scaleX: 1, duration: dur.xl, ease: ease.draw, overwrite: true });
   };
 
   const hide = (dir) => {
     gsap.to(titles, {
       yPercent: dir > 0 ? 115 : -115,
-      duration: 0.4,
-      ease: 'power2.in',
+      duration: dur.sm,
+      ease: ease.in,
       overwrite: true
     });
     gsap.to(items, {
       opacity: 0,
       y: dir * 42,
-      duration: 0.45,
-      stagger: 0.03,
-      ease: 'power2.in',
+      duration: dur.sm,
+      stagger: stagger.tight,
+      ease: ease.in,
       overwrite: true
     });
-    if (line) gsap.to(line, { scaleX: 0, duration: 0.4, ease: 'power2.in', overwrite: true });
+    if (line) gsap.to(line, { scaleX: 0, duration: dur.sm, ease: ease.in, overwrite: true });
   };
 
   const st = ScrollTrigger.create({
@@ -115,9 +116,9 @@ export function sectionAnim(node) {
 export function cardHover(node) {
   if (reduced()) return {};
   const enter = () =>
-    gsap.to(node, { scale: 1.025, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
+    gsap.to(node, { scale: 1.025, duration: dur.sm, ease: ease.ui, overwrite: 'auto' });
   const leave = () =>
-    gsap.to(node, { scale: 1, duration: 0.55, ease: 'power2.out', overwrite: 'auto' });
+    gsap.to(node, { scale: 1, duration: dur.md, ease: ease.ui, overwrite: 'auto' });
   node.addEventListener('pointerenter', enter);
   node.addEventListener('pointerleave', leave);
   node.addEventListener('focusin', enter);

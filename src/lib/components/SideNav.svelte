@@ -1,17 +1,19 @@
 <script>
   import { onMount } from 'svelte';
   import { gsap } from 'gsap';
+  import { ease, dur } from '$lib/motion.js';
 
   /** @type {{ activeId?: string }} */
   let { activeId = '' } = $props();
 
   const blogUrl = 'https://blog.suryatmaja.dev';
   const items = [
+    // 01 is the hero itself (the "01" marker on that screen); sections start at 02.
     { key: 'home', label: 'Top', num: '' },
-    { key: 'about', label: 'About', num: '01' },
-    { key: 'skills', label: 'Skills', num: '02' },
-    { key: 'portfolio', label: 'Portfolio', num: '03' },
-    { key: 'contact', label: 'Contact', num: '04' },
+    { key: 'about', label: 'About', num: '02' },
+    { key: 'skills', label: 'Skills', num: '03' },
+    { key: 'portfolio', label: 'Portfolio', num: '04' },
+    { key: 'contact', label: 'Contact', num: '05' },
     { key: 'blog', label: 'Blog', num: '', external: true }
   ];
 
@@ -35,14 +37,14 @@
   $effect(() => {
     if (!mounted || !nav) return;
     const active = activeId;
-    const d = reduce() ? 0 : 0.5;
+    const d = reduce() ? 0 : dur.md;
     const visible = active !== '';
 
     gsap.to(nav, {
       autoAlpha: visible ? 1 : 0,
       xPercent: visible ? 0 : -10,
       duration: d,
-      ease: 'power3.out',
+      ease: ease.out,
       overwrite: true
     });
 
@@ -56,7 +58,7 @@
         // never drifts when a wide item like "03 Portfolio" unfolds.
         x: home ? 28 : on ? 14 : 0,
         duration: d,
-        ease: 'power3.out',
+        ease: ease.out,
         overwrite: 'auto'
       });
       if (num)
@@ -87,8 +89,8 @@
       gsap.to(el.querySelector('[data-star]'), {
         rotation: entering ? 180 : 0,
         opacity: entering ? 1 : 0.6,
-        duration: 0.55,
-        ease: 'power3.out',
+        duration: dur.md,
+        ease: ease.ui,
         overwrite: 'auto'
       });
       return;
@@ -97,14 +99,14 @@
     const isActive = key === activeId;
     gsap.to(el.querySelector('[data-label]'), {
       opacity: entering || isActive ? 1 : 0.4,
-      duration: 0.3,
-      ease: 'power2.out',
+      duration: dur.xs,
+      ease: ease.ui,
       overwrite: 'auto'
     });
     gsap.to(el, {
       x: isActive ? 14 : entering ? 6 : 0,
-      duration: 0.35,
-      ease: 'power2.out',
+      duration: dur.sm,
+      ease: ease.ui,
       overwrite: 'auto'
     });
 
@@ -113,8 +115,8 @@
       gsap.to(ext, {
         autoAlpha: entering ? 1 : 0,
         x: entering ? 0 : -4,
-        duration: 0.3,
-        ease: 'power2.out',
+        duration: dur.xs,
+        ease: ease.ui,
         overwrite: 'auto'
       });
   }

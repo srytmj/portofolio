@@ -1,6 +1,6 @@
 <script>
   import { sectionAnim } from '$lib/scroll/sectionAnim.js';
-  import { contact, identity } from '$lib/content/site.js';
+  import { contact, headings, identity } from '$lib/content/site.js';
   const year = new Date().getFullYear();
 </script>
 
@@ -10,12 +10,12 @@
   use:sectionAnim
   class="relative flex min-h-[100svh] flex-col justify-center py-28 sm:py-36"
 >
-  <div data-skew class="mx-auto w-full max-w-6xl px-6 sm:px-10">
+  <div data-skew class="wrap">
     <div class="relative pb-4">
       <h2
-        class="overflow-hidden pb-1 text-2xl font-semibold uppercase tracking-tight sm:text-3xl"
+        class="overflow-hidden pb-1 text-h2 font-semibold uppercase tracking-tight"
       >
-        <span data-anim-title class="block">{contact.heading}</span>
+        <span data-anim-title class="block">{headings.contact}</span>
       </h2>
       <span
         data-anim-line
@@ -26,10 +26,10 @@
 
     <div class="mt-14 grid gap-12 md:grid-cols-[1.4fr_1fr]">
       <div data-anim>
-        <p class="max-w-md text-lg leading-relaxed text-white/80">{contact.body}</p>
+        <p class="max-w-[var(--measure)] text-lead text-white/80">{contact.body}</p>
         <a
           href={'mailto:' + contact.email}
-          class="mt-8 inline-block text-2xl font-medium tracking-tight underline decoration-white/20 underline-offset-8 transition-colors hover:decoration-white sm:text-3xl"
+          class="mt-10 inline-block text-h3 font-medium tracking-tight underline decoration-white/20 underline-offset-8 transition-colors hover:decoration-white"
         >
           {contact.email}
         </a>
@@ -50,7 +50,7 @@
       </nav>
     </div>
 
-    <p data-anim class="mt-24 text-xs uppercase tracking-[0.3em] text-ash-1">
+    <p data-anim class="mt-24 text-label uppercase tracking-[0.3em] text-ash-1">
       © {year} {identity.name}. Built with SvelteKit, Threlte, GSAP, Lenis.
     </p>
   </div>

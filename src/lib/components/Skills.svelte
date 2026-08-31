@@ -1,7 +1,7 @@
 <script>
   import { fade } from 'svelte/transition';
   import Section from './Section.svelte';
-  import { stack } from '$lib/content/site.js';
+  import { stack, headings } from '$lib/content/site.js';
 
   const reduce =
     typeof window !== 'undefined' &&
@@ -11,7 +11,13 @@
 
   // Track by name (primitive) — Svelte 5 proxies objects put in $state, so
   // object-identity comparisons across the import boundary would never match.
+  // Reverts to the hint the moment the pointer/focus leaves the tool list.
   let activeName = $state(null);
+
+  const clear = () => (activeName = null);
+  const clearOnFocusLeave = (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) activeName = null;
+  };
 
   const activeTool = $derived(
     activeName ? stack.flatMap((l) => l.items).find((t) => t.name === activeName) : null
@@ -20,14 +26,19 @@
   const isActiveLayer = (layer) => layer.items.some((i) => i.name === activeName);
 </script>
 
-<Section id="skills" title="Skills">
+<Section id="skills" title={headings.skills}>
   <div class="relative">
     <div
       class="pointer-events-none absolute bottom-6 left-[5px] top-6 hidden w-px bg-white/10 md:block"
       aria-hidden="true"
     ></div>
 
-    <div class="flex flex-col">
+    <div
+      class="flex flex-col"
+      onpointerleave={clear}
+      onfocusout={clearOnFocusLeave}
+      role="presentation"
+    >
       {#each stack as layer}
         {@const on = isActiveLayer(layer)}
         <div
@@ -42,7 +53,7 @@
               aria-hidden="true"
             ></span>
             <span
-              class="font-mono text-[11px] uppercase tracking-[0.22em] transition-colors duration-300 {on
+              class="font-mono text-label uppercase tracking-[0.22em] transition-colors duration-300 {on
                 ? 'text-white'
                 : 'text-ash-2'}"
             >
@@ -59,7 +70,7 @@
                   onpointerenter={() => (activeName = it.name)}
                   onfocus={() => (activeName = it.name)}
                   aria-pressed={sel}
-                  class="group relative pb-1 text-lg transition-colors {sel
+                  class="group relative pb-1 text-lead transition-colors {sel
                     ? 'text-white'
                     : 'text-white/80 hover:text-white'}"
                 >
@@ -80,7 +91,7 @@
 
     <p
       data-anim
-      class="mt-10 flex min-h-[1.5em] items-start gap-2.5 text-sm leading-relaxed text-ash-3"
+      class="mt-10 flex min-h-[1.5em] items-start gap-2.5 text-caption text-ash-3"
     >
       <span class="mt-[0.15em] text-ash-1" aria-hidden="true">—</span>
       {#key caption}

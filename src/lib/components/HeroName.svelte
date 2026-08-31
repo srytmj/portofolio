@@ -1,17 +1,22 @@
 <script>
-  /** @type {{ title: string, line: string }} */
-  let { title, line } = $props();
+  /** @type {{ display: string[], role: string[] }} */
+  let { display, role } = $props();
 </script>
 
-<div class="mx-auto flex max-w-3xl select-none flex-col items-center gap-4 text-center">
+<div class="flex max-w-[52rem] select-none flex-col items-start text-left">
   <h1
-    class="text-[clamp(2.2rem,7vw,4.25rem)] font-semibold uppercase leading-[0.95] tracking-tight text-white [text-shadow:0_2px_40px_rgba(0,0,0,0.75)]"
+    class="text-display font-black uppercase leading-[0.82] tracking-[-0.03em] text-white [text-shadow:0_2px_40px_rgba(0,0,0,0.75)]"
   >
-    {title}
+    {#each display as part}
+      <span class="block">{part}</span>
+    {/each}
   </h1>
-  <p
-    class="max-w-lg text-balance font-sans text-[clamp(1rem,2.3vw,1.25rem)] font-normal leading-relaxed text-white/60 [text-shadow:0_1px_20px_rgba(0,0,0,0.85)]"
+  <div
+    data-reveal
+    class="mt-6 flex flex-col gap-1 font-sans text-label uppercase tracking-[0.28em] text-white/55"
   >
-    {line}
-  </p>
+    {#each role as line, i}
+      <span class={i > 0 ? 'text-white/40' : ''}>{line}</span>
+    {/each}
+  </div>
 </div>

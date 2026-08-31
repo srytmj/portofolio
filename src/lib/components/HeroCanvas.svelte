@@ -9,10 +9,18 @@
    *   reducedMotion: boolean,
    *   shrink?: number,
    *   paused?: boolean,
-   *   onDowngrade?: (t: 'static') => void
+   *   onDowngrade?: (t: 'static') => void,
+   *   onActive?: (name: string | null) => void
    * }}
    */
-  let { tier, reducedMotion, shrink = 1, paused = false, onDowngrade } = $props();
+  let {
+    tier,
+    reducedMotion,
+    shrink = 1,
+    paused = false,
+    onDowngrade,
+    onActive
+  } = $props();
 
   const maxDpr =
     typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 1;
@@ -44,6 +52,7 @@
       {dpr}
       {onQuality}
       {onDowngrade}
+      {onActive}
     />
   </Canvas>
 </div>

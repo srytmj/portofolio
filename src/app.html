@@ -11,6 +11,20 @@
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover" class="bg-black text-white antialiased">
+    <!-- Painted from the very first frame so the prerendered hero never flashes
+         before the JS decides whether to play the opening sequence. Removed by
+         the root layout once hydration is done (or the intro overlay is up). -->
+    <div
+      id="boot-cover"
+      style="position:fixed;inset:0;background:#000;z-index:100;transition:opacity .3s ease"
+    ></div>
+    <noscript><style>#boot-cover{display:none}</style></noscript>
+    <script>
+      setTimeout(function () {
+        var e = document.getElementById('boot-cover');
+        if (e) e.remove();
+      }, 5000);
+    </script>
     <div style="display: contents">%sveltekit.body%</div>
   </body>
 </html>

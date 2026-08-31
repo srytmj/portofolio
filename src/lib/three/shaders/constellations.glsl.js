@@ -37,6 +37,8 @@ uniform float uTime;
 uniform float uSize;
 uniform float uPixelRatio;
 uniform float uReducedMotion;
+uniform float uSignature;      // constellation index of the signature figure, -1 = none
+uniform float uSignatureGlow;  // steady additive glow for it while the sky is idle
 attribute float aConst;     // -1 for background stars
 attribute float aScale;
 attribute float aSeed;
@@ -52,6 +54,12 @@ void main() {
 
   if (uReducedMotion < 0.5) {
     glow *= 0.7 + 0.3 * sin(uTime * 1.3 + aSeed * 6.2831);
+  }
+
+  // Signature figure: a subtle steady lift so it reads a touch brighter than
+  // the rest when nothing is hovered. Only its own stars.
+  if (aConst > -0.5 && abs(aConst - uSignature) < 0.5) {
+    glow += uSignatureGlow;
   }
   vGlow = glow;
 

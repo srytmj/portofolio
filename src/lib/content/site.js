@@ -1,15 +1,31 @@
 // Central content model. Edit copy here, not in the components.
 
 export const identity = {
-  name: 'Suryatmaja',
+  name: 'Suryatmaja', // footer, one word
+  display: ['Surya', 'Atmaja'], // hero headline — two stacked lines
+  // Hero role, under the name. Two lines so it says the whole picture — not
+  // just an app dev, but the cloud + self-hosted infra it runs on.
+  role: ['Full-stack developer', 'Cloud & homelab infrastructure'],
+  // The constellation lines, set small on the right of the hero like a margin
+  // note. One entry per line so the wrap is deliberate, not ragged.
+  trivia: [
+    'Every point of light is nothing on its own.',
+    "It's the lines between them that make a shape worth naming."
+  ],
   title: 'Surya Atmaja - Full stack Developer', // browser tab
-  role: 'Full-stack developer', // hero headline
-  pitch: 'I build web apps and run the infrastructure they scale on.', // hero support line
   tagline: 'Full-stack developer. I build web apps and run the infrastructure they scale on.'
 };
 
+// Section headings. The nav labels stay literal (About / Skills / Portfolio /
+// Contact); these first-person lines are what shows at the top of each section.
+export const headings = {
+  about: 'Get to know me',
+  skills: 'Tech stack',
+  portfolio: 'Things I have built',
+  contact: "Let's talk"
+};
+
 export const about = {
-  heading: 'About',
   intro:
     "Greetings, I'm Maja — a full-stack developer who also runs the infrastructure the apps sit on.",
   body: [
@@ -132,7 +148,6 @@ export const projects = [
 ];
 
 export const contact = {
-  heading: "Let's talk",
   body: 'Open to full-stack and infrastructure work. Email is the fastest way to reach me.',
   email: 'contact@suryatmaja.dev',
   links: [

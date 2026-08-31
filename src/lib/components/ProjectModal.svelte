@@ -2,16 +2,20 @@
   import { onMount, tick } from 'svelte';
   import { gsap } from 'gsap';
   import { portal } from '$lib/actions/portal.js';
+  import { ease, dur, stagger } from '$lib/motion.js';
 
-  /** @type {{ project: any, onClose: () => void }} */
-  let { project, onClose } = $props();
+  /** @type {{ project: any, index?: number, onClose: () => void }} */
+  let { project, index = 0, onClose } = $props();
 
   const reduce =
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  const num = String(index + 1).padStart(2, '0');
+  const paras = project.detail ?? [project.summary];
+  const lead = paras[0];
+  const rest = paras.slice(1);
   const images = project.images ?? [];
-  let active = $state(0);
 
   /** @type {HTMLElement} */ let backdrop;
   /** @type {HTMLElement} */ let panel;
@@ -22,19 +26,15 @@
     if (closing) return;
     closing = true;
     if (reduce) return onClose();
-    gsap.to(panel, { y: 20, scale: 0.96, autoAlpha: 0, duration: 0.18, ease: 'power2.in' });
-    gsap.to(backdrop, { autoAlpha: 0, duration: 0.22, ease: 'power1.in', onComplete: onClose });
-    setTimeout(onClose, 320); // safety net if a frame never lands
+    gsap.to(panel, { autoAlpha: 0, y: 16, duration: dur.xs, ease: ease.in });
+    gsap.to(backdrop, { autoAlpha: 0, duration: dur.xs, ease: ease.in, onComplete: onClose });
+    setTimeout(onClose, 340); // safety net if a frame never lands
   }
 
   function key(e) {
     if (e.key === 'Escape') {
       e.preventDefault();
       close();
-    } else if (e.key === 'ArrowRight' && images.length > 1) {
-      active = (active + 1) % images.length;
-    } else if (e.key === 'ArrowLeft' && images.length > 1) {
-      active = (active - 1 + images.length) % images.length;
     } else if (e.key === 'Tab' && panel) {
       const f = panel.querySelectorAll('a[href], button, [tabindex]:not([tabindex="-1"])');
       if (!f.length) return;
@@ -56,13 +56,13 @@
     if (!reduce) {
       const q = gsap.utils.selector(panel);
       gsap
-        .timeline({ defaults: { ease: 'power3.out' } })
-        .from(backdrop, { autoAlpha: 0, duration: 0.28 })
-        .from(panel, { y: 34, scale: 0.93, autoAlpha: 0, duration: 0.44 }, '-=0.12')
+        .timeline({ defaults: { ease: ease.out } })
+        .from(backdrop, { autoAlpha: 0, duration: dur.sm, ease: ease.ui })
+        .from(panel, { autoAlpha: 0, y: 26, scale: 0.99, duration: dur.md }, '-=0.24')
         .from(
           q('[data-m]'),
-          { y: 22, autoAlpha: 0, duration: 0.42, stagger: 0.07 },
-          '-=0.24'
+          { y: 18, autoAlpha: 0, duration: dur.md, stagger: stagger.base },
+          '-=0.4'
         );
     }
 
@@ -75,98 +75,140 @@
 
 <svelte:window onkeydown={key} />
 
-<!-- Backdrop (portalled to <body> so it clears the fixed header + stacking contexts) -->
+<!-- Full-bleed takeover, portalled to <body>. -->
 <div
   bind:this={backdrop}
   use:portal
-  class="fixed inset-0 z-[999] flex items-center justify-center overscroll-contain bg-black/75 p-3 backdrop-blur-md sm:p-6"
+  class="fixed inset-0 z-[999] overscroll-contain bg-black/92 p-0 backdrop-blur-md sm:p-6 lg:p-10"
   onclick={close}
   role="presentation"
 >
-  <!-- Panel -->
   <div
     bind:this={panel}
-    class="relative flex max-h-[calc(100svh-1.5rem)] w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-white/12 bg-ink-1 shadow-2xl shadow-black/60 sm:max-h-[calc(100svh-3rem)] sm:max-w-2xl"
+    class="relative flex h-full w-full flex-col overflow-y-auto border-white/10 bg-[#0a0a0a] font-serif sm:rounded-xl sm:border lg:grid lg:grid-cols-[minmax(15rem,36%)_1fr] lg:overflow-hidden"
     onclick={(e) => e.stopPropagation()}
     role="dialog"
     aria-modal="true"
     aria-labelledby="pm-title"
+    tabindex="-1"
+    data-lenis-prevent
   >
     <button
-      class="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full border border-white/15 bg-black/40 text-lg text-white/70 transition-colors hover:border-white/40 hover:text-white"
+      class="absolute right-4 top-4 z-20 grid h-9 w-9 place-items-center rounded-full border border-white/15 bg-black/40 text-white/70 transition-colors hover:border-white/40 hover:text-white"
       onclick={close}
       aria-label="Close"
     >
-      ✕
+      <svg
+        viewBox="0 0 24 24"
+        class="h-4 w-4"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M6 6l12 12M18 6L6 18" />
+      </svg>
     </button>
 
-    <!-- Gallery -->
-    {#if images.length}
-      <div data-m class="shrink-0 overflow-hidden border-b border-white/10 bg-black">
-        <div class="aspect-[16/9] w-full">
-          {#key active}
-            <img
-              src={images[active]}
-              alt={`${project.title}, image ${active + 1}`}
-              class="h-full w-full object-cover"
-              loading="lazy"
-            />
-          {/key}
+    <!-- LEFT — index, title, spec sheet -->
+    <aside
+      class="flex flex-col gap-6 border-b border-white/10 px-7 py-10 sm:px-10 lg:h-full lg:overflow-y-auto lg:border-b-0 lg:border-r lg:py-14"
+      data-lenis-prevent
+    >
+      <p data-m class="font-sans text-label uppercase tracking-[0.32em] text-ash-2">
+        Project
+      </p>
+      <p
+        data-m
+        class="font-sans font-[900] tracking-[-0.02em] text-transparent [-webkit-text-stroke:1.5px_rgba(255,255,255,0.32)] text-display"
+      >
+        {num}
+      </p>
+      <h2
+        id="pm-title"
+        data-m
+        class="text-h2 font-semibold tracking-tight text-white"
+      >
+        {project.title}
+      </h2>
+
+      <dl data-m class="flex flex-col gap-2 font-sans text-label text-white/70">
+        <div class="flex items-baseline gap-3">
+          <dt class="tracking-[0.18em] text-ash-2">YEAR</dt>
+          <span class="h-px flex-1 translate-y-[-2px] border-b border-dotted border-white/25"></span>
+          <dd class="m-0">{project.year}</dd>
         </div>
-        {#if images.length > 1}
-          <div class="flex gap-2 p-3">
-            {#each images as img, i}
-              <button
-                class="h-14 w-20 shrink-0 overflow-hidden rounded-md border transition-opacity {i ===
-                active
-                  ? 'border-white/70'
-                  : 'border-white/10 opacity-50 hover:opacity-90'}"
-                onclick={() => (active = i)}
-                aria-label={`Show image ${i + 1}`}
-              >
-                <img src={img} alt="" class="h-full w-full object-cover" />
-              </button>
-            {/each}
-          </div>
-        {/if}
-      </div>
-    {/if}
-
-    <!-- Body -->
-    <div class="min-h-0 flex-1 space-y-6 overflow-y-auto p-6 sm:p-8" data-lenis-prevent>
-      <div data-m>
-        <p class="text-xs uppercase tracking-[0.25em] text-ash-2">
-          {project.kind} · {project.year}
-        </p>
-        <h3 id="pm-title" class="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
-          {project.title}
-        </h3>
-      </div>
-
-      <div data-m class="space-y-4">
-        {#each project.detail ?? [project.summary] as para}
-          <p class="text-sm leading-relaxed text-white/75">{para}</p>
-        {/each}
-      </div>
+        <div class="flex items-baseline gap-3">
+          <dt class="tracking-[0.18em] text-ash-2">TYPE</dt>
+          <span class="h-px flex-1 translate-y-[-2px] border-b border-dotted border-white/25"></span>
+          <dd class="m-0">{project.kind}</dd>
+        </div>
+      </dl>
 
       {#if project.stack?.length}
-        <ul data-m class="flex flex-wrap gap-2">
+        <div data-m class="font-sans text-label leading-[1.9] text-white/65">
+          <span class="mb-1 block tracking-[0.18em] text-ash-2">STACK</span>
           {#each project.stack as s}
-            <li class="rounded-full border border-white/10 px-3 py-1 text-xs text-ash-3">
-              {s}
-            </li>
+            <span class="block">{s}</span>
           {/each}
-        </ul>
+        </div>
       {/if}
 
+      <span
+        class="mt-auto hidden font-sans text-label tracking-[0.28em] text-ash-1 lg:block"
+        aria-hidden="true">✕ · ESC</span
+      >
+    </aside>
+
+    <!-- RIGHT — the narrative -->
+    <div
+      class="flex flex-col gap-7 py-10 pl-7 pr-0 sm:pl-10 lg:h-full lg:overflow-y-auto lg:py-14 lg:pl-14"
+      data-lenis-prevent
+    >
+      <p
+        data-m
+        class="max-w-[26ch] pr-7 text-lead italic text-white sm:pr-10 lg:pr-14"
+      >
+        {lead}
+      </p>
+
+      {#if images[0]}
+        <img
+          data-m
+          src={images[0]}
+          alt={`${project.title}, 1`}
+          class="w-full border-y border-white/10 object-cover"
+          style="aspect-ratio: 16/9"
+          loading="lazy"
+        />
+      {/if}
+
+      {#each rest as para}
+        <p data-m class="max-w-[var(--measure)] pr-7 text-body text-white/70 sm:pr-10 lg:pr-14">
+          {para}
+        </p>
+      {/each}
+
+      {#each images.slice(1) as img, i}
+        <img
+          data-m
+          src={img}
+          alt={`${project.title}, ${i + 2}`}
+          class="w-full border-y border-white/10 object-cover"
+          style="aspect-ratio: 16/9"
+          loading="lazy"
+        />
+      {/each}
+
       {#if project.links?.length}
-        <div data-m class="flex flex-wrap gap-3 pt-2">
+        <div data-m class="flex flex-col pr-7 pt-2 sm:pr-10 lg:pr-14">
           {#each project.links as link}
             <a
               href={link.href}
               target={link.href.startsWith('http') ? '_blank' : undefined}
               rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-              class="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs uppercase tracking-[0.15em] text-white/85 transition-colors hover:border-white hover:text-white"
+              class="flex items-center justify-between border-b border-white/10 py-3 font-sans text-lead font-medium text-white/90 transition-colors hover:text-white"
             >
               {link.label}<span aria-hidden="true">→</span>
             </a>
