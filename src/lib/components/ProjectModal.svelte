@@ -178,8 +178,8 @@
           <img
             src={images[0]}
             alt={`${project.title}, 1`}
-            class="block h-auto w-full object-contain"
             loading="lazy"
+            class="block h-auto w-full object-contain"
           />
         </div>
       {/if}
@@ -195,8 +195,8 @@
           <img
             src={img}
             alt={`${project.title}, ${i + 2}`}
-            class="block h-auto w-full object-contain"
             loading="lazy"
+            class="block h-auto w-full object-contain"
           />
         </div>
       {/each}

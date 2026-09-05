@@ -39,7 +39,8 @@
               <span
                 data-anim-word
                 data-dir={i % 2 === 0 ? 'left' : 'right'}
-                class="inline-block origin-bottom will-change-transform"
+                data-glitch={word}
+                class="chromatic-glitch inline-block origin-bottom will-change-transform"
               >
                 {word}
               </span>
@@ -71,7 +72,9 @@
 
     <div class="mt-14 grid gap-12 md:grid-cols-[1.4fr_1fr]">
       <div data-anim>
-        <p class="max-w-[var(--measure)] text-lead text-white/80">{contact.body}</p>
+        <p class="max-w-[var(--measure)] text-lead text-white/80">
+          {contact.body}
+        </p>
         <div class="mt-10 flex flex-wrap items-center gap-4">
           <a
             href={'mailto:' + contact.email}

@@ -5,6 +5,7 @@
 
 <div class="flex max-w-[52rem] select-none flex-col items-start text-left">
   <h1
+    data-reveal
     class="text-display font-black uppercase leading-[0.82] tracking-[-0.03em] text-white [text-shadow:0_2px_40px_rgba(0,0,0,0.75)]"
   >
     {#each display as part}

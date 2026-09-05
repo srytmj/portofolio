@@ -11,11 +11,15 @@
   $effect(() => {
     if (typeof document === 'undefined') return;
     if (open !== null) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
       const prev = document.body.style.overflow;
+      const prevPad = document.body.style.paddingRight;
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
       document.body.style.overflow = 'hidden';
       window.__lenis?.stop();
       return () => {
         document.body.style.overflow = prev;
+        document.body.style.paddingRight = prevPad;
         window.__lenis?.start();
       };
     }

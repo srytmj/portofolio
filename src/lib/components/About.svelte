@@ -34,7 +34,9 @@
         {about.intro}
       </p>
       {#each about.body as para}
-        <p data-anim class="max-w-[var(--measure)] text-body text-white/80">{para}</p>
+        <p data-anim class="max-w-[var(--measure)] text-body text-white/80">
+          {para}
+        </p>
       {/each}
 
       <ul data-anim class="!mt-10 space-y-2 border-l border-white/15 pl-5">

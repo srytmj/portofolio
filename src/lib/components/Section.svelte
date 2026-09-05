@@ -30,7 +30,8 @@
               <span
                 data-anim-word
                 data-dir={i % 2 === 0 ? 'left' : 'right'}
-                class="inline-block origin-bottom will-change-transform"
+                data-glitch={word}
+                class="chromatic-glitch inline-block origin-bottom will-change-transform"
               >
                 {word}
               </span>

@@ -31,11 +31,12 @@
   let activeFigure = $state(null);
   let lastRevealedFigure = $state(null);
 
-  $effect(() => {
-    if (activeFigure) {
-      lastRevealedFigure = activeFigure;
+  function handleActive(fig) {
+    activeFigure = fig;
+    if (fig) {
+      lastRevealedFigure = fig;
     }
-  });
+  }
 
   let currentFigure = $derived(activeFigure || lastRevealedFigure || defaultFigure);
 
@@ -109,10 +110,10 @@
   });
 </script>
 
-<section bind:this={section} class="relative" data-hero>
+<section bind:this={section} class="relative bg-black" data-hero>
   <div
     bind:this={pinInner}
-    class="relative flex h-[100svh] w-full items-center justify-center overflow-hidden bg-black"
+    class="relative flex h-[100svh] w-full items-center justify-center overflow-hidden"
   >
     {#if useCanvas}
       {#key tier}
@@ -122,7 +123,7 @@
           {shrink}
           paused={dormant}
           onDowngrade={() => (tier = 'static')}
-          onActive={(fig) => (activeFigure = fig)}
+          onActive={handleActive}
         />
       {/key}
     {:else}
