@@ -6,6 +6,52 @@ Format berbasis pada [Keep a Changelog](https://keepachangelog.com/id/1.0.0/).
 
 ---
 
+## [0.2.6] - 2026-09-06
+
+### Changed & Improved
+- **Peleburan Sinergis Opsi 2 & Opsi 3 (Kinetic Typography Split + Technical Scanline & Badges)**:
+  - *Berkas:* `src/lib/scroll/sectionAnim.js`, `src/lib/components/Section.svelte`, `src/lib/components/Contact.svelte`.
+  - *Latar Belakang & Konsep:* Menggabungkan kekuatan ekspresi tipografi dinamis dari Opsi 2 dengan identitas telemetri teknik dan presisi CAD dari Opsi 3 untuk menciptakan transisi visual yang berkarakter kuat, elegan, dan profesional.
+  - *Detail Implementasi Hybrid:*
+    1. **Kinetic Word Masking (Opsi 2):** Kata-kata pada judul (`GET TO KNOW ME`, `TECH STACK`, `THINGS I HAVE BUILT`, `LET'S TALK`) meluncur masuk dari vektor berlawanan (`left/right`, kemiringan dinamis `±3°`) dengan kurva `power4.out`.
+    2. **Technical System Badges (Opsi 3):** Indeks bagian monospaced menggunakan identitas modul lengkap: `SEC // 02`, `SEC // 03`, `SEC // 04`, `SEC // 05` yang meluncur dari balik mask.
+    3. **Laser Scanline Beam Sweep (Opsi 3):** Garis pembatas *hairline* presisi terbuka dari kiri ke kanan disertai sapuan horizontal berkas laser putih cerah (`[data-anim-scan]`).
+    4. **Blur-to-Focus Telemetry Unblur (Opsi 3):** Blok-blok konten di bawah header naik secara halus dari fokus optik optik `blur(4px)` ke `blur(0px)` dengan kurva pegas `power3.out`.
+    5. **100% Upright Stability:** Seluruh elemen halaman tetap tegak lurus dan stabil tanpa ada efek distorsi miring (*velocity skew*).
+  - *Cara revert/edit:* Cek `sectionAnim.js` untuk parameter durasi dan easing atau modifikasi template header di `Section.svelte` dan `Contact.svelte`.
+
+---
+
+## [0.2.5] - 2026-09-06
+
+### Changed & Improved
+- **Implementasi Opsi 2 (Kinetic Typography Split & Directional Masking)**:
+  - *Berkas:* `src/lib/scroll/sectionAnim.js`, `src/lib/components/Section.svelte`, `src/lib/components/Contact.svelte`.
+  - *Latar Belakang & Konsep:* Menguji Opsi 2 dengan gaya tipografi kinetik yang bold, punchy, dan berenergi tinggi ala studio kreatif / *contemporary brutalist portfolio*.
+  - *Fitur & Perubahan:*
+    1. **Kinetic Word Split (Directional Masking):** Kata-kata pada judul setiap section (`GET TO KNOW ME`, `TECH STACK`, `THINGS I HAVE BUILT`, `LET'S TALK`) kini di-render terpisah dalam kontainer *masked overflow-hidden*, meluncur masuk dari vektor berlawanan (`left/right`, rotasi dinamis `±3°`) dengan akselerasi tajam `power4.out`.
+    2. **Section Index Counter (`// 02`, `// 03`, `// 04`, `// 05`):** Indeks monospaced meluncur vertikal dari balik mask dengan delay teratur.
+    3. **Center-Outward Hairline Snap:** Garis pembatas teknik mekar secara simetris dari titik tengah (`origin-center`) ke kedua sisi dengan kurva `power4.out`.
+    4. **Crisp Typographic Item Snap:** Elemen konten di bawahnya naik secara tegas dan reaktif tanpa blur (`filter: none`), memberikan kesan responsif instan.
+  - *Cara revert/edit:* Cek easing dan stagger di `sectionAnim.js` atau kembalikan template header di `Section.svelte` dan `Contact.svelte`.
+
+---
+
+## [0.2.4] - 2026-09-06
+
+### Changed & Improved
+- **Pembaruan Transisi Antar-Section (Opsi 3: Technical Scanline & Hairline Wireframe)**:
+  - *Berkas:* `src/lib/scroll/smoothScroll.js`, `src/lib/scroll/sectionAnim.js`, `src/lib/components/Section.svelte`, `src/lib/components/Contact.svelte`.
+  - *Latar Belakang & Masalah:* Animasi transisi section sebelumnya menggunakan velocity skew (`skewY`) yang membuat elemen terlihat miring/melengkung saat di-scroll cepat. Efek ini terasa melelahkan mata dan kurang selaras dengan konsep *technical blueprint / engineering portfolio*.
+  - *Implementasi Opsi 3:*
+    1. **Penghapusan Efek Miring (*Velocity Skew*):** Menghapus ticker kalkulasi `skewY` dari Lenis di `smoothScroll.js` dan mencabut atribut `data-skew` dari semua kontainer. Sekarang seluruh elemen halaman tetap tegak lurus (*upright*), stabil, dan tajam saat di-scroll.
+    2. **Technical Section Badges:** Menambahkan penanda sistem monospaced di header setiap seksi (`SEC // 02` About, `SEC // 03` Skills, `SEC // 04` Portfolio, `SEC // 05` Contact).
+    3. **Laser Scanline Beam Sweep:** Menambahkan hairline divider dengan berkas cahaya *scanline* horizontal (`[data-anim-scan]`) yang menyapu dari kiri ke kanan saat seksi memasuki layar (*viewport*).
+    4. **Subtle Blur-to-Focus Unblur:** Elemen konten muncul secara bertahap (*staggered rise*) dari `blur(4px)` menjadi `blur(0px)` yang memberikan kesan data instrumen presisi yang sedang di-*render* secara live.
+  - *Cara revert/edit:* Cek `sectionAnim.js` untuk durasi/gaya scanline atau kembalikan template header di `Section.svelte` dan `Contact.svelte`.
+
+---
+
 ## [0.2.3] - 2026-09-06
 
 ### Fixed

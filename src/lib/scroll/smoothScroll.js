@@ -28,17 +28,8 @@ export function initSmoothScroll() {
 
   lenis.on('scroll', ScrollTrigger.update);
 
-  // Scroll-velocity skew: the faster you scroll, the more `[data-skew]`
-  // elements lean. Eases back to flat when you stop.
-  const skew = gsap.quickSetter('[data-skew]', 'skewY', 'deg');
-  let cur = 0;
-
   const onTick = (time) => {
     lenis.raf(time * 1000);
-    const target = gsap.utils.clamp(-2, 2, (lenis.velocity || 0) * 0.055);
-    cur += (target - cur) * 0.12;
-    if (Math.abs(cur) < 0.002) cur = 0;
-    skew(cur);
   };
   gsap.ticker.add(onTick);
   gsap.ticker.lagSmoothing(0);
@@ -49,7 +40,6 @@ export function initSmoothScroll() {
   return () => {
     lenis.off('scroll', ScrollTrigger.update);
     gsap.ticker.remove(onTick);
-    skew(0);
     lenis.destroy();
     delete window.__lenis;
   };
