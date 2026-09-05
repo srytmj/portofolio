@@ -39,6 +39,7 @@ export const about = {
   ],
   now: 'Tinkering with the homelab and reading about distributed systems.',
   location: 'WIB · UTC+7',
+  status: 'Node 01: Staging & Lab Assembly',
   // Portrait: set to '/portrait.jpg' (drop the photo in static/) to render it
   // as a halftone dot field. null = show the auto-playing snake placeholder.
   portrait: null
@@ -109,12 +110,14 @@ export const projects = [
     kind: 'Infrastructure',
     year: 'Since 2024',
     summary:
-      'The mini-PC that runs most of my projects. Reverse proxy, containers, backups, monitoring.',
+      'A mini-PC cluster node running containerised services behind a Zero-Trust Tailscale mesh, with automatic TLS, monitoring, and off-site encrypted backups.',
     detail: [
-      'One mini-PC running around 15 containerised services behind a reverse proxy, with automatic TLS and off-site encrypted backups.',
-      'Service definitions and DNS live in a Git repo. A self-hosted runner applies changes on merge. It also doubles as a place to test Terraform modules before they go near client work.'
+      'Physical Node: Intel 4-Core mini-PC with 16GB RAM running Debian Linux and Proxmox hypervisor. Network connectivity via 2.5 GbE LAN and a Tailscale Zero Trust mesh network (*.ts.net) with MagicDNS.',
+      'Workloads: Over 15 containerised services managed via Docker Compose and GitOps. Ingress is routed through a reverse proxy with automated Let’s Encrypt TLS certificates.',
+      'Storage & Backups: System on NVMe with automated nightly encrypted snapshots pushed to an offsite S3-compatible vault via restic.',
+      'Telemetry & Observability: Prometheus and Netdata scrape node metrics; Grafana renders cluster health boards with Uptime Kuma monitoring service endpoints.'
     ],
-    stack: ['Docker', 'Terraform', 'GitHub Actions', 'Prometheus', 'Grafana'],
+    stack: ['Proxmox VE', 'Tailscale ZTNA', 'Docker', 'Terraform', 'GitHub Actions', 'Prometheus', 'Grafana'],
     images: ['/projects/homelab-1.svg', '/projects/homelab-2.svg'],
     links: [{ label: 'Notes', href: 'https://blog.suryatmaja.dev' }]
   },

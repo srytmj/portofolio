@@ -10,7 +10,7 @@
    *   shrink?: number,
    *   paused?: boolean,
    *   onDowngrade?: (t: 'static') => void,
-   *   onActive?: (name: string | null) => void
+   *   onActive?: (data: { id: string, name: string, coords: string } | null) => void
    * }}
    */
   let {

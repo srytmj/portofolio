@@ -4,6 +4,19 @@ import names from '$lib/data/constellation-names.json';
 
 const DEG = Math.PI / 180;
 
+/** Format RA (deg) and Dec (deg) to standard astronomical coordinates string */
+function formatRaDec(raDeg, decDeg) {
+  let ra = raDeg;
+  if (ra < 0) ra += 360;
+  ra = ra % 360;
+  const raHoursTotal = ra / 15;
+  const h = Math.floor(raHoursTotal);
+  const m = Math.floor((raHoursTotal - h) * 60);
+  const sign = decDeg >= 0 ? '+' : '-';
+  const d = Math.round(Math.abs(decDeg));
+  return `RA ${h}h ${String(m).padStart(2, '0')}m · Dec ${sign}${d}°`;
+}
+
 /** RA (deg, -180..180) + Dec (deg) → point on a sphere of radius R. */
 function toVec(ra, dec, R) {
   const a = ra * DEG;
@@ -83,12 +96,28 @@ export function buildConstellations(R = 100) {
       }
     }
 
+    let raSum = 0;
+    let decSum = 0;
+    let ptCount = 0;
+
+    for (const poly of f.geometry.coordinates) {
+      for (const [ra, dec] of poly) {
+        raSum += ra;
+        decSum += dec;
+        ptCount++;
+      }
+    }
+
+    const avgRa = ptCount ? raSum / ptCount : 0;
+    const avgDec = ptCount ? decSum / ptCount : 0;
+
     constellations.push({
       id: f.id,
       name: names[f.id] || f.id,
       index,
       rank: Number(f.properties?.rank) || 99,
-      centroid: centroid.divideScalar(n || 1).setLength(R)
+      centroid: centroid.divideScalar(n || 1).setLength(R),
+      coords: formatRaDec(avgRa, avgDec)
     });
   });
 

@@ -85,7 +85,7 @@
 >
   <div
     bind:this={panel}
-    class="relative flex h-full w-full flex-col overflow-y-auto border-white/10 bg-[#0a0a0a] font-serif sm:rounded-xl sm:border lg:grid lg:grid-cols-[minmax(15rem,36%)_1fr] lg:overflow-hidden"
+    class="relative flex h-full w-full flex-col overflow-y-auto border-white/10 bg-[#0a0a0a] font-serif outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none sm:rounded-xl sm:border lg:grid lg:grid-cols-[minmax(18rem,28%)_1fr] lg:overflow-hidden"
     onclick={(e) => e.stopPropagation()}
     role="dialog"
     aria-modal="true"
@@ -94,7 +94,7 @@
     data-lenis-prevent
   >
     <button
-      class="absolute right-4 top-4 z-20 grid h-9 w-9 place-items-center rounded-full border border-white/15 bg-black/40 text-white/70 transition-colors hover:border-white/40 hover:text-white"
+      class="absolute right-4 top-4 z-20 grid h-9 w-9 place-items-center rounded-full border border-white/15 bg-black/40 text-white/70 outline-none transition-colors hover:border-white/40 hover:text-white focus:outline-none focus-visible:outline-none"
       onclick={close}
       aria-label="Close"
     >
@@ -163,46 +163,46 @@
 
     <!-- RIGHT — the narrative -->
     <div
-      class="flex flex-col gap-7 py-10 pl-7 pr-0 sm:pl-10 lg:h-full lg:overflow-y-auto lg:py-14 lg:pl-14"
+      class="flex flex-col gap-8 py-10 px-7 sm:px-10 lg:h-full lg:overflow-y-auto lg:py-14 lg:px-14"
       data-lenis-prevent
     >
       <p
         data-m
-        class="max-w-[26ch] pr-7 text-lead italic text-white sm:pr-10 lg:pr-14"
+        class="w-full text-lead italic text-white/95 leading-relaxed"
       >
         {lead}
       </p>
 
       {#if images[0]}
-        <img
-          data-m
-          src={images[0]}
-          alt={`${project.title}, 1`}
-          class="w-full border-y border-white/10 object-cover"
-          style="aspect-ratio: 16/9"
-          loading="lazy"
-        />
+        <div data-m class="w-full shrink-0 overflow-hidden rounded-md border border-white/10 bg-black/60">
+          <img
+            src={images[0]}
+            alt={`${project.title}, 1`}
+            class="block h-auto w-full object-contain"
+            loading="lazy"
+          />
+        </div>
       {/if}
 
       {#each rest as para}
-        <p data-m class="max-w-[var(--measure)] pr-7 text-body text-white/70 sm:pr-10 lg:pr-14">
+        <p data-m class="w-full text-body text-white/80 leading-relaxed">
           {para}
         </p>
       {/each}
 
       {#each images.slice(1) as img, i}
-        <img
-          data-m
-          src={img}
-          alt={`${project.title}, ${i + 2}`}
-          class="w-full border-y border-white/10 object-cover"
-          style="aspect-ratio: 16/9"
-          loading="lazy"
-        />
+        <div data-m class="w-full shrink-0 overflow-hidden rounded-md border border-white/10 bg-black/60">
+          <img
+            src={img}
+            alt={`${project.title}, ${i + 2}`}
+            class="block h-auto w-full object-contain"
+            loading="lazy"
+          />
+        </div>
       {/each}
 
       {#if project.links?.length}
-        <div data-m class="flex flex-col pr-7 pt-2 sm:pr-10 lg:pr-14">
+        <div data-m class="flex flex-col pt-2">
           {#each project.links as link}
             <a
               href={link.href}

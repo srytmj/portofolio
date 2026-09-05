@@ -2,6 +2,22 @@
   import { sectionAnim } from '$lib/scroll/sectionAnim.js';
   import { contact, headings, identity } from '$lib/content/site.js';
   const year = new Date().getFullYear();
+
+  let copied = $state(false);
+  let copyTimer;
+
+  async function copyEmail() {
+    try {
+      await navigator.clipboard.writeText(contact.email);
+      copied = true;
+      clearTimeout(copyTimer);
+      copyTimer = setTimeout(() => {
+        copied = false;
+      }, 2000);
+    } catch {
+      // Fallback
+    }
+  }
 </script>
 
 <footer
@@ -27,12 +43,51 @@
     <div class="mt-14 grid gap-12 md:grid-cols-[1.4fr_1fr]">
       <div data-anim>
         <p class="max-w-[var(--measure)] text-lead text-white/80">{contact.body}</p>
-        <a
-          href={'mailto:' + contact.email}
-          class="mt-10 inline-block text-h3 font-medium tracking-tight underline decoration-white/20 underline-offset-8 transition-colors hover:decoration-white"
-        >
-          {contact.email}
-        </a>
+        <div class="mt-10 flex flex-wrap items-center gap-4">
+          <a
+            href={'mailto:' + contact.email}
+            class="text-h3 font-medium tracking-tight underline decoration-white/20 underline-offset-8 transition-colors hover:decoration-white"
+          >
+            {contact.email}
+          </a>
+          <button
+            type="button"
+            onclick={copyEmail}
+            aria-label="Copy email address"
+            class="group relative inline-flex items-center gap-2 overflow-hidden rounded-md border px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em] outline-none transition-all duration-300 hover:border-white/40 hover:bg-white/10 hover:text-white active:scale-95 focus:outline-none focus-visible:outline-none {copied ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-white/15 bg-white/5'}"
+          >
+            <span class="relative flex h-3.5 w-3.5 items-center justify-center">
+              <svg
+                viewBox="0 0 24 24"
+                class="absolute h-3.5 w-3.5 text-white/50 transition-all duration-300 {copied ? '-rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100'}"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              <svg
+                viewBox="0 0 24 24"
+                class="absolute h-3.5 w-3.5 text-emerald-400 transition-all duration-300 {copied ? 'rotate-0 scale-100 opacity-100' : 'rotate-90 scale-0 opacity-0'}"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </span>
+            <span class="transition-colors duration-300 {copied ? 'font-semibold text-emerald-400' : 'text-ash-3 group-hover:text-white'}">
+              {copied ? 'copied to clipboard' : 'copy'}
+            </span>
+          </button>
+        </div>
       </div>
 
       <nav class="flex flex-col gap-3">

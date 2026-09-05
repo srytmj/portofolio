@@ -41,9 +41,8 @@
   const full = tier === 'full';
   const R = 100;
 
-  // Full tier only: name the figure the pointer is revealing, and give one
-  // "signature" figure a steady glow when the sky is idle.
-  const labelsOn = full && !reducedMotion;
+  // Enable constellation labels and coordinates whenever reduced-motion is not requested
+  const labelsOn = !reducedMotion;
   const SIGNATURE_ID = 'Cap'; // Capricornus
 
   const { constellations, linesGeometry, starsGeometry } = buildConstellations(R);
@@ -177,7 +176,7 @@
     _dir.set(smooth.x, smooth.y, 0.5).unproject(cam).sub(cam.position).normalize();
     _dir.applyQuaternion(_q.copy(sky.quaternion).invert());
     let best = -1;
-    let bestDot = 0.93; // ~21.5° cone
+    let bestDot = 0.82; // ~35° cone for immediate, responsive detection
     for (let i = 0; i < centroids.length; i++) {
       const d = _dir.dot(centroids[i]) / R;
       if (d > bestDot) {
@@ -207,14 +206,11 @@
       );
     };
 
-    if (!coarse) {
-      window.addEventListener('pointermove', onMove, { passive: true });
-      window.addEventListener('pointerleave', onLeave);
-      window.addEventListener('blur', onLeave);
-    } else {
-      window.addEventListener('touchstart', onTouch, { passive: true });
-      window.addEventListener('touchmove', onTouch, { passive: true });
-    }
+    window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('pointerleave', onLeave);
+    window.addEventListener('blur', onLeave);
+    window.addEventListener('touchstart', onTouch, { passive: true });
+    window.addEventListener('touchmove', onTouch, { passive: true });
 
     const lost = (e) => {
       e.preventDefault();
@@ -267,21 +263,30 @@
     // which constellation is lit — the single nearest to the pointer
     if (findIdx >= 0) {
       active = findIdx;
+    } else if (hasPointer) {
+      active = pick();
     } else if (coarse && !reducedMotion) {
       if (t - autoAt > 3.8) {
         autoAt = t;
         autoI = (autoI + 1) % rankOrder.length;
         active = rankOrder[autoI];
-        hasPointer = true;
       }
     } else {
-      active = pick();
+      active = -1;
     }
 
-    // full tier: name the figure under the pointer (fires only on change)
+    // full tier: name and coordinates of figure under pointer (fires only on change)
     if (labelsOn && active !== reportedActive) {
       reportedActive = active;
-      onActive?.(active >= 0 ? constellations[active].name : null);
+      onActive?.(
+        active >= 0
+          ? {
+              id: constellations[active].id,
+              name: constellations[active].name,
+              coords: constellations[active].coords
+            }
+          : null
+      );
     }
 
     // ease every constellation toward its target reveal

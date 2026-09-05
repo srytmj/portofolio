@@ -1,10 +1,127 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" font-family="'Space Grotesk',sans-serif">
-  <rect width="1600" height="1000" fill="#101010"/>
-  <g stroke="#ffffff" stroke-opacity="0.06"><path d="M0 250H1600M0 500H1600M0 750H1600"/></g>
-  <polyline points="80,720 260,640 440,660 620,520 800,560 980,400 1160,300 1340,340 1520,220"
-    fill="none" stroke="#e8e8e8" stroke-opacity="0.6" stroke-width="3"/>
-  <polyline points="80,820 260,800 440,780 620,800 800,700 980,720 1160,640 1340,660 1520,600"
-    fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2" stroke-dasharray="6 8"/>
-  <text x="80" y="180" fill="#ffffff" fill-opacity="0.85" font-size="72" font-weight="700" letter-spacing="-2">METRICS</text>
-  <text x="84" y="230" fill="#8a8a8a" font-size="24" letter-spacing="5">CPU · MEMORY · REQUEST LATENCY</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" font-family="'Space Mono', ui-monospace, monospace">
+  <defs>
+    <pattern id="grid2" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-opacity="0.04" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="metricGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="1600" height="1000" fill="#09090b"/>
+  <rect width="1600" height="1000" fill="url(#grid2)"/>
+
+  <!-- Outer Blueprint Frame & Header -->
+  <rect x="50" y="50" width="1500" height="900" fill="none" stroke="#ffffff" stroke-opacity="0.15" stroke-width="1.5"/>
+  <line x1="50" y1="120" x2="1550" y2="120" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
+  
+  <text x="80" y="95" fill="#ffffff" font-size="20" font-weight="700" letter-spacing="4">SYS-OPS // TELEMETRY &amp; CLUSTER METRICS</text>
+  <text x="1310" y="95" fill="#34d399" font-size="14" letter-spacing="2">PROMETHEUS · GRAFANA</text>
+
+  <!-- Metric Tile 1: Host CPU Allocation -->
+  <g transform="translate(80, 160)">
+    <rect width="450" height="240" rx="4" fill="#000000" fill-opacity="0.6" stroke="#ffffff" stroke-opacity="0.2" stroke-width="1.5"/>
+    <text x="24" y="36" fill="#888888" font-size="12" letter-spacing="2">HOST CPU USAGE (INTEL 4-CORE)</text>
+    <text x="24" y="74" fill="#ffffff" font-size="36" font-weight="700">14.2 %</text>
+    <text x="160" y="74" fill="#34d399" font-size="14">AVG LOAD: 0.42</text>
+    
+    <!-- Mini Graph -->
+    <path d="M 24 200 L 70 180 L 120 190 L 170 140 L 220 160 L 270 130 L 320 150 L 370 120 L 420 135" fill="none" stroke="#ffffff" stroke-width="2"/>
+    <path d="M 24 200 L 70 180 L 120 190 L 170 140 L 220 160 L 270 130 L 320 150 L 370 120 L 420 135 L 420 210 L 24 210 Z" fill="url(#metricGrad)"/>
+    <line x1="24" y1="210" x2="426" y2="210" stroke="#ffffff" stroke-opacity="0.1"/>
+  </g>
+
+  <!-- Metric Tile 2: Memory Distribution -->
+  <g transform="translate(570, 160)">
+    <rect width="450" height="240" rx="4" fill="#000000" fill-opacity="0.6" stroke="#ffffff" stroke-opacity="0.2" stroke-width="1.5"/>
+    <text x="24" y="36" fill="#888888" font-size="12" letter-spacing="2">DDR5 RAM UTILIZATION</text>
+    <text x="24" y="74" fill="#ffffff" font-size="36" font-weight="700">9.4 / 16 GB</text>
+    <text x="280" y="74" fill="#38bdf8" font-size="14">58.7 %</text>
+
+    <!-- Progress Bar Stack -->
+    <rect x="24" y="110" width="402" height="20" rx="3" fill="#18181b"/>
+    <rect x="24" y="110" width="160" height="20" rx="3" fill="#38bdf8" fill-opacity="0.8"/>
+    <rect x="184" y="110" width="76" height="20" fill="#a78bfa" fill-opacity="0.8"/>
+    
+    <text x="24" y="160" fill="#cccccc" font-size="12">■ Containers: 6.4 GB</text>
+    <text x="210" y="160" fill="#cccccc" font-size="12">■ ZFS ARC Cache: 3.0 GB</text>
+    <text x="24" y="195" fill="#888888" font-size="11">Swap Used: 0 MB · Memory Pressure: 0.00</text>
+  </g>
+
+  <!-- Metric Tile 3: Network Throughput & Latency -->
+  <g transform="translate(1060, 160)">
+    <rect width="450" height="240" rx="4" fill="#000000" fill-opacity="0.6" stroke="#ffffff" stroke-opacity="0.2" stroke-width="1.5"/>
+    <text x="24" y="36" fill="#888888" font-size="12" letter-spacing="2">NETWORK THROUGHPUT (2.5 GbE)</text>
+    <text x="24" y="74" fill="#ffffff" font-size="36" font-weight="700">18.4 MB/s</text>
+    <text x="270" y="74" fill="#34d399" font-size="14">RTT: 4.2 ms</text>
+
+    <!-- Transfer graph -->
+    <path d="M 24 190 L 80 170 L 140 185 L 200 130 L 260 145 L 320 110 L 380 130 L 426 120" fill="none" stroke="#34d399" stroke-width="2"/>
+    <line x1="24" y1="210" x2="426" y2="210" stroke="#ffffff" stroke-opacity="0.1"/>
+    <text x="24" y="145" fill="#888888" font-size="11">TX: 1.2 TB / RX: 3.8 TB (30d)</text>
+  </g>
+
+  <!-- Section: Active Services Heartbeat Table -->
+  <g transform="translate(80, 440)">
+    <rect width="1430" height="450" rx="6" fill="#000000" fill-opacity="0.7" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.5"/>
+    <rect x="0" y="0" width="1430" height="46" rx="6" fill="#ffffff" fill-opacity="0.05"/>
+    <text x="24" y="30" fill="#ffffff" font-size="14" font-weight="700" letter-spacing="3">UPTIME KUMA // SERVICE HEARTBEAT &amp; PING STATUS</text>
+
+    <!-- Table Header -->
+    <text x="40" y="80" fill="#888888" font-size="12">SERVICE</text>
+    <text x="320" y="80" fill="#888888" font-size="12">TARGET ENDPOINT</text>
+    <text x="700" y="80" fill="#888888" font-size="12">STATUS</text>
+    <text x="940" y="80" fill="#888888" font-size="12">RESPONSE TIME</text>
+    <text x="1220" y="80" fill="#888888" font-size="12">UPTIME (30D)</text>
+    <line x1="40" y1="96" x2="1390" y2="96" stroke="#ffffff" stroke-opacity="0.15"/>
+
+    <!-- Row 1 -->
+    <text x="40" y="132" fill="#ffffff" font-size="13" font-weight="700">Traefik Ingress</text>
+    <text x="320" y="132" fill="#aaaaaa" font-size="12">https://proxy.internal.ts.net:443</text>
+    <text x="700" y="132" fill="#34d399" font-size="12">● OPERATIONAL</text>
+    <text x="940" y="132" fill="#ffffff" font-size="12">1.8 ms</text>
+    <text x="1220" y="132" fill="#ffffff" font-size="12">99.98 %</text>
+    <line x1="40" y1="148" x2="1390" y2="148" stroke="#ffffff" stroke-opacity="0.06"/>
+
+    <!-- Row 2 -->
+    <text x="40" y="184" fill="#ffffff" font-size="13" font-weight="700">Vaultwarden</text>
+    <text x="320" y="184" fill="#aaaaaa" font-size="12">https://vaultwarden.ts.net/alive</text>
+    <text x="700" y="184" fill="#34d399" font-size="12">● OPERATIONAL</text>
+    <text x="940" y="184" fill="#ffffff" font-size="12">4.1 ms</text>
+    <text x="1220" y="184" fill="#ffffff" font-size="12">100.00 %</text>
+    <line x1="40" y1="200" x2="1390" y2="200" stroke="#ffffff" stroke-opacity="0.06"/>
+
+    <!-- Row 3 -->
+    <text x="40" y="236" fill="#ffffff" font-size="13" font-weight="700">Immich Core</text>
+    <text x="320" y="236" fill="#aaaaaa" font-size="12">https://immich.ts.net/api/server-info/ping</text>
+    <text x="700" y="236" fill="#34d399" font-size="12">● OPERATIONAL</text>
+    <text x="940" y="236" fill="#ffffff" font-size="12">6.2 ms</text>
+    <text x="1220" y="236" fill="#ffffff" font-size="12">99.94 %</text>
+    <line x1="40" y1="252" x2="1390" y2="252" stroke="#ffffff" stroke-opacity="0.06"/>
+
+    <!-- Row 4 -->
+    <text x="40" y="288" fill="#ffffff" font-size="13" font-weight="700">Jellyfin Media</text>
+    <text x="320" y="288" fill="#aaaaaa" font-size="12">https://jellyfin.ts.net/health</text>
+    <text x="700" y="236" fill="#34d399" font-size="12">● OPERATIONAL</text>
+    <text x="940" y="288" fill="#ffffff" font-size="12">5.4 ms</text>
+    <text x="1220" y="288" fill="#ffffff" font-size="12">99.89 %</text>
+    <line x1="40" y1="304" x2="1390" y2="304" stroke="#ffffff" stroke-opacity="0.06"/>
+
+    <!-- Row 5 -->
+    <text x="40" y="340" fill="#ffffff" font-size="13" font-weight="700">PostgreSQL (Primary)</text>
+    <text x="320" y="340" fill="#aaaaaa" font-size="12">tcp://100.64.0.10:5432 (pg_isready)</text>
+    <text x="700" y="340" fill="#34d399" font-size="12">● OPERATIONAL</text>
+    <text x="940" y="340" fill="#ffffff" font-size="12">0.9 ms</text>
+    <text x="1220" y="340" fill="#ffffff" font-size="12">100.00 %</text>
+    <line x1="40" y1="356" x2="1390" y2="356" stroke="#ffffff" stroke-opacity="0.06"/>
+
+    <!-- Row 6 -->
+    <text x="40" y="392" fill="#ffffff" font-size="13" font-weight="700">Restic S3 Backup</text>
+    <text x="320" y="392" fill="#aaaaaa" font-size="12">s3.us-east-1.amazonaws.com/vault-backup</text>
+    <text x="700" y="392" fill="#38bdf8" font-size="12">○ NEXT RUN @ 03:00</text>
+    <text x="940" y="392" fill="#ffffff" font-size="12">Last: 42m ago</text>
+    <text x="1220" y="392" fill="#ffffff" font-size="12">Success: 30/30</text>
+  </g>
 </svg>

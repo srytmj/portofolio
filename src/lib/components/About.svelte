@@ -13,9 +13,20 @@
       {:else}
         <SnakePlaceholder />
       {/if}
-      <p class="mt-4 font-mono text-label uppercase tracking-[0.2em] text-ash-2">
-        {about.location}
-      </p>
+      <div class="mt-4 flex flex-col gap-1.5 font-mono text-[11px] tracking-[0.16em]">
+        <p class="uppercase text-ash-2">
+          {about.location}
+        </p>
+        {#if about.status}
+          <div class="inline-flex items-center gap-2 text-[10px] text-white/55">
+            <span class="relative flex h-2 w-2">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/40 opacity-75"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+            </span>
+            <span>{about.status}</span>
+          </div>
+        {/if}
+      </div>
     </div>
 
     <div class="space-y-6">

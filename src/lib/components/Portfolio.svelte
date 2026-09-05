@@ -30,7 +30,7 @@
         type="button"
         use:cardHover
         onclick={() => (open = i)}
-        class="group relative flex flex-col justify-between gap-8 overflow-hidden rounded-lg border border-white/10 bg-ink-1 p-8 text-left transition-colors hover:border-white/40 sm:p-10"
+        class="group relative flex flex-col justify-between gap-8 overflow-hidden rounded-lg border border-white/10 bg-ink-1 p-8 text-left outline-none ring-0 transition-colors hover:border-white/40 focus:outline-none focus:ring-0 focus-visible:outline-none sm:p-10"
       >
         <span
           class="pointer-events-none absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-white/50 transition-transform duration-500 group-hover:scale-x-100"

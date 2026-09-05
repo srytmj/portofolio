@@ -20,14 +20,24 @@
   let shrink = $state(1);
   let dormant = $state(false);
 
-  // Name of the constellation the pointer is revealing (full tier only).
-  // `displayName` lingers through the fade-out so the text never blanks first.
-  let activeName = $state(null);
-  let displayName = $state('');
+  // Default signature figure (Capricornus)
+  const defaultFigure = {
+    id: 'Cap',
+    name: 'Capricornus',
+    coords: 'RA 21h 00m · Dec -20°'
+  };
+
+  // Figure the pointer is revealing
+  let activeFigure = $state(null);
+  let lastRevealedFigure = $state(null);
+
   $effect(() => {
-    if (activeName) displayName = activeName;
+    if (activeFigure) {
+      lastRevealedFigure = activeFigure;
+    }
   });
-  const showLabel = $derived(!!activeName && shrink > 0.6);
+
+  let currentFigure = $derived(activeFigure || lastRevealedFigure || defaultFigure);
 
   /** @type {HTMLElement} */ let section;
   /** @type {HTMLElement} */ let pinInner;
@@ -112,7 +122,7 @@
           {shrink}
           paused={dormant}
           onDowngrade={() => (tier = 'static')}
-          onActive={(n) => (activeName = n)}
+          onActive={(fig) => (activeFigure = fig)}
         />
       {/key}
     {:else}
@@ -168,14 +178,19 @@
       </svg>
     </a>
 
-    <!-- Name of the constellation currently revealing (full tier only). -->
-    <span
+    <!-- Name and astronomical coordinates of the constellation (full tier only). -->
+    <div
       aria-hidden="true"
-      class="pointer-events-none absolute bottom-7 right-7 z-10 font-serif text-caption italic text-white/55 transition-opacity duration-500"
-      class:opacity-0={!showLabel}
+      class="pointer-events-none absolute bottom-7 right-7 z-10 flex flex-col items-end gap-1 text-right font-mono transition-opacity duration-500"
+      class:opacity-0={shrink <= 0.5}
     >
-      {displayName}
-    </span>
+      <span class="font-serif text-caption italic tracking-wide text-white/90 transition-all duration-300">
+        {currentFigure.name}
+      </span>
+      <span class="text-[10px] tracking-[0.2em] text-white/40 uppercase transition-all duration-300">
+        {currentFigure.coords} · {currentFigure.id}
+      </span>
+    </div>
   </div>
 </section>
 

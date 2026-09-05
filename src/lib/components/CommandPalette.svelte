@@ -1,5 +1,5 @@
 <script>
-  import { tick } from 'svelte';
+  import { tick, onMount } from 'svelte';
   import { gsap } from 'gsap';
   import { portal } from '$lib/actions/portal.js';
   import { ease, dur, stagger } from '$lib/motion.js';
@@ -214,6 +214,17 @@
       filtered[sel]?.run?.();
     }
   }
+
+  onMount(() => {
+    const handleOpen = () => openPalette();
+    const handleToggle = () => (show ? close() : openPalette());
+    window.addEventListener('open-command-palette', handleOpen);
+    window.addEventListener('toggle-command-palette', handleToggle);
+    return () => {
+      window.removeEventListener('open-command-palette', handleOpen);
+      window.removeEventListener('toggle-command-palette', handleToggle);
+    };
+  });
 </script>
 
 <svelte:window onkeydown={onKey} />

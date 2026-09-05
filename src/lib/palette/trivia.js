@@ -19,5 +19,10 @@ export const trivia = [
   { id: 'Sgr', name: 'Sagittarius', fact: 'The Archer. Its central stars form the Teapot; steam from the spout points at the galactic centre.' },
   { id: 'And', name: 'Andromeda', fact: 'The chained princess. Under dark skies you can see the Andromeda Galaxy as a faint smudge near her hip.' },
   { id: 'Boo', name: 'Boötes', fact: 'The Herdsman, a kite-shaped figure driving the bears around the pole. Arcturus is its base.' },
-  { id: 'Dra', name: 'Draco', fact: 'The Dragon, winding between the two bears. Thuban, in its tail, was the pole star for the pyramid builders.' }
+  { id: 'Dra', name: 'Draco', fact: 'The Dragon, winding between the two bears. Thuban, in its tail, was the pole star for the pyramid builders.' },
+  { id: 'Cap', name: 'Capricornus', fact: 'The Sea-Goat. Ancient constellation along the ecliptic; holds a quiet glow across the southern horizon.' },
+  { id: 'CMa', name: 'Canis Major', fact: 'The Greater Dog following Orion. Anchored by Sirius, the brightest star in the night sky.' },
+  { id: 'Cen', name: 'Centaurus', fact: 'The Centaur of the southern sky. Hosts Alpha Centauri, the nearest star system to our sun.' },
+  { id: 'Car', name: 'Carina', fact: 'The Keel of the mythical ship Argo Navis. Contains Canopus, the second brightest star in the heavens.' },
+  { id: 'Aur', name: 'Auriga', fact: 'The Charioteer. A prominent pentagonal ring crowned by brilliant golden Capella.' }
 ];

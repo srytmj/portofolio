@@ -1,22 +1,166 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" font-family="'Space Grotesk',sans-serif">
-  <rect width="1600" height="1000" fill="#0b0b0b"/>
-  <g fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="2">
-    <rect x="640" y="120" width="320" height="180" rx="10"/>
-    <line x1="800" y1="300" x2="800" y2="380"/>
-    <line x1="300" y1="380" x2="1300" y2="380"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" font-family="'Space Mono', ui-monospace, monospace">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-opacity="0.04" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.02"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#ffffff" fill-opacity="0.4"/>
+    </marker>
+  </defs>
+
+  <!-- Background Canvas with Blueprint Grid -->
+  <rect width="1600" height="1000" fill="#09090b"/>
+  <rect width="1600" height="1000" fill="url(#grid)"/>
+
+  <!-- Outer Blueprint Frame & Header -->
+  <rect x="50" y="50" width="1500" height="900" fill="none" stroke="#ffffff" stroke-opacity="0.15" stroke-width="1.5"/>
+  <line x1="50" y1="120" x2="1550" y2="120" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
+  
+  <text x="80" y="95" fill="#ffffff" font-size="20" font-weight="700" letter-spacing="4">SYS-ARCH // TOPOLOGY &amp; ZERO-TRUST INGRESS</text>
+  <text x="1350" y="95" fill="#888888" font-size="14" letter-spacing="2">REV 2.4 · TS-MESH</text>
+
+  <!-- Section 1: WAN & Ingress Clients -->
+  <g transform="translate(90, 160)">
+    <rect width="360" height="240" rx="4" fill="url(#glow)" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.5"/>
+    <text x="24" y="38" fill="#ffffff" font-size="14" font-weight="700" letter-spacing="2">INGRESS BOUNDARY</text>
+    <line x1="24" y1="52" x2="336" y2="52" stroke="#ffffff" stroke-opacity="0.1" stroke-width="1"/>
+    
+    <!-- Remote Nodes -->
+    <rect x="24" y="70" width="312" height="42" rx="3" fill="#000000" fill-opacity="0.6" stroke="#ffffff" stroke-opacity="0.2"/>
+    <circle cx="44" cy="91" r="4" fill="#34d399"/>
+    <text x="60" y="96" fill="#e5e5e5" font-size="12">Authorized Clients (*.ts.net)</text>
+
+    <rect x="24" y="125" width="312" height="42" rx="3" fill="#000000" fill-opacity="0.6" stroke="#ffffff" stroke-opacity="0.2"/>
+    <circle cx="44" cy="146" r="4" fill="#38bdf8"/>
+    <text x="60" y="151" fill="#e5e5e5" font-size="12">Tailscale Mesh / WireGuard</text>
+
+    <rect x="24" y="180" width="312" height="42" rx="3" fill="#000000" fill-opacity="0.6" stroke="#ffffff" stroke-opacity="0.2"/>
+    <circle cx="44" cy="201" r="4" fill="#a78bfa"/>
+    <text x="60" y="206" fill="#e5e5e5" font-size="12">Public Cloudflare Edge Tunnel</text>
   </g>
-  <g fill="#ffffff" fill-opacity="0.12">
-    <rect x="200" y="400" width="200" height="140" rx="8"/>
-    <rect x="460" y="400" width="200" height="140" rx="8"/>
-    <rect x="720" y="400" width="200" height="140" rx="8"/>
-    <rect x="980" y="400" width="200" height="140" rx="8"/>
-    <rect x="1240" y="400" width="160" height="140" rx="8"/>
+
+  <!-- Link: WAN to Node-01 Gateway -->
+  <path d="M 450 280 L 550 280" fill="none" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
+  <text x="462" y="270" fill="#888888" font-size="11">ZTNA ACLs</text>
+
+  <!-- Section 2: Physical Node 01 -->
+  <g transform="translate(560, 160)">
+    <rect width="900" height="730" rx="6" fill="#000000" fill-opacity="0.7" stroke="#ffffff" stroke-opacity="0.3" stroke-width="2"/>
+    <rect x="0" y="0" width="900" height="46" rx="6" fill="#ffffff" fill-opacity="0.06"/>
+    <text x="24" y="30" fill="#ffffff" font-size="15" font-weight="700" letter-spacing="3">NODE-01 // PROXMOX VE HYPERVISOR (BARE-METAL INTEL N100 · 16GB RAM)</text>
+    <text x="760" y="30" fill="#34d399" font-size="12">STATUS: HEALTHY</text>
+
+    <!-- Sub-Block: Reverse Proxy Ingress -->
+    <g transform="translate(30, 70)">
+      <rect width="840" height="90" rx="4" fill="#141416" stroke="#ffffff" stroke-opacity="0.2" stroke-width="1.5"/>
+      <text x="20" y="32" fill="#ffffff" font-size="13" font-weight="700" letter-spacing="2">TRAEFIK REVERSE PROXY // AUTOMATED TLS (ACME / LET'S ENCRYPT)</text>
+      <text x="20" y="62" fill="#999999" font-size="12">Host Routing: *.ts.net / Custom Domain &amp; Path Prefix Dispatcher (:443 / :80)</text>
+    </g>
+
+    <!-- Connectors from Proxy to Containers -->
+    <path d="M 450 160 L 450 190" fill="none" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5"/>
+    <path d="M 170 190 L 730 190" fill="none" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5"/>
+    <line x1="170" y1="190" x2="170" y2="210" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <line x1="450" y1="190" x2="450" y2="210" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <line x1="730" y1="190" x2="730" y2="210" stroke="#ffffff" stroke-opacity="0.3" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <!-- Sub-Block: Container Stack Tier -->
+    <!-- Column 1: Core Apps -->
+    <g transform="translate(30, 215)">
+      <rect width="260" height="270" rx="4" fill="#111113" stroke="#ffffff" stroke-opacity="0.2"/>
+      <text x="16" y="28" fill="#ffffff" font-size="12" font-weight="700">APPS &amp; IDENTITY</text>
+      <line x1="16" y1="38" x2="244" y2="38" stroke="#ffffff" stroke-opacity="0.08"/>
+      <text x="16" y="68" fill="#cccccc" font-size="12">· Vaultwarden (Bitwarden)</text>
+      <text x="16" y="100" fill="#cccccc" font-size="12">· Authelia SSO (OIDC/SAML)</text>
+      <text x="16" y="132" fill="#cccccc" font-size="12">· Nextcloud (Files &amp; Sync)</text>
+      <text x="16" y="164" fill="#cccccc" font-size="12">· Firefly III (Finances)</text>
+      <text x="16" y="196" fill="#cccccc" font-size="12">· Shiori (Bookmarks)</text>
+      <text x="16" y="228" fill="#cccccc" font-size="12">· YOURLS &amp; Reclip</text>
+    </g>
+
+    <!-- Column 2: Media & Automation -->
+    <g transform="translate(310, 215)">
+      <rect width="280" height="270" rx="4" fill="#111113" stroke="#ffffff" stroke-opacity="0.2"/>
+      <text x="16" y="28" fill="#ffffff" font-size="12" font-weight="700">MEDIA &amp; AUTOMATION</text>
+      <line x1="16" y1="38" x2="264" y2="38" stroke="#ffffff" stroke-opacity="0.08"/>
+      <text x="16" y="68" fill="#cccccc" font-size="12">· Jellyfin (Hardware Transcode)</text>
+      <text x="16" y="100" fill="#cccccc" font-size="12">· Immich (ML Photo Backup)</text>
+      <text x="16" y="132" fill="#cccccc" font-size="12">· Kavita (Document Reader)</text>
+      <text x="16" y="164" fill="#cccccc" font-size="12">· n8n Workflow Automation</text>
+      <text x="16" y="196" fill="#cccccc" font-size="12">· White Archive Media API</text>
+      <text x="16" y="228" fill="#cccccc" font-size="12">· MinIO S3 Object Store</text>
+    </g>
+
+    <!-- Column 3: Telemetry & Monitoring -->
+    <g transform="translate(610, 215)">
+      <rect width="260" height="270" rx="4" fill="#111113" stroke="#ffffff" stroke-opacity="0.2"/>
+      <text x="16" y="28" fill="#ffffff" font-size="12" font-weight="700">TELEMETRY &amp; OPS</text>
+      <line x1="16" y1="38" x2="244" y2="38" stroke="#ffffff" stroke-opacity="0.08"/>
+      <text x="16" y="68" fill="#cccccc" font-size="12">· Prometheus (Metrics Scrape)</text>
+      <text x="16" y="100" fill="#cccccc" font-size="12">· Grafana (Visual Dashboard)</text>
+      <text x="16" y="132" fill="#cccccc" font-size="12">· Netdata (Host Performance)</text>
+      <text x="16" y="164" fill="#cccccc" font-size="12">· Uptime Kuma (Heartbeat)</text>
+      <text x="16" y="196" fill="#cccccc" font-size="12">· Portainer (Docker Mgmt)</text>
+      <text x="16" y="228" fill="#cccccc" font-size="12">· GitOps Runner (Auto Deploy)</text>
+    </g>
+
+    <!-- Storage & Persistence Layer -->
+    <g transform="translate(30, 520)">
+      <rect width="840" height="175" rx="4" fill="#0d0d0f" stroke="#ffffff" stroke-opacity="0.25"/>
+      <text x="20" y="32" fill="#ffffff" font-size="13" font-weight="700" letter-spacing="2">STORAGE ARCHITECTURE &amp; DISASTER RECOVERY</text>
+      <line x1="20" y1="46" x2="820" y2="46" stroke="#ffffff" stroke-opacity="0.1"/>
+
+      <g transform="translate(20, 60)">
+        <rect width="240" height="95" rx="3" fill="#18181b" stroke="#ffffff" stroke-opacity="0.15"/>
+        <text x="16" y="30" fill="#ffffff" font-size="12" font-weight="700">NVMe BOOT POOL</text>
+        <text x="16" y="55" fill="#888888" font-size="11">Proxmox VE + Containers</text>
+        <text x="16" y="75" fill="#34d399" font-size="11">Read: 3500MB/s · Low Latency</text>
+      </g>
+
+      <g transform="translate(290, 60)">
+        <rect width="250" height="95" rx="3" fill="#18181b" stroke="#ffffff" stroke-opacity="0.15"/>
+        <text x="16" y="30" fill="#ffffff" font-size="12" font-weight="700">ZFS MIRROR POOL</text>
+        <text x="16" y="55" fill="#888888" font-size="11">Data, Media &amp; PostgreSQL</text>
+        <text x="16" y="75" fill="#38bdf8" font-size="11">RAID-1 Fault Tolerant</text>
+      </g>
+
+      <g transform="translate(570, 60)">
+        <rect width="250" height="95" rx="3" fill="#18181b" stroke="#ffffff" stroke-opacity="0.15"/>
+        <text x="16" y="30" fill="#ffffff" font-size="12" font-weight="700">RESTIC OFFSITE VAULT</text>
+        <text x="16" y="55" fill="#888888" font-size="11">Daily AES-256 Encrypted</text>
+        <text x="16" y="75" fill="#a78bfa" font-size="11">Automated S3 Cold Storage</text>
+      </g>
+    </g>
   </g>
-  <g fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2">
-    <line x1="300" y1="380" x2="300" y2="400"/><line x1="560" y1="380" x2="560" y2="400"/>
-    <line x1="820" y1="380" x2="820" y2="400"/><line x1="1080" y1="380" x2="1080" y2="400"/>
-    <line x1="1320" y1="380" x2="1320" y2="400"/>
+
+  <!-- Technical Spec Watermark / Notes -->
+  <g transform="translate(90, 440)">
+    <rect width="360" height="450" rx="4" fill="#0c0c0e" stroke="#ffffff" stroke-opacity="0.15"/>
+    <text x="24" y="36" fill="#ffffff" font-size="13" font-weight="700" letter-spacing="2">NETWORK SPEC SHEET</text>
+    <line x1="24" y1="48" x2="336" y2="48" stroke="#ffffff" stroke-opacity="0.1"/>
+    
+    <text x="24" y="80" fill="#888888" font-size="11">INTERFACE:</text>
+    <text x="24" y="98" fill="#e5e5e5" font-size="12">Intel 2.5 GbE (I226-V)</text>
+
+    <text x="24" y="130" fill="#888888" font-size="11">ROUTING &amp; DNS:</text>
+    <text x="24" y="148" fill="#e5e5e5" font-size="12">MagicDNS / 100.64.0.0/10</text>
+
+    <text x="24" y="180" fill="#888888" font-size="11">SECURITY POSTURE:</text>
+    <text x="24" y="198" fill="#e5e5e5" font-size="12">Zero Inbound NAT Ports</text>
+    <text x="24" y="216" fill="#34d399" font-size="11">Tailnet-Only Ingress</text>
+
+    <text x="24" y="250" fill="#888888" font-size="11">INFRASTRUCTURE AS CODE:</text>
+    <text x="24" y="268" fill="#e5e5e5" font-size="12">Terraform Cloud + GitHub Actions</text>
+
+    <text x="24" y="302" fill="#888888" font-size="11">BACKUP SCHEDULE:</text>
+    <text x="24" y="320" fill="#e5e5e5" font-size="12">Nightly @ 03:00 WIB (Cron)</text>
+
+    <rect x="24" y="360" width="312" height="60" rx="3" fill="#18181b" stroke="#ffffff" stroke-opacity="0.1"/>
+    <text x="36" y="385" fill="#34d399" font-size="11">● NODE DEPLOYMENT: IN PROGRESS</text>
+    <text x="36" y="405" fill="#777777" font-size="10">PROXMOX VE 8.x KERNEL 6.8</text>
   </g>
-  <text x="200" y="760" fill="#ffffff" fill-opacity="0.9" font-size="120" font-weight="700" letter-spacing="-4">HOMELAB</text>
-  <text x="204" y="820" fill="#8a8a8a" font-size="26" letter-spacing="6">REVERSE PROXY · 15 SERVICES · MONITORING</text>
 </svg>
