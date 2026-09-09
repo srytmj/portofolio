@@ -8,12 +8,20 @@
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  let activeId = $state(null);
+  const allTools = stack.flatMap((l) => l.items);
+  const defaultTool = allTools.reduce(
+    (best, t) => (best && best.readiness >= t.readiness ? best : t),
+    allTools[0]
+  );
+  const defaultToolId = defaultTool ? defaultTool.id : null;
+
+  let activeId = $state(defaultToolId);
+  // Drives the affordance hint and the mobile spec bar: both should wait for a
+  // real gesture rather than appear on load.
+  let interacted = $state(false);
   let cardsContainerEl = $state(null);
   let inspectorEl = $state(null);
   let showMobileInspector = $state(false);
-
-  const allTools = $derived(stack.flatMap((l) => l.items));
 
   const activeTech = $derived(
     activeId ? allTools.find((t) => t.id === activeId) || null : null
@@ -26,13 +34,14 @@
       clearTimeout(leaveTimer);
       leaveTimer = null;
     }
+    interacted = true;
     activeId = id;
   }
 
   function handleTechLeave() {
     if (leaveTimer) clearTimeout(leaveTimer);
     leaveTimer = setTimeout(() => {
-      activeId = null;
+      activeId = defaultToolId;
     }, 120);
   }
 
@@ -41,6 +50,7 @@
       clearTimeout(leaveTimer);
       leaveTimer = null;
     }
+    interacted = true;
     activeId = id;
     if (openMobile && typeof window !== 'undefined' && window.innerWidth < 768) {
       showMobileInspector = true;
@@ -66,7 +76,7 @@
             <!-- Domain Layer Header -->
             <div class="w-full flex items-center justify-between border-b border-current/10 pb-2 font-mono text-[11px] tracking-[0.2em] uppercase opacity-75 group text-left">
               <div class="flex items-center gap-2">
-                <span style="color: var(--yorha-accent);">SEC // {layer.code || '00'}</span>
+                <span style="color: var(--yorha-text-muted);">SEC // {layer.code || '00'}</span>
                 <span class="font-medium opacity-90">{layer.layer}</span>
               </div>
               <div class="flex items-center gap-2">
@@ -84,7 +94,7 @@
                   onpointerenter={() => handleTechEnter(it.id)}
                   onpointerleave={handleTechLeave}
                   class="group relative inline-flex items-center gap-2 px-3 py-1.5 border transition-colors duration-150 cursor-pointer text-xs {isCurrent
-                    ? 'border-current font-semibold shadow-xs'
+                    ? 'border-current font-semibold'
                     : 'border-current/20 opacity-80 hover:opacity-100 hover:border-current/50'}"
                   style="background-color: {isCurrent ? 'var(--yorha-surface-elevated)' : 'var(--yorha-surface)'};"
                 >
@@ -108,20 +118,20 @@
       <div data-anim class="hidden md:block md:col-span-5 md:sticky md:top-24">
         <div
           bind:this={inspectorEl}
-          class="border border-current/20 p-5 font-mono text-xs flex flex-col justify-between gap-4 relative shadow-sm min-h-[460px]"
+          class="border border-current/20 p-5 font-mono text-xs flex flex-col justify-between gap-4 relative min-h-[460px]"
           style="background-color: var(--yorha-surface-elevated);"
         >
           <!-- Tactical Pod Frame Markings -->
-          <span class="pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border-l-2 border-t-2 border-current" aria-hidden="true"></span>
-          <span class="pointer-events-none absolute -top-px -right-px h-2.5 w-2.5 border-r-2 border-t-2 border-current" aria-hidden="true"></span>
-          <span class="pointer-events-none absolute -bottom-px -left-px h-2.5 w-2.5 border-b-2 border-l-2 border-current" aria-hidden="true"></span>
-          <span class="pointer-events-none absolute -bottom-px -right-px h-2.5 w-2.5 border-b-2 border-r-2 border-current" aria-hidden="true"></span>
+          <span class="pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border-l-2 border-t-2 border-current/35" aria-hidden="true"></span>
+          <span class="pointer-events-none absolute -top-px -right-px h-2.5 w-2.5 border-r-2 border-t-2 border-current/35" aria-hidden="true"></span>
+          <span class="pointer-events-none absolute -bottom-px -left-px h-2.5 w-2.5 border-b-2 border-l-2 border-current/35" aria-hidden="true"></span>
+          <span class="pointer-events-none absolute -bottom-px -right-px h-2.5 w-2.5 border-b-2 border-r-2 border-current/35" aria-hidden="true"></span>
 
           <!-- Top Status Bar -->
           <div class="flex items-center justify-between border-b border-current/10 pb-3">
             <div class="flex items-center gap-2">
               <span
-                class="h-2 w-2 rounded-full {activeTech ? 'animate-pulse' : 'opacity-40'}"
+                class="h-2 w-2 rounded-full {activeTech ? '' : 'opacity-40'}"
                 style="background-color: {activeTech ? 'var(--yorha-accent)' : 'var(--yorha-text-muted)'};"
               ></span>
               <span class="font-bold tracking-wider text-[11px]">POD_042 // SPEC_DIAGNOSTICS</span>
@@ -140,14 +150,14 @@
               <div data-inspector-body in:fade={{ duration: reduce ? 0 : 150 }} class="flex flex-col gap-3 flex-1">
                 <div class="flex items-baseline justify-between gap-2 border-b border-current/10 pb-2">
                   <div>
-                    <span class="text-[9px] opacity-50 block tracking-widest uppercase">ACTIVE TARGET SPEC</span>
+                    <span class="text-[9px] opacity-75 block tracking-widest uppercase">ACTIVE TARGET SPEC</span>
                     <h4 class="text-base sm:text-lg font-semibold tracking-tight flex items-center gap-2">
                       <span>{activeTech.name}</span>
                       <span class="text-xs font-normal" style="color: var(--yorha-accent);">[{activeTech.id}]</span>
                     </h4>
                   </div>
                   <div class="text-right">
-                    <span class="text-[9px] opacity-50 block tracking-widest uppercase">CLASSIFICATION</span>
+                    <span class="text-[9px] opacity-75 block tracking-widest uppercase">CLASSIFICATION</span>
                     <span class="text-[11px] uppercase opacity-90">{activeTech.badge}</span>
                   </div>
                 </div>
@@ -204,7 +214,7 @@
             <!-- Standby State (When mouse is not hovering any skill) -->
             <div in:fade={{ duration: reduce ? 0 : 150 }} class="flex flex-col items-center justify-center flex-1 py-12 px-4 text-center gap-3 border border-dashed border-current/15 my-1">
               <div class="h-10 w-10 border border-current/25 flex items-center justify-center font-mono text-sm opacity-60">
-                <span class="animate-pulse" style="color: var(--yorha-accent);">✦</span>
+                <span style="color: var(--yorha-accent);">✦</span>
               </div>
               <div class="space-y-1.5">
                 <p class="text-[11px] font-semibold tracking-widest uppercase opacity-85">
@@ -219,7 +229,7 @@
 
           <!-- Pod Bottom Diagnostics Status -->
           <div class="border-t border-current/10 pt-3 flex flex-wrap items-center justify-between gap-2 text-[9px] opacity-50">
-            <span>{activeTech ? 'SYS_LATENCY: 0.2ms' : 'RADAR: SCANNING'}</span>
+            <span>{interacted ? 'SYS_LATENCY: 0.2ms' : 'HOVER A NODE TO INSPECT'}</span>
             <span>{activeTech ? 'MEM_FOOTPRINT: MINIMAL' : `NODES: ${allTools.length} READY`}</span>
             <span class="opacity-80">{activeTech ? 'NODE_VERIFIED: YES' : 'TARGET: NONE'}</span>
           </div>
@@ -229,16 +239,16 @@
     </div>
 
     <!-- Mobile Sticky Pod Mini Bar (< md) -->
-    {#if activeTech}
+    {#if interacted && activeTech}
       <div class="md:hidden sticky bottom-4 z-30 pt-1">
         <button
           type="button"
           onclick={() => (showMobileInspector = true)}
-          class="w-full flex items-center justify-between px-3.5 py-2.5 border font-mono text-xs shadow-lg backdrop-blur-md transition-all cursor-pointer yorha-invert-hover"
+          class="w-full flex items-center justify-between px-3.5 py-2.5 border font-mono text-xs backdrop-blur-md transition-all cursor-pointer yorha-invert-hover"
           style="background-color: var(--yorha-surface-elevated); border-color: var(--yorha-border); color: var(--yorha-text-primary);"
         >
           <div class="flex items-center gap-2">
-            <span class="h-2 w-2 rounded-full animate-pulse" style="background-color: var(--yorha-accent);"></span>
+            <span class="h-2 w-2 rounded-full" style="background-color: var(--yorha-accent);"></span>
             <span class="font-semibold tracking-wider">{activeTech.name}</span>
             <span class="text-[10px]" style="color: var(--yorha-accent);">{activeTech.readiness}%</span>
           </div>
@@ -262,7 +272,7 @@
   >
     <div
       transition:fly={{ y: 200, duration: 200 }}
-      class="relative w-full max-h-[85vh] overflow-y-auto border-t p-5 font-mono text-xs flex flex-col gap-4 shadow-2xl rounded-none"
+      class="relative w-full max-h-[85vh] overflow-y-auto border-t p-5 font-mono text-xs flex flex-col gap-4 rounded-none"
       style="background-color: var(--yorha-surface-elevated); border-color: var(--yorha-border); color: var(--yorha-text-primary);"
       onclick={(e) => e.stopPropagation()}
       role="dialog"
@@ -277,7 +287,7 @@
       <!-- Top Status Bar with Close Button -->
       <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--yorha-border);">
         <div class="flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full animate-pulse" style="background-color: var(--yorha-accent);"></span>
+          <span class="h-2 w-2 rounded-full" style="background-color: var(--yorha-accent);"></span>
           <span class="font-bold tracking-wider text-[11px]">POD_042 // SPEC_DIAGNOSTICS</span>
         </div>
         <button
@@ -294,14 +304,14 @@
       <div class="flex flex-col gap-3">
         <div class="flex items-baseline justify-between gap-2 border-b pb-2" style="border-color: var(--yorha-border);">
           <div>
-            <span class="text-[9px] opacity-50 block tracking-widest uppercase">ACTIVE TARGET SPEC</span>
+            <span class="text-[9px] opacity-75 block tracking-widest uppercase">ACTIVE TARGET SPEC</span>
             <h4 class="text-lg font-semibold tracking-tight flex items-center gap-2">
               <span>{modalTech.name}</span>
               <span class="text-xs font-normal" style="color: var(--yorha-accent);">[{modalTech.id}]</span>
             </h4>
           </div>
           <div class="text-right">
-            <span class="text-[9px] opacity-50 block tracking-widest uppercase">CLASSIFICATION</span>
+            <span class="text-[9px] opacity-75 block tracking-widest uppercase">CLASSIFICATION</span>
             <span class="text-[11px] uppercase opacity-90">{modalTech.badge}</span>
           </div>
         </div>

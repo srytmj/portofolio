@@ -7,35 +7,42 @@
   let copied = $state(false);
   let copyTimer;
 
+  // Public visit counter. The endpoint counts every hit and this footer
+  // remounts on client-side navigation, so bump it once per session and read
+  // the cached value afterwards. There is no local fallback on purpose:
+  // inventing a number only that visitor can see is worse than showing nothing.
   let visitorCount = $state(null);
 
+  const COUNTER_URL = 'https://api.counterapi.dev/v1/suryatmaja-portfolio/visits';
+  const COUNTER_SESSION_KEY = 'visitor_count';
+
   onMount(async () => {
+    let cached = null;
     try {
-      const res = await fetch('https://api.counterapi.dev/v1/suryatmaja-portfolio/visits/up');
-      if (res.ok) {
-        const data = await res.json();
-        if (data && typeof data.count === 'number') {
-          visitorCount = data.count;
-          localStorage.setItem('visitor_count_cache', String(data.count));
-        }
+      cached = sessionStorage.getItem(COUNTER_SESSION_KEY);
+    } catch {
+      /* private mode */
+    }
+
+    if (cached) {
+      visitorCount = Number(cached) || null;
+      return;
+    }
+
+    try {
+      const signal = AbortSignal?.timeout ? AbortSignal.timeout(4000) : undefined;
+      const res = await fetch(`${COUNTER_URL}/up`, { signal });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (typeof data?.count !== 'number') return;
+      visitorCount = data.count;
+      try {
+        sessionStorage.setItem(COUNTER_SESSION_KEY, String(data.count));
+      } catch {
+        /* private mode */
       }
     } catch {
-      // Fallback if offline or network failure
-    }
-
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('visitor_count_cache');
-    }
-
-    if (!visitorCount) {
-      const stored = localStorage.getItem('portfolio_visitor_count');
-      let base = stored ? parseInt(stored, 10) : 0;
-      if (typeof window !== 'undefined' && !sessionStorage.getItem('visited_session')) {
-        base += 1;
-        sessionStorage.setItem('visited_session', '1');
-        localStorage.setItem('portfolio_visitor_count', String(base));
-      }
-      visitorCount = base;
+      // Offline, blocked or too slow: the badge simply does not render.
     }
   });
 
@@ -52,7 +59,6 @@
     }
   }
 
-  const words = $derived(headings.contact.split(' '));
 </script>
 
 <footer
@@ -121,10 +127,10 @@
         class="group relative flex flex-col justify-between border border-current/15 p-4 sm:p-6 sm:p-7 transition-all duration-150 hover:-translate-y-0.5 hover:border-current/40"
         style="background-color: var(--yorha-surface);"
       >
-        <span class="pointer-events-none absolute top-[-1px] left-[-1px] h-2.5 w-2.5 border-l-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute top-[-1px] right-[-1px] h-2.5 w-2.5 border-r-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute bottom-[-2px] left-[-1px] h-2.5 w-2.5 border-b-2 border-l-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute bottom-[-2px] right-[-1px] h-2.5 w-2.5 border-b-2 border-r-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute top-[-1px] left-[-1px] h-2.5 w-2.5 border-l-2 border-t-2 border-transparent group-hover:border-current/70 transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute top-[-1px] right-[-1px] h-2.5 w-2.5 border-r-2 border-t-2 border-transparent group-hover:border-current/70 transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute bottom-[-2px] left-[-1px] h-2.5 w-2.5 border-b-2 border-l-2 border-transparent group-hover:border-current/70 transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute bottom-[-2px] right-[-1px] h-2.5 w-2.5 border-b-2 border-r-2 border-transparent group-hover:border-current/70 transition-colors" aria-hidden="true"></span>
 
         <!-- Top Sweep Line on Hover -->
         <span
@@ -136,8 +142,8 @@
         <div>
           <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-wider opacity-60 leading-none">
             <span>CHANNEL // 01</span>
-            <span class="inline-flex items-center gap-1.5 leading-none" style="color: var(--yorha-accent);">
-              <span class="h-1.5 w-1.5 shrink-0 rounded-full animate-pulse -translate-y-[0.5px]" style="background-color: var(--yorha-accent);"></span>
+            <span class="inline-flex items-center gap-1.5 leading-none">
+              <span class="h-1.5 w-1.5 shrink-0 rounded-full -translate-y-[0.5px] bg-current opacity-60"></span>
               <span class="leading-none">[ DIRECT_INBOX ]</span>
             </span>
           </div>
@@ -176,10 +182,10 @@
         class="group relative flex flex-col justify-between border border-current/15 p-4 sm:p-6 sm:p-7 transition-all duration-150 hover:-translate-y-0.5 hover:border-current/40"
         style="background-color: var(--yorha-surface);"
       >
-        <span class="pointer-events-none absolute top-[-1px] left-[-1px] h-2.5 w-2.5 border-l-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute top-[-1px] right-[-1px] h-2.5 w-2.5 border-r-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute bottom-[-2px] left-[-1px] h-2.5 w-2.5 border-b-2 border-l-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute bottom-[-2px] right-[-1px] h-2.5 w-2.5 border-b-2 border-r-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute top-[-1px] left-[-1px] h-2.5 w-2.5 border-l-2 border-t-2 border-transparent group-hover:border-current/70 transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute top-[-1px] right-[-1px] h-2.5 w-2.5 border-r-2 border-t-2 border-transparent group-hover:border-current/70 transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute bottom-[-2px] left-[-1px] h-2.5 w-2.5 border-b-2 border-l-2 border-transparent group-hover:border-current/70 transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute bottom-[-2px] right-[-1px] h-2.5 w-2.5 border-b-2 border-r-2 border-transparent group-hover:border-current/70 transition-colors" aria-hidden="true"></span>
 
         <!-- Top Sweep Line on Hover -->
         <span
@@ -191,7 +197,7 @@
         <div>
           <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-wider opacity-60 leading-none">
             <span>CHANNEL // 02</span>
-            <span style="color: var(--yorha-accent);">[ EXTERNAL_NODES ]</span>
+            <span>[ EXTERNAL_NODES ]</span>
           </div>
 
           <h3 class="mt-2.5 sm:mt-4 font-display text-base sm:text-lg font-semibold uppercase tracking-wider transition-colors">
@@ -216,7 +222,7 @@
               <span class="text-[9px]" style="color: var(--yorha-accent);">■</span>
               <div class="flex flex-col">
                 <span class="text-xs font-semibold tracking-tight">GITHUB / SRYTMJ</span>
-                <span class="text-[9px] opacity-50 select-all">github.com/srytmj</span>
+                <span class="text-[9px] opacity-75 select-all">github.com/srytmj</span>
               </div>
             </div>
             <span class="text-[10px] uppercase tracking-wider group-hover/item:translate-x-1 transition-transform" style="color: var(--yorha-accent);">
@@ -235,7 +241,7 @@
               <span class="text-[9px]" style="color: var(--yorha-accent);">■</span>
               <div class="flex flex-col">
                 <span class="text-xs font-semibold tracking-tight">LINKEDIN / SURYATMAJA</span>
-                <span class="text-[9px] opacity-50 select-all">linkedin.com/in/suryatmaja</span>
+                <span class="text-[9px] opacity-75 select-all">linkedin.com/in/suryatmaja</span>
               </div>
             </div>
             <span class="text-[10px] uppercase tracking-wider group-hover/item:translate-x-1 transition-transform" style="color: var(--yorha-accent);">

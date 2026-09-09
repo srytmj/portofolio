@@ -10,6 +10,7 @@
   const isHome = $derived(!page?.url || page.url.pathname === '/');
   const showClock = $derived(!isHome || activeId !== '');
   const figure = $derived(constellation.figure);
+  const traced = $derived(constellation.traced);
   
   // Animate the button in only when we're definitively on a subpage (blog, projects, etc)
   const isSubpage = $derived(!isHome);
@@ -17,7 +18,7 @@
 
 <div
   aria-live="polite"
-  class="hidden sm:block fixed bottom-6 left-6 sm:bottom-7 sm:left-14 z-40 font-mono select-none pointer-events-none"
+  class="hidden sm:block fixed bottom-6 left-6 sm:bottom-7 min-[1440px]:left-14 z-40 font-mono select-none pointer-events-none"
 >
   <div class="relative flex items-end min-h-[42px]">
     <!-- Constellation Figure & Celestial Coordinates (Visible in Main Hero Section) -->
@@ -28,7 +29,7 @@
         {figure.name}
       </span>
       <span class="text-[10px] tracking-[0.2em] uppercase transition-all duration-300" style="color: var(--yorha-text-muted);">
-        {figure.coords} · {figure.id}
+        {#if traced}{figure.coords} · {figure.id}{:else}Move to trace a figure{/if}
       </span>
     </div>
 

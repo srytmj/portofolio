@@ -8,10 +8,7 @@
 >
   <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3" style="border-color: var(--yorha-border);">
     <div class="inline-flex items-center gap-2">
-      <span class="relative flex h-2 w-2">
-        <span class="absolute inline-flex h-full w-full animate-ping rounded-none opacity-75" style="background-color: var(--yorha-accent);"></span>
-        <span class="relative inline-flex h-2 w-2 rounded-none" style="background-color: var(--yorha-accent);"></span>
-      </span>
+      <span class="inline-flex h-2 w-2 rounded-none" style="background-color: var(--yorha-accent);"></span>
       <span class="font-mono text-[10px] uppercase tracking-[0.2em] font-medium" style="color: var(--yorha-accent);">
         Currently Building
       </span>

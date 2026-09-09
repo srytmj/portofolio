@@ -92,7 +92,7 @@
     <a
       href="/projects"
       onclick={handleExploreClick}
-      class="yorha-invert-hover inline-flex items-center gap-2.5 border border-current/20 bg-current/5 px-5 py-2.5 font-mono text-[11px] uppercase tracking-wider transition-all duration-150 cursor-pointer"
+      class="group yorha-invert-hover inline-flex items-center gap-2.5 border border-current/20 bg-current/5 px-5 py-2.5 font-mono text-[11px] uppercase tracking-wider transition-all duration-150 cursor-pointer"
       class:opacity-75={isNavigating}
     >
       <span class="text-[9px]" style="color: var(--yorha-accent);">■</span>

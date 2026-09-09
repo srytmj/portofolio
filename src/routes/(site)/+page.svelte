@@ -51,31 +51,26 @@
     aria-hidden="true"
   ></div>
 
-  <!-- Tactical HUD Transition Seam / Telemetry Hairline -->
-  <div class="relative z-10 w-full border-b border-current/15 bg-current/[0.015] overflow-hidden">
-    <div class="flex items-center py-2 font-mono text-[9px] tracking-[0.3em] uppercase opacity-45 whitespace-nowrap pointer-events-none">
-      <div class="flex animate-marquee min-w-max">
-        {#each Array(4) as _}
-          <div class="flex items-center gap-12 sm:gap-24 pr-12 sm:pr-24">
-            <div class="flex items-center gap-2">
-              <span class="inline-block h-1.5 w-1.5 animate-pulse" style="background-color: var(--yorha-accent);"></span>
-              <span>SYS_ENGAGE // SECTOR_02_MONITOR</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <span>+ + +</span>
-              <span class="h-2 w-px bg-current/30"></span>
-              <span>HUD_MATRIX_ONLINE</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="h-1 w-1 rounded-full bg-current"></span>
-              <span>ORBIT → TERRESTRIAL</span>
-            </div>
-            <div class="flex items-center gap-3 text-[8px] opacity-70">
-              <span>DATA_LINK_ESTABLISHED</span>
-              <span>[0x00FF9]</span>
-            </div>
-          </div>
-        {/each}
+  <!-- Tactical HUD Transition Seam / Telemetry Hairline.
+       Deliberately static: this sits exactly where the reader is meant to stop
+       looking at the sky and start reading, and a looping marquee here is the
+       strongest attention magnet on the page. -->
+  <div class="relative z-10 w-full border-b border-current/15 bg-current/[0.015]">
+    <div
+      class="wrap flex items-center justify-between gap-4 py-2 font-mono text-[10px] tracking-[0.2em] uppercase opacity-55"
+    >
+      <div class="flex items-center gap-2">
+        <span class="inline-block h-1.5 w-1.5" style="background-color: var(--yorha-accent);"></span>
+        <span>SYS_ENGAGE // SECTOR_02_MONITOR</span>
+      </div>
+      <div class="hidden sm:flex items-center gap-3 text-[9px] tracking-[0.35em]">
+        <span>+ + +</span>
+        <span class="h-2 w-px bg-current/30"></span>
+        <span>HUD_MATRIX_ONLINE</span>
+      </div>
+      <div class="hidden md:flex items-center gap-2">
+        <span class="h-1 w-1 rounded-full bg-current"></span>
+        <span>ORBIT &rarr; TERRESTRIAL</span>
       </div>
     </div>
   </div>

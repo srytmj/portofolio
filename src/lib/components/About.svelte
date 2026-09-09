@@ -28,23 +28,23 @@
             <!-- Node 01 Status -->
             {#if about.status}
               <div class="inline-flex items-center gap-1.5 text-[9.5px] opacity-85 leading-none">
-                <span class="relative flex h-1.5 w-1.5 shrink-0 -translate-y-[0.5px]">
-                  <span class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style="background-color: var(--yorha-accent);"></span>
-                  <span class="relative inline-flex h-1.5 w-1.5 rounded-full" style="background-color: var(--yorha-accent);"></span>
-                </span>
+                <span class="h-1.5 w-1.5 shrink-0 rounded-full -translate-y-[0.5px]" style="background-color: var(--yorha-accent);"></span>
                 <span class="leading-none truncate font-medium">{about.status}</span>
               </div>
             {/if}
 
             <!-- Location -->
-            <div class="text-[9px] opacity-50 tracking-[0.16em] uppercase">
+            <div class="text-[9px] opacity-75 tracking-[0.16em] uppercase">
               LOC: {about.location}
             </div>
 
             <!-- Under Node 01: Open for Opportunities -->
             {#if availability}
               <div class="pt-0.5 flex items-center gap-1.5 text-[9.5px] uppercase tracking-wider font-semibold" style="color: var(--yorha-accent);">
-                <span class="h-1.5 w-1.5 shrink-0 rounded-full" style="background-color: var(--yorha-accent);"></span>
+                <span class="relative flex h-1.5 w-1.5 shrink-0">
+                  <span class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style="background-color: var(--yorha-accent);"></span>
+                  <span class="relative inline-flex h-1.5 w-1.5 rounded-full" style="background-color: var(--yorha-accent);"></span>
+                </span>
                 <span class="leading-none truncate">{availability.status}</span>
               </div>
             {/if}
@@ -64,14 +64,11 @@
         <div class="hidden sm:flex flex-col gap-1.5 font-mono text-[11px] tracking-[0.16em]">
           {#if about.status}
             <div class="inline-flex items-center gap-2 text-[10px] opacity-80 leading-none">
-              <span class="relative flex h-2 w-2 shrink-0 -translate-y-[0.5px]">
-                <span class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style="background-color: var(--yorha-accent);"></span>
-                <span class="relative inline-flex h-2 w-2 rounded-full" style="background-color: var(--yorha-accent);"></span>
-              </span>
+              <span class="h-2 w-2 shrink-0 rounded-full -translate-y-[0.5px]" style="background-color: var(--yorha-accent);"></span>
               <span class="leading-none">{about.status}</span>
             </div>
           {/if}
-          <div class="text-[10px] opacity-50 tracking-[0.18em] uppercase">
+          <div class="text-[10px] opacity-75 tracking-[0.18em] uppercase">
             LOC: {about.location}
           </div>
         </div>
@@ -83,7 +80,10 @@
 
 
           <div class="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] leading-none font-semibold" style="color: var(--yorha-accent);">
-            <span class="h-1.5 w-1.5 shrink-0 rounded-full group-hover:scale-125 transition-transform duration-200 -translate-y-[0.5px]" style="background-color: var(--yorha-accent);"></span>
+            <span class="relative flex h-1.5 w-1.5 shrink-0 -translate-y-[0.5px] group-hover:scale-125 transition-transform duration-200">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style="background-color: var(--yorha-accent);"></span>
+              <span class="relative inline-flex h-1.5 w-1.5 rounded-full" style="background-color: var(--yorha-accent);"></span>
+            </span>
             <span class="leading-none">{availability.status}</span>
           </div>
           <p class="opacity-70 text-[10px] tracking-wider uppercase">

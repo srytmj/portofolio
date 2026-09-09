@@ -109,7 +109,7 @@
         viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        class="overflow-visible text-white"
+        class="overflow-visible"
       >
         <!-- Tactical Crosshair with center dot -->
         <path d="M12 2 L12 8 M12 16 L12 22 M2 12 L8 12 M16 12 L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="square" />
@@ -121,6 +121,9 @@
 
 <style>
   .cursor-root {
+    /* Follows the theme instead of being hard white: on the Bunker (light)
+       theme a white crosshair on cream is effectively invisible. */
+    color: var(--yorha-text-primary);
     margin-left: -12px;
     margin-top: -12px;
     transition: opacity 0.15s ease;
@@ -131,8 +134,9 @@
     align-items: center;
     justify-content: center;
     transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-    /* Stark drop-shadow guarantees visibility on both Dark (black) and Light (white) themes */
-    filter: drop-shadow(0px 0px 1px rgba(0,0,0,0.9)) drop-shadow(0px 0px 3px rgba(0,0,0,0.6));
+    /* Halo in the page background colour, so the crosshair keeps a readable
+       edge over imagery and over the canvas in either theme. */
+    filter: drop-shadow(0 0 1px var(--yorha-bg)) drop-shadow(0 0 3px var(--yorha-bg));
   }
 
   /* When hovering interactive elements, spin 45deg and scale up for tactical lock-on */

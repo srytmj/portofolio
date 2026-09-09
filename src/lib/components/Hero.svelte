@@ -155,16 +155,28 @@
         data-reveal
         class="flex max-w-[42ch] flex-col gap-3.5 lg:self-center lg:items-end"
       >
-        <!-- Quick Shortcut to Blog / Engineering Journal -->
-        <a
-          href="/blog"
-          class="pointer-events-auto group yorha-invert-hover inline-flex items-center gap-2 font-mono text-[11px] tracking-wider uppercase px-3.5 py-1.5 border border-current/20 bg-current/5 transition-all duration-150 cursor-pointer"
-          style="color: var(--yorha-text-primary);"
-        >
-          <span class="text-[9px] text-[var(--yorha-accent)]">■</span>
-          <span>Engineering Journal</span>
-          <span class="text-[10px] transition-transform group-hover:translate-x-1">→</span>
-        </a>
+        <div class="pointer-events-auto flex flex-wrap items-center gap-2.5 lg:justify-end">
+          <!-- Primary: the work itself -->
+          <a
+            href="/projects"
+            class="group inline-flex cursor-pointer items-center gap-2 border px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-all duration-150 hover:-translate-y-0.5 active:translate-y-0"
+            style="background-color: var(--yorha-invert-bg); border-color: var(--yorha-invert-bg); color: var(--yorha-invert-text);"
+          >
+            <span>View projects</span>
+            <span class="text-[10px] transition-transform group-hover:translate-x-1">→</span>
+          </a>
+
+          <!-- Secondary: the engineering journal -->
+          <a
+            href="/blog"
+            class="group yorha-invert-hover inline-flex cursor-pointer items-center gap-2 border border-current/20 bg-current/5 px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-all duration-150 hover:-translate-y-0.5 active:translate-y-0"
+            style="color: var(--yorha-text-primary);"
+          >
+            <span class="text-[9px]" style="color: var(--yorha-accent);">■</span>
+            <span>Engineering Journal</span>
+            <span class="text-[10px] transition-transform group-hover:translate-x-1">→</span>
+          </a>
+        </div>
 
         <div
           class="flex flex-col gap-2.5 border-t border-current/15 pt-3.5 font-sans text-[11px] leading-[1.6] opacity-70 lg:text-right tracking-wide"

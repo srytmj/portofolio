@@ -6,7 +6,6 @@
   /** @type {{ activeId?: string }} */
   let { activeId = '' } = $props();
 
-  const blogUrl = '/blog';
   const items = [
     // 01 is the hero itself (the "01" marker on that screen); sections start at 02.
     { key: 'home', label: 'Top', num: '' },
@@ -24,19 +23,39 @@
   /** @type {HTMLElement} */ let nav;
   let mounted = $state(false);
 
+  // The rail lives in the left gutter, and that gutter only exists once the
+  // viewport is wider than the 72rem content container plus its padding.
+  //
+  //   content left edge = max(gutter, (100vw - 1152px) / 2 + gutter)
+  //
+  // Below 1440 there is room for the numbers but not the labels, so the rail
+  // collapses to a number column and expands over the page only while it is
+  // hovered or focused. Below 1280 there is no usable gutter at all and the
+  // rail stays hidden, which is why it used to sit on top of the About column.
+  // Navigation is still covered there by the MENU button and Ctrl+K palette.
+  let compact = $state(false);
+  let railOpen = $state(false);
+  const expanded = $derived(!compact || railOpen);
+
   onMount(() => {
+    const mq = window.matchMedia('(max-width: 1439.98px)');
+    const sync = () => (compact = mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+
     // Hidden until a section is in view (the hero shows nothing).
-    // Maintain yPercent: -50 so vertical centering is never overwritten by GSAP!
+    // Maintain yPercent: -50 so vertical centering is never overwritten by GSAP.
     gsap.set(nav, { autoAlpha: 0, xPercent: -10, yPercent: -50 });
-    gsap.set(nav.querySelectorAll('[data-num]'), { width: 0, marginRight: 0, autoAlpha: 0 });
-    gsap.set(nav.querySelectorAll('[data-label]'), { opacity: 0.4 });
     gsap.set(nav.querySelector('[data-star]'), { opacity: 0.6, transformOrigin: '50% 50%' });
     mounted = true;
+
+    return () => mq.removeEventListener('change', sync);
   });
 
   $effect(() => {
     if (!mounted || !nav) return;
     const active = activeId;
+    const open = expanded;
     const d = reduce() ? 0 : dur.md;
     const visible = active !== '';
 
@@ -53,24 +72,42 @@
       const home = el.dataset.key === 'home';
       const on = el.dataset.key === active;
       const num = el.querySelector('[data-num]');
+      const labelWrap = el.querySelector('[data-label-wrap]');
       const label = el.querySelector('[data-label]');
+
+      // Collapsed, every number shows: it is the only thing left to navigate
+      // by. Expanded, the number belongs to the active row only.
+      const showNum = !open || on;
+
       gsap.to(el, {
-        // The star sits at a fixed offset (roughly the column centre) so it
-        // never drifts when a wide item like "03 Portfolio" unfolds.
-        x: home ? 28 : on ? 14 : 0,
+        // The star sits at a fixed offset (roughly the label column centre) so
+        // it never drifts when a wide item like "04 Portfolio" unfolds. With
+        // the labels collapsed there is no label column to align to.
+        x: home ? (open ? 28 : 0) : on ? 14 : 0,
         duration: d,
         ease: ease.out,
         overwrite: 'auto'
       });
+
       if (num)
         gsap.to(num, {
-          width: on ? 'auto' : 0,
-          marginRight: on ? 8 : 0,
-          autoAlpha: on ? 1 : 0,
+          width: showNum ? 'auto' : 0,
+          marginRight: showNum && open ? 8 : 0,
+          autoAlpha: showNum ? (on ? 1 : 0.5) : 0,
           duration: d,
           ease: 'power3.out',
           overwrite: 'auto'
         });
+
+      if (labelWrap)
+        gsap.to(labelWrap, {
+          width: open ? 'auto' : 0,
+          autoAlpha: open ? 1 : 0,
+          duration: d,
+          ease: 'power3.out',
+          overwrite: 'auto'
+        });
+
       if (label)
         gsap.to(label, {
           opacity: on ? 1 : 0.4,
@@ -112,6 +149,15 @@
     });
   }
 
+  function openRail() {
+    railOpen = true;
+  }
+
+  function closeRail(e) {
+    if (e?.relatedTarget && nav?.contains(e.relatedTarget)) return;
+    railOpen = false;
+  }
+
   function handleNavClick(e, it) {
     if (it.key === 'blog') return;
 
@@ -134,7 +180,12 @@
 <nav
   bind:this={nav}
   aria-label="Sections"
-  class="invisible hidden lg:flex fixed left-7 top-1/2 z-50 flex-col gap-[18px] sm:left-14"
+  onpointerenter={openRail}
+  onpointerleave={closeRail}
+  onfocusin={openRail}
+  onfocusout={closeRail}
+  class="invisible fixed top-1/2 z-50 hidden flex-col gap-[18px] xl:flex"
+  style="left: {compact ? '1.5rem' : '3.5rem'};"
 >
   {#each items as it}
     <a
@@ -143,6 +194,7 @@
       target={it.external ? '_blank' : undefined}
       rel={it.external ? 'noopener noreferrer' : undefined}
       aria-current={it.key === activeId ? 'true' : undefined}
+      aria-label={it.key === 'home' ? 'Back to top' : it.label}
       onclick={(e) => handleNavClick(e, it)}
       onpointerenter={(e) => hover(e.currentTarget, true)}
       onpointerleave={(e) => hover(e.currentTarget, false)}
@@ -154,10 +206,9 @@
     >
       {#if it.key === 'home'}
         <span data-star class="inline-block text-xs leading-none font-mono" style="color: var(--yorha-accent);">✦</span>
-        <span class="sr-only">Back to top</span>
       {:else}
         <span data-num class="overflow-hidden font-mono text-[0.85em]" style="color: var(--yorha-text-muted);">{it.num}</span>
-        <span data-label>{it.label}</span>
+        <span data-label-wrap class="overflow-hidden"><span data-label>{it.label}</span></span>
       {/if}
     </a>
   {/each}

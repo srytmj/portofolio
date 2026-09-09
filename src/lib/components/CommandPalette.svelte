@@ -265,7 +265,7 @@
     role="presentation"
   >
     <div
-      class="animate-crt-on relative flex max-h-[62vh] w-full max-w-lg flex-col overflow-hidden rounded-none border font-sans bg-black"
+      class="animate-crt-on relative flex max-h-[62vh] w-full max-w-lg flex-col overflow-hidden rounded-none border font-sans"
       style="background-color: var(--yorha-surface); border-color: var(--yorha-border); color: var(--yorha-text-primary);"
       onclick={(e) => e.stopPropagation()}
       role="dialog"

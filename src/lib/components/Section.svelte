@@ -10,7 +10,6 @@
     contact: 'SEC // 05'
   };
 
-  const words = $derived(title.split(' '));
 </script>
 
 <section

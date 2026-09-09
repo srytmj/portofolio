@@ -8,6 +8,45 @@ Format changelog ini mengacu pada [Keep a Changelog](https://keepachangelog.com/
 
 ## [Unreleased] - 2026-09-10
 
+### Fixed
+- **[01:56 WIB] Eliminasi Tabrakan SideNav dengan Kolom Konten pada Layar 1024-1400px (`SideNav.svelte`, `CornerTelemetry.svelte`):**
+  - *Root cause*: rail dipasang `fixed left-14` (56px) sementara tepi kiri konten dihitung `max(gutter, (100vw - 1152px) / 2 + gutter)`. Pada viewport 1280px konten baru mulai di 100px sedangkan rail membentang 56-128px (hingga 156px saat baris aktif mekar), sehingga tumpang tindih 28-56px persis di atas kolom potret/Snake pada section About.
+  - *Solusi*: rail kini punya tiga mode. Di bawah 1280px rail disembunyikan sepenuhnya karena memang tidak ada gutter yang layak (navigasi tetap tersedia lewat tombol MENU dan Ctrl+K). Pada 1280-1439px rail menciut menjadi kolom nomor (`02`-`06`) di `left: 1.5rem`, dan labelnya baru mengembang ketika rail di-hover atau menerima fokus keyboard. Pada 1440px ke atas perilaku lama dipertahankan penuh di `left: 3.5rem`.
+  - *Verifikasi terukur*: 1280px menghasilkan rail 24-38px versus konten 100px (jarak bersih 62px, sebelumnya tumpang tindih 28px), dan saat rail di-hover lebarnya hanya mencapai 96px sehingga tetap bersih. 1440px menghasilkan rail 56-128px versus konten 180px (jarak bersih 52px) dengan seluruh label tampil.
+  - *Aksesibilitas*: setiap tautan rail diberi `aria-label` eksplisit sehingga pembaca layar tetap membacakan "About", "Skills", dan seterusnya walaupun label visualnya sedang menciut menjadi nomor.
+  - `CornerTelemetry` disejajarkan ke geometri yang sama (`left-6` dengan `min-[1440px]:left-14`) supaya HUD jam tidak menindih konten pada laptop 1280 dan 1366.
+- **[01:56 WIB] Variant `dark:` Tailwind Terlepas dari Sistem Tema Situs (`app.css`, `app.html`):**
+  - *Root cause*: Tailwind v4 memetakan `dark:` ke `@media (prefers-color-scheme: dark)` secara bawaan, sedangkan situs ini bertema melalui atribut `data-theme`. Akibatnya pengunjung dengan OS mode terang yang membuka situs dalam tema Tactical (gelap) menerima layar putih penuh dari `bg-neutral-50` milik overlay intro selama sekitar tiga detik, lalu menjeblos ke hitam pekat.
+  - *Solusi*: menambahkan `@custom-variant dark` yang menargetkan `:root:not([data-theme=light])` pada `app.css`, sehingga seluruh utilitas `dark:` mengikuti tema aplikasi dengan gelap sebagai default.
+  - Melengkapi dengan stamping `data-theme` dan `data-blog-theme` ke elemen `html` di skrip inline `app.html` sebelum cat pertama, plus aturan `#boot-cover` yang mengikuti tema (`#000` untuk gelap, `#d1d2c5` untuk terang). Sebelumnya boot cover selalu hitam, jadi penutup anti-kedip itu sendiri yang menjadi kedipan pada mode terang.
+  - *Verifikasi*: pada CSS hasil build sudah tidak ada `prefers-color-scheme` sama sekali, dan utilitas `dark:` terkompilasi menjadi selector `:root:not([data-theme=light])`.
+- **[01:56 WIB] Opening Sequence Dapat Menggantung Permanen (`intro/IntroCalibration.svelte`):**
+  - *Root cause*: timeline memanggil `tl.call` berisi `tl.pause()` tanpa syarat pada label `sync-wait` (sekitar detik 1,15), sedangkan satu-satunya yang membangunkannya kembali adalah `checkProceed()` yang dipicu timer 1200ms dan event `load`. Bila timeline baru mencapai titik pause setelah kedua kondisi itu sudah terpenuhi (sangat mungkin, karena hidrasi dan inisialisasi Three.js membuat frame awal tersendat), tidak ada lagi yang memanggil `play()` dan intro diam di reticle sampai pengunjung mengklik. Selisih amannya hanya 50ms.
+  - *Solusi*: gerbang dibuat eksplisit melalui flag `cleared`. Timeline hanya menjeda dirinya bila gerbang belum dibuka, dan `clearGate()` selalu mampu melanjutkannya dari sisi mana pun. Ditambahkan failsafe `MAX_WAIT_MS` 2000ms yang membuka gerbang secara paksa bila `window.load` tidak kunjung datang karena font atau gambar yang macet.
+  - Menambahkan penjagaan `document.hidden`: tab yang dibuka di latar belakang memiliki `requestAnimationFrame` yang dibekukan browser, sehingga timeline akan diam dengan scroll halaman terkunci sampai pengunjung berpindah ke tab itu. Kini intro langsung menyerahkan kendali ke Hero.
+  - Durasi total dipangkas dari sekitar 3,5 detik menjadi sekitar 2,1 detik, dan waktu tampil minimum diturunkan dari 1200ms ke 700ms.
+  - Seluruh warna overlay dipindahkan dari `neutral-50` dan `white` yang hardcoded ke token `--yorha-bg` dan `--yorha-text-primary`, sehingga intro selalu sewarna tema yang sedang aktif.
+  - Tombol bypass kini juga menerima `Enter` dan mendeteksi `e.code` bernilai `Space`, bukan hanya `e.key` berupa spasi.
+- **[01:56 WIB] Custom Cursor Ter-mount Ganda, Tidak Ikut Tema, dan Berisiko Menghilangkan Pointer (`(site)/+layout.svelte`, `CustomCursor.svelte`, `app.css`):**
+  - `CustomCursor` ter-mount dua kali pada seluruh halaman `(site)`, yaitu di root layout dan di site layout, menghasilkan dua elemen kursor beserta dua set listener `mousemove`. Mount duplikat di site layout dihapus.
+  - SVG crosshair yang sebelumnya dikunci `text-white` kini mewarisi `var(--yorha-text-primary)`, dan halo `drop-shadow` memakai `var(--yorha-bg)`. Pada tema Bunker yang berlatar krem, kursor putih praktis tidak terlihat.
+  - Aturan `cursor: none` global kini dijaga `:has(.cursor-root)`, sehingga penunjuk bawaan hanya disembunyikan selama elemen penggantinya benar-benar ada di DOM. Sebelumnya satu kegagalan render membuat pengunjung kehilangan pointer sepenuhnya tanpa jalan keluar.
+- **[01:56 WIB] Kontras Teks Mikro di Bawah Ambang WCAG AA (`app.css`, `About.svelte`, `Skills.svelte`, `Contact.svelte`):**
+  - *Terukur*: `--yorha-text-muted` versi gelap `#686760` hanya mencapai rasio 3,70:1 di atas `#000000`, dan versi terang `#7d796c` hanya 2,85:1 di atas `#d1d2c5`. Padahal token itu justru dipakai untuk label berukuran 9 sampai 11 piksel.
+  - Token dinaikkan menjadi `#767569` (4,52:1) untuk mode gelap dan digelapkan menjadi `#59564c` (4,80:1) untuk mode terang, termasuk pasangan `--blog-text-muted`.
+  - Label 9-10px yang duduk di `opacity-50` (`ACTIVE TARGET SPEC`, `CLASSIFICATION`, alamat GitHub dan LinkedIn, baris `LOC:`) dinaikkan ke `opacity-75`.
+- **[01:56 WIB] Penghitung Kunjungan Memanggil API Setiap Mount dengan Logika Cache Mati (`Contact.svelte`):**
+  - *Root cause*: `localStorage.setItem` untuk `visitor_count_cache` langsung diikuti `localStorage.removeItem` tanpa syarat apa pun, sehingga cache tidak pernah berfungsi. Selain itu fallback lokal mengarang angka yang hanya bisa dilihat pengunjung itu sendiri, dan endpoint `/up` menaikkan hitungan pada setiap remount saat navigasi sisi klien.
+  - *Solusi*: hitungan dinaikkan sekali per sesi lalu dibaca dari `sessionStorage`, request diberi `AbortSignal.timeout(4000)`, dan fallback yang mengarang angka dihapus seluruhnya. Bila API gagal atau diblokir, lencana cukup tidak ditampilkan.
+- **[01:56 WIB] Panah CTA Arsip Proyek Tidak Pernah Bergerak (`Portfolio.svelte`):**
+  - Tautan `Explore All Projects Archive` menganimasikan panahnya dengan `group-hover:translate-x-1`, padahal elemen `a` induknya tidak pernah diberi kelas `group`. Kelas `group` ditambahkan.
+
+### Removed
+- **[01:56 WIB] Route Eksperimen, Dependensi, dan Kode Mati (`(site)/sandbox/`, `(site)/test-intro/`, `package.json`, `Section.svelte`, `Contact.svelte`, `CommandPalette.svelte`):**
+  - Menghapus route `sandbox` dan `test-intro`. Keduanya ikut ter-prerender ke `build/` karena `export const prerender = true` berlaku global di root layout, sehingga halaman eksperimen internal akan dapat diakses publik setelah deploy. Isinya tetap dapat dipulihkan dari commit `2ce3237`.
+  - Menghapus dependensi `animejs` yang tidak pernah diimpor sama sekali. Proyek ini memakai GSAP sebagai satu-satunya pustaka animasi.
+  - Membersihkan `const words` hasil `$derived` yang tidak terpakai di `Section.svelte` dan `Contact.svelte`, serta kelas mati `bg-black` pada panel CommandPalette yang sudah tertimpa `background-color` inline.
+
 ### Added
 - **[01:20 WIB] Sistem Opening Sequence Baru Berbasis Kalibrasi Optik YoRHa (`lib/components/intro/`, `(site)/+page.svelte`):**
   - Menambahkan direktori `src/lib/components/intro/` berisi tiga konsep opening sequence: `IntroCalibration.svelte` (dipakai di produksi), `IntroTacticalCalibration.svelte`, dan `IntroConstellation.svelte`.
@@ -33,6 +72,17 @@ Format changelog ini mengacu pada [Keep a Changelog](https://keepachangelog.com/
   - Mengubah paragraf intro dan body About dari `font-serif italic` (Baskervville) menjadi `font-sans tracking-wide` (Epilogue) demi keterbacaan pada layar kecil.
   - Mengubah margin note rasi bintang di hero dari serif italic 13px menjadi sans 11px dengan opacity 70.
   - Menghapus empat corner bracket pada kartu Availability agar kartu tidak bersaing dengan kartu proyek.
+- **[01:56 WIB] Penurunan Kebisingan Visual Halaman Utama (`(site)/+page.svelte`, `About.svelte`, `Skills.svelte`, `Contact.svelte`, `CurrentlyBuilding.svelte`, `app.css`):**
+  - **Marquee seam dihapus**: seam transisi Hero ke About dikembalikan menjadi bilah statis. Marquee horizontal yang berjalan tanpa henti berada persis di titik pembaca seharusnya berhenti menatap langit dan mulai membaca, dan gerak berulang di posisi itu adalah magnet perhatian terkuat di seluruh halaman. `@keyframes marquee` dan `.animate-marquee` ikut dibersihkan dari `app.css`.
+  - **Denyut dipangkas dari sembilan menjadi satu per section**: sebelumnya ada indikator berdenyut pada Node 01, Availability, Currently Building, Pod 042, bilah spesifikasi mobile Skills, lembar mobile Skills, Channel 01, badge COMMISSIONS, dan seam. Kini denyut hanya tersisa pada Availability di section About dan COMMISSIONS di section Contact, yaitu dua sinyal yang benar-benar dapat ditindaklanjuti pengunjung. Sisanya menjadi titik statis.
+  - **Aksen emerald dikembalikan maknanya**: kode indeks `SEC // 0x` pada Skills serta label `[ DIRECT_INBOX ]` dan `[ EXTERNAL_NODES ]` pada Contact tidak lagi memakai warna aksen. Aksen kini disediakan untuk status yang hidup dan hal yang bisa diklik.
+  - **Corner bracket menjadi umpan balik hover**: delapan bracket permanen pada dua kartu Contact kini hanya muncul saat hover, mengikuti pola kartu proyek. Bingkai Pod 042 diturunkan dari `border-current` penuh menjadi `border-current/35`.
+  - **Bayangan dibersihkan**: empat pelanggaran aturan zero-shadow di `Skills.svelte` (`shadow-xs`, `shadow-sm`, `shadow-lg`, `shadow-2xl`) dihapus.
+- **[01:56 WIB] Hero Memperoleh Aksi Utama (`Hero.svelte`):**
+  - Menambahkan tombol primer `View projects` menuju `/projects` dengan gaya blok terbalik (`--yorha-invert-bg`), berdampingan dengan tombol `Engineering Journal` yang kini berperan sebagai aksi sekunder. Sebelumnya satu-satunya aksi di atas lipatan adalah tautan ke blog, padahal tugas pertama sebuah portofolio adalah menawarkan karyanya.
+- **[01:56 WIB] Pod 042 Terbuka dengan Isi, dan Interaksi Rasi Bintang Dijelaskan (`Skills.svelte`, `stores/constellation.svelte.js`, `CornerTelemetry.svelte`):**
+  - Inspector Pod 042 kini terbuka pada kapabilitas dengan `readiness` tertinggi, bukan bingkai kosong bertuliskan STANDBY setinggi 460px. Baris status bawah menampilkan `HOVER A NODE TO INSPECT` sampai pengunjung benar-benar menyentuh sebuah node, dan bilah spesifikasi mobile hanya muncul setelah ketukan yang disengaja.
+  - Store rasi bintang memperoleh flag `traced`. Selama belum ada figur yang tersingkap, HUD sudut kiri bawah menampilkan `Move to trace a figure` alih-alih koordinat langit. Interaksi paling mahal secara teknis di proyek ini sebelumnya sama sekali tidak punya petunjuk keberadaan.
 
 ---
 
