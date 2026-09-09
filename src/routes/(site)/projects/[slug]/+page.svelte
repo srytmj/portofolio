@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
   import { gsap } from 'gsap';
   import { ease, dur } from '$lib/motion.js';
   import LeftEdgeReturn from '$lib/components/LeftEdgeReturn.svelte';
@@ -9,10 +10,19 @@
   const prevProject = $derived(data.prevProject);
   const nextProject = $derived(data.nextProject);
 
+  function handleKeyDown(e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      goto('/projects');
+    }
+  }
+
   onMount(() => {
     // No layout animations needed
   });
 </script>
+
+<svelte:window onkeydown={handleKeyDown} />
 
 <svelte:head>
   <title>{project.title} — Architecture & Case Study — Suryatmaja</title>
@@ -26,16 +36,29 @@
   <!-- Tactical Return Trigger on Left Edge Hover -->
   <LeftEdgeReturn />
 
-  <!-- Breadcrumbs & Meta Tag -->
-  <header data-project-anim class="mb-12 space-y-4 max-w-4xl">
-    <div class="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em]" style="color: var(--yorha-text-muted);">
-      <a href="/" class="hover:underline transition-colors" style="color: var(--yorha-text-muted);">Home</a>
-      <span>/</span>
-      <a href="/projects" class="hover:underline transition-colors" style="color: var(--yorha-text-muted);">Projects</a>
-      <span>/</span>
-      <span style="color: var(--yorha-text-primary);">{project.title}</span>
-    </div>
+  <!-- Top Navigation Bar: Breadcrumbs (Left) & All Projects Shortcut (Right) -->
+  <div class="flex items-center justify-between gap-4 mb-8 max-w-5xl">
+    <nav aria-label="Breadcrumbs" class="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] min-w-0">
+      <a href="/" class="hover:underline transition-colors shrink-0" style="color: var(--yorha-text-muted);">Home</a>
+      <span class="shrink-0" style="color: var(--yorha-text-muted);">/</span>
+      <a href="/projects" class="hover:underline transition-colors shrink-0" style="color: var(--yorha-text-muted);">Projects</a>
+      <span class="shrink-0" style="color: var(--yorha-text-muted);">/</span>
+      <span class="truncate" style="color: var(--yorha-text-primary);">{project.title}</span>
+    </nav>
 
+    <a
+      href="/projects"
+      class="inline-flex items-center gap-2 px-3 py-1 font-mono text-xs border rounded-none transition-all duration-150 hover:-translate-y-0.5 yorha-invert-hover cursor-pointer shrink-0"
+      style="background-color: var(--yorha-surface); border-color: var(--yorha-border); color: var(--yorha-text-primary);"
+      title="Return to all projects (Press ESC)"
+    >
+      <span>← [ ALL PROJECTS ]</span>
+      <kbd class="px-1.5 py-0.5 text-[9px] font-mono border rounded-none opacity-80" style="border-color: var(--yorha-border); background-color: var(--yorha-bg); color: var(--yorha-text-muted);">ESC</kbd>
+    </a>
+  </div>
+
+  <!-- Header -->
+  <header data-project-anim class="mb-12 space-y-4 max-w-4xl">
     <div class="flex flex-wrap items-center gap-3 font-mono text-xs">
       <span
         class="px-2 py-0.5 text-[10px] uppercase tracking-widest font-medium rounded-none border"
@@ -46,7 +69,7 @@
       <span class="uppercase tracking-widest" style="color: var(--yorha-text-muted);">{project.year}</span>
     </div>
 
-    <h1 class="text-h1 font-display tracking-tight" style="color: var(--yorha-text-primary);">
+    <h1 class="text-h1 font-display tracking-normal leading-[1.15] sm:leading-[1.18] pt-1 pb-1" style="color: var(--yorha-text-primary);">
       {project.title}
     </h1>
 
@@ -150,6 +173,14 @@
             ← All Projects
           </a>
         {/if}
+
+        <a
+          href="/projects"
+          class="inline-flex items-center gap-1.5 px-3 py-1 border rounded-none transition-all duration-150 hover:-translate-y-0.5 yorha-invert-hover cursor-pointer order-last sm:order-none"
+          style="background-color: var(--yorha-surface); border-color: var(--yorha-border); color: var(--yorha-text-primary);"
+        >
+          <span>[ ALL PROJECTS ARCHIVE ]</span>
+        </a>
 
         {#if nextProject}
           <a href={`/projects/${nextProject.slug}`} class="hover:underline transition-colors" style="color: var(--yorha-text-primary);">

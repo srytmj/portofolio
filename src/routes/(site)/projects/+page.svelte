@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { gsap } from 'gsap';
   import ProjectModal from '$lib/components/ProjectModal.svelte';
   import LeftEdgeReturn from '$lib/components/LeftEdgeReturn.svelte';
@@ -8,7 +8,11 @@
 
   let searchQuery = $state('');
   let selectedKind = $state('all');
-  let open = $state(null);
+  let openProject = $state(null);
+  let openIndex = $state(0);
+
+  const ITEMS_PER_PAGE = 6;
+  let currentPage = $state(1);
 
   const reduce =
     typeof window !== 'undefined' &&
@@ -23,7 +27,7 @@
       gsap.fromTo(
         '[data-project-card]',
         { y: 24, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.4, stagger: 0.05, ease: 'power2.out', clearProps: 'all' }
+        { y: 0, opacity: 1, duration: 0.4, stagger: 0.05, ease: 'power2.out', clearProps: 'transform,opacity' }
       );
     }
   });
@@ -32,25 +36,45 @@
   function setKind(kind) {
     if (selectedKind === kind) return;
     selectedKind = kind;
+    currentPage = 1;
     animateGrid();
   }
 
   $effect(() => {
-    // When search query changes, trigger animation
+    // When search query changes, reset page and trigger animation
     searchQuery;
+    currentPage = 1;
     animateGrid();
   });
 
-  function animateGrid() {
+  async function animateGrid() {
     if (reduce) return;
+    await tick();
     requestAnimationFrame(() => {
       gsap.killTweensOf('[data-project-card]');
       gsap.fromTo(
         '[data-project-card]',
         { y: 16, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.35, stagger: 0.04, ease: 'power2.out', clearProps: 'all' }
+        { y: 0, opacity: 1, duration: 0.35, stagger: 0.04, ease: 'power2.out', clearProps: 'transform,opacity' }
       );
     });
+  }
+
+  function goToPage(page) {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+    currentPage = page;
+    animateGrid();
+    if (typeof window !== 'undefined') {
+      const gridElem = document.getElementById('projects-grid');
+      if (gridElem) {
+        const y = gridElem.getBoundingClientRect().top + window.scrollY - 120;
+        if (window.__lenis) {
+          window.__lenis.scrollTo(y);
+        } else {
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }
+    }
   }
 
   // Extract all unique project kinds/categories
@@ -76,6 +100,12 @@
       return matchKind && matchQuery;
     });
   });
+
+  const totalPages = $derived(Math.ceil(filteredProjects.length / ITEMS_PER_PAGE));
+  const paginatedProjects = $derived.by(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProjects.slice(start, start + ITEMS_PER_PAGE);
+  });
 </script>
 
 <svelte:head>
@@ -92,14 +122,14 @@
   <LeftEdgeReturn />
 
   <!-- Header -->
-  <header class="mb-12 max-w-[var(--measure)] space-y-3">
+  <header class="mb-12 max-w-[var(--measure)] space-y-4">
     <div class="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em]" style="color: var(--yorha-text-muted);">
       <a href="/" class="hover:underline transition-colors" style="color: var(--yorha-text-muted);">Home</a>
       <span>/</span>
       <span style="color: var(--yorha-text-primary);">Projects</span>
     </div>
 
-    <h1 class="text-h1 font-display tracking-tight" style="color: var(--yorha-text-primary);">
+    <h1 class="text-h1 font-display tracking-normal leading-[1.15] sm:leading-[1.18] pt-1 pb-1" style="color: var(--yorha-text-primary);">
       Projects Archive
     </h1>
     <p class="text-body leading-relaxed" style="color: var(--yorha-text-muted);">
@@ -129,46 +159,52 @@
       {/if}
     </div>
 
-    <!-- Category Filters (Tactical Brackets & Block Invert) -->
-    <div class="flex items-center gap-1.5 pt-2 pb-1 font-mono text-[10px] uppercase tracking-wider overflow-x-auto sm:overflow-visible sm:flex-wrap no-scrollbar">
-      <span class="mr-1 select-none shrink-0 flex items-center gap-1.5" style="color: var(--yorha-text-muted);">
-        <span class="inline-block h-1.5 w-1.5" style="background-color: var(--yorha-accent);"></span>
-        FILTER:
+    <!-- Category Filters (Tactical Brackets & Animated Hover) -->
+    <div class="flex items-center gap-2 py-1.5 font-mono text-[10px] uppercase tracking-wider overflow-x-auto sm:overflow-visible sm:flex-wrap no-scrollbar">
+      <span class="mr-1 select-none shrink-0 inline-flex items-center gap-1.5 leading-none self-center" style="color: var(--yorha-text-muted);">
+        <span class="w-1.5 h-1.5 shrink-0 block -translate-y-[0.5px]" style="background-color: var(--yorha-accent);"></span>
+        <span class="leading-none">FILTER:</span>
       </span>
       {#each allKinds as kind}
         {@const active = selectedKind === kind}
         <button
           type="button"
           onclick={() => setKind(kind)}
-          class="group relative shrink-0 px-2.5 py-1 transition-all duration-150 border cursor-pointer rounded-none {active
-            ? 'font-medium'
-            : 'hover:opacity-80'}"
+          class="group relative shrink-0 px-3 py-1.5 transition-all duration-200 border cursor-pointer rounded-none select-none hover:-translate-y-0.5 active:translate-y-0 {active
+            ? 'font-medium shadow-sm'
+            : 'hover:border-current/60 hover:text-[var(--yorha-text-primary)]'}"
           style={active
             ? 'background-color: var(--yorha-invert-bg); color: var(--yorha-invert-text); border-color: var(--yorha-invert-bg);'
             : 'background-color: var(--yorha-surface); color: var(--yorha-text-muted); border-color: var(--yorha-border);'}
         >
-          <span class="relative z-10">{kind}</span>
-          {#if active}
-            <span class="pointer-events-none absolute -top-px -left-px h-1.5 w-1.5 border-l border-t" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
-            <span class="pointer-events-none absolute -bottom-px -right-px h-1.5 w-1.5 border-b border-r" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
-          {/if}
+          <!-- Tactical Corner Reticle on Hover / Active -->
+          <span class="pointer-events-none absolute -top-px -left-px h-1.5 w-1.5 border-l border-t transition-opacity duration-150 {active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
+          <span class="pointer-events-none absolute -bottom-px -right-px h-1.5 w-1.5 border-b border-r transition-opacity duration-150 {active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
+
+          <span class="relative z-10 flex items-center gap-1.5">
+            {#if active}
+              <span class="inline-block w-1 h-1 rounded-full animate-pulse" style="background-color: var(--yorha-accent);"></span>
+            {/if}
+            {kind}
+          </span>
         </button>
       {/each}
     </div>
   </div>
 
   <!-- Projects Grid -->
-    <div class="grid gap-6 sm:grid-cols-2 max-w-5xl">
-      {#if filteredProjects.length === 0}
+  <div id="projects-grid" class="space-y-8 max-w-5xl">
+    <div class="grid gap-6 sm:grid-cols-2">
+      {#if paginatedProjects.length === 0}
         <div class="col-span-full py-16 text-center font-mono text-sm border p-8 rounded-none" style="background-color: var(--yorha-surface); border-color: var(--yorha-border); color: var(--yorha-text-muted);">
           No projects match the specified search query or category filter.
         </div>
       {:else}
-        {#each filteredProjects as p, i (p.slug)}
+        {#each paginatedProjects as p, i (p.slug)}
           <div
             data-project-card
-            class="group relative flex flex-col justify-between gap-6 rounded-none border p-5 sm:p-7 sm:p-8 transition-colors duration-150 hover:-translate-y-0.5 cursor-pointer"
-            style="background-color: var(--yorha-surface); border-color: var(--yorha-border);"
+            class="group relative flex flex-col justify-between gap-6 rounded-none border border-transparent hover:border-current/40 hover:bg-current/[0.02] p-5 sm:p-7 sm:p-8 transition-all duration-150 hover:-translate-y-0.5 cursor-pointer"
+            style="background-color: var(--yorha-surface);"
           >
           <!-- Tactical Reticle Brackets on Hover -->
           <span class="pointer-events-none absolute -top-px -left-px h-2 w-2 border-l-2 border-t-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
@@ -185,7 +221,11 @@
           <div>
             <div class="flex items-start justify-between gap-4">
               <a href={`/projects/${p.slug}`} class="block group/title">
-                <h2 class="text-h3 font-semibold tracking-tight transition-colors duration-200" style="color: var(--yorha-text-primary);">
+                <h2
+                  data-card-title
+                  class="text-h3 font-semibold tracking-tight transition-colors duration-200"
+                  style="color: var(--yorha-text-primary);"
+                >
                   {p.title}
                 </h2>
                 <p class="mt-1 font-mono text-label uppercase tracking-[0.22em]" style="color: var(--yorha-text-muted);">
@@ -214,7 +254,10 @@
               <div class="flex items-center gap-3">
                 <button
                   type="button"
-                  onclick={() => (open = i)}
+                  onclick={() => {
+                    openProject = p;
+                    openIndex = (currentPage - 1) * ITEMS_PER_PAGE + i;
+                  }}
                   class="inline-flex items-center gap-1.5 transition-colors cursor-pointer group/btn yorha-invert-hover px-2 py-0.5 border"
                   style="border-color: var(--yorha-border); color: var(--yorha-text-primary); background-color: var(--yorha-bg);"
                 >
@@ -253,6 +296,72 @@
     {/if}
   </div>
 
+  <!-- Pagination Bar (When items > 6) -->
+  {#if totalPages > 1}
+    <div class="pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs" style="border-color: var(--yorha-border);">
+      <div class="text-[11px] uppercase tracking-wider" style="color: var(--yorha-text-muted);">
+        <span>RECORDS: </span>
+        <span style="color: var(--yorha-text-primary);">
+          {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredProjects.length)}
+        </span>
+        <span> OF {filteredProjects.length}</span>
+        <span class="mx-2 opacity-40">|</span>
+        <span>PAGE </span>
+        <span style="color: var(--yorha-accent);">{currentPage}</span>
+        <span> OF {totalPages}</span>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <!-- Previous Page Button -->
+        <button
+          type="button"
+          onclick={() => goToPage(currentPage - 1)}
+          disabled={currentPage === 1}
+          class="px-3 py-1.5 border rounded-none uppercase tracking-wider transition-all duration-150 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed hover:not-disabled:-translate-y-0.5"
+          style="background-color: var(--yorha-surface); border-color: var(--yorha-border); color: var(--yorha-text-primary);"
+          aria-label="Previous Page"
+        >
+          ← PREV
+        </button>
+
+        <!-- Page Number Chips -->
+        {#each Array.from({ length: totalPages }, (_, idx) => idx + 1) as pageNum}
+          {@const isCurrent = currentPage === pageNum}
+          <button
+            type="button"
+            onclick={() => goToPage(pageNum)}
+            class="relative px-3 py-1.5 border rounded-none transition-all duration-150 cursor-pointer hover:-translate-y-0.5 {isCurrent
+              ? 'font-bold'
+              : 'hover:border-current/60'}"
+            style={isCurrent
+              ? 'background-color: var(--yorha-invert-bg); color: var(--yorha-invert-text); border-color: var(--yorha-invert-bg);'
+              : 'background-color: var(--yorha-surface); color: var(--yorha-text-muted); border-color: var(--yorha-border);'}
+            aria-current={isCurrent ? 'page' : undefined}
+          >
+            {#if isCurrent}
+              <span class="pointer-events-none absolute -top-px -left-px h-1 w-1 border-l border-t" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
+              <span class="pointer-events-none absolute -bottom-px -right-px h-1 w-1 border-b border-r" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
+            {/if}
+            {String(pageNum).padStart(2, '0')}
+          </button>
+        {/each}
+
+        <!-- Next Page Button -->
+        <button
+          type="button"
+          onclick={() => goToPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          class="px-3 py-1.5 border rounded-none uppercase tracking-wider transition-all duration-150 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed hover:not-disabled:-translate-y-0.5"
+          style="background-color: var(--yorha-surface); border-color: var(--yorha-border); color: var(--yorha-text-primary);"
+          aria-label="Next Page"
+        >
+          NEXT →
+        </button>
+      </div>
+    </div>
+  {/if}
+  </div>
+
   <!-- Footer Navigation -->
   <footer class="mt-16 pt-8 border-t max-w-5xl flex items-center justify-between font-mono text-xs" style="border-color: var(--yorha-border); color: var(--yorha-text-muted);">
     <a href="/" class="hover:underline transition-colors" style="color: var(--yorha-text-muted);">
@@ -266,10 +375,17 @@
 </div>
 
 <!-- Detail Modal -->
-{#if open !== null}
+{#if openProject !== null}
   <ProjectModal
-    project={filteredProjects[open]}
-    index={open}
-    onClose={() => (open = null)}
+    project={openProject}
+    index={openIndex}
+    onClose={() => (openProject = null)}
   />
 {/if}
+
+<style>
+  [data-project-card]:hover [data-card-title],
+  [data-project-card]:focus-within [data-card-title] {
+    color: var(--yorha-accent) !important;
+  }
+</style>

@@ -379,7 +379,7 @@
         <span>/</span>
         <a href="/blog" class="hover:underline transition-colors" style="color: var(--blog-text-muted);">Blog</a>
         <span>/</span>
-        <span class="truncate max-w-[180px] sm:max-w-xs" style="color: var(--blog-text-primary); opacity: 0.6;">{post.slug}</span>
+        <span class="truncate max-w-[180px] sm:max-w-xs font-medium" style="color: var(--blog-accent);">{post.slug}</span>
       </div>
 
       <!-- Action items: Quick Search & Back link -->
@@ -437,10 +437,12 @@
                     {#each post.categories as cat, idx}
                       <a
                         href={`/blog?category=${encodeURIComponent(cat)}`}
-                        class="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 border rounded-none transition-colors yorha-invert-hover cursor-pointer"
+                        class="group relative font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 border rounded-none transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer hover:border-[var(--blog-accent)]"
                         style="background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-primary);"
                       >
-                        {cat}
+                        <span class="pointer-events-none absolute -top-px -left-px h-1.5 w-1.5 border-l border-t opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                        <span class="pointer-events-none absolute -bottom-px -right-px h-1.5 w-1.5 border-b border-r opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                        <span class="relative z-10 transition-colors group-hover:text-[var(--blog-accent)]">{cat}</span>
                       </a>
                       {#if idx < post.categories.length - 1}
                         <span class="text-[10px] opacity-40 font-mono">/</span>
@@ -460,10 +462,12 @@
                     {#each post.tags as tag}
                       <a
                         href={`/blog?tag=${encodeURIComponent(tag)}`}
-                        class="font-mono text-[10px] px-2 py-0.5 border rounded-none transition-colors yorha-invert-hover cursor-pointer"
+                        class="group relative font-mono text-[10px] px-2.5 py-1 border rounded-none transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer hover:border-[var(--blog-accent)]"
                         style="background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-muted);"
                       >
-                        #{tag}
+                        <span class="pointer-events-none absolute -top-px -left-px h-1.5 w-1.5 border-l border-t opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                        <span class="pointer-events-none absolute -bottom-px -right-px h-1.5 w-1.5 border-b border-r opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                        <span class="relative z-10 transition-colors group-hover:text-[var(--blog-text-primary)]">#{tag}</span>
                       </a>
                     {/each}
                   </div>
@@ -576,15 +580,29 @@
                 {#each recentPosts as rPost}
                   <a
                     href={`/blog/${rPost.slug}`}
-                    class="group block p-2.5 border transition-all duration-200 rounded-none"
+                    class="group relative block p-2.5 border transition-all duration-200 rounded-none hover:-translate-y-0.5 active:translate-y-0 cursor-pointer overflow-hidden"
                     style="background-color: var(--blog-surface); border-color: var(--blog-border);"
                   >
-                    <div class="text-xs font-semibold transition-colors line-clamp-2 leading-snug" style="color: var(--blog-text-primary);">
+                    <!-- Pixel-perfect Corner Reticles on Hover -->
+                    <span class="pointer-events-none absolute -top-px -left-px h-1.5 w-1.5 border-l border-t opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                    <span class="pointer-events-none absolute -bottom-px -right-px h-1.5 w-1.5 border-b border-r opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+
+                    <!-- Top Scanline on Hover -->
+                    <span
+                      class="pointer-events-none absolute inset-x-0 top-0 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"
+                      style="background-color: var(--blog-accent);"
+                      aria-hidden="true"
+                    ></span>
+
+                    <div class="text-xs font-semibold transition-colors duration-150 line-clamp-2 leading-snug group-hover:text-[var(--blog-accent)]" style="color: var(--blog-text-primary);">
                       {rPost.title}
                     </div>
                     <div class="mt-2 flex items-center justify-between font-mono text-[10px]" style="color: var(--blog-text-muted);">
                       <time datetime={rPost.date}>{rPost.date}</time>
-                      <span>{rPost.readingTime}</span>
+                      <div class="flex items-center gap-1">
+                        <span>{rPost.readingTime}</span>
+                        <span class="transition-transform duration-200 group-hover:translate-x-0.5 opacity-0 group-hover:opacity-100" style="color: var(--blog-accent);">→</span>
+                      </div>
                     </div>
                   </a>
                 {/each}
@@ -603,11 +621,15 @@
                   {#each trendingTags as t}
                     <a
                       href={`/blog?tag=${encodeURIComponent(t.name)}`}
-                      class="font-mono text-[11px] px-2 py-1 border transition-colors flex items-center gap-1.5 rounded-none"
+                      class="group relative font-mono text-[11px] px-2.5 py-1 border transition-all duration-200 flex items-center gap-1.5 rounded-none hover:-translate-y-0.5 active:translate-y-0 cursor-pointer hover:border-[var(--blog-accent)]"
                       style="background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-muted);"
                     >
-                      <span>#{t.name}</span>
-                      <span class="text-[9px] opacity-60">[{t.count}]</span>
+                      <!-- Tactical Corner Reticle on Hover -->
+                      <span class="pointer-events-none absolute -top-px -left-px h-1.5 w-1.5 border-l border-t opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                      <span class="pointer-events-none absolute -bottom-px -right-px h-1.5 w-1.5 border-b border-r opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+
+                      <span class="transition-colors group-hover:text-[var(--blog-text-primary)]">#{t.name}</span>
+                      <span class="text-[9px] opacity-60 transition-colors group-hover:opacity-100" style="color: var(--blog-accent);">[{t.count}]</span>
                     </a>
                   {/each}
                 </div>

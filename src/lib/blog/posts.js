@@ -497,12 +497,44 @@ export function getArchiveByYear(posts) {
     map.get(year).push(p);
   }
 
+  const MONTH_NAMES = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
   const result = [];
   for (const [year, yearPosts] of map.entries()) {
+    // Group posts within this year by month
+    const monthMap = new Map();
+    for (const p of yearPosts) {
+      const monthMatch = (p.date || '').match(/^\d{4}-(\d{2})/);
+      const monthKey = monthMatch ? monthMatch[1] : '00';
+      if (!monthMap.has(monthKey)) {
+        monthMap.set(monthKey, []);
+      }
+      monthMap.get(monthKey).push(p);
+    }
+
+    const months = [];
+    for (const [monthKey, mPosts] of monthMap.entries()) {
+      const mNum = parseInt(monthKey, 10);
+      const monthName = (mNum >= 1 && mNum <= 12) ? MONTH_NAMES[mNum - 1] : 'Undated';
+      months.push({
+        month: monthKey,
+        monthName,
+        count: mPosts.length,
+        posts: mPosts
+      });
+    }
+
+    // Sort months descending (12 -> 01)
+    months.sort((a, b) => b.month.localeCompare(a.month));
+
     result.push({
       year,
       count: yearPosts.length,
-      posts: yearPosts // already sorted newest first
+      posts: yearPosts, // already sorted newest first
+      months
     });
   }
 

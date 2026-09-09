@@ -27,13 +27,15 @@ npm run preview  # preview built site locally
   - Automatic tier degradation: `full` (desktop/dedicated GPU), `lite` (mobile/integrated GPU), and `static` (CSS-only starfield for low-power, SSR, or `prefers-reduced-motion`).
 - **Engineering Journal (Blog Engine)**:
   - Markdown-driven publishing via Vite eager glob (`import.meta.glob('/src/posts/*.md')`).
+  - Multi-view navigation system (Home, Categories Tree, Tags Cloud, and Chronological Timeline Archive grouped by year and month).
   - Full syntax highlighting powered by Prism.js with copy-to-clipboard buttons and language badges.
-  - Interactive Mermaid.js architectural flowchart and sequence rendering.
+  - Interactive Mermaid.js architectural flowchart and sequence rendering with reactive theme adaptation.
   - Dual reading mode: OLED Black and Sepia Bunker Archive.
   - Responsive Table of Contents (TOC) with scroll-spy and auto-following viewport synchronization.
 - **Projects & Production Architecture Archive**:
   - Filterable production archive by classification (`cloud`, `homelab`, `fullstack`, `automation`, `systems`).
   - Real-time search query filtering with zero-stagger instantaneous transitions.
+  - Tactical pagination system (capped at 6 projects per page with keyboard & quick navigation).
   - Tactical specification inspector modal dialog with deep-dive routing (`/projects/[slug]`).
 - **Tactical Command Palette (Ctrl+K / ⌘K)**:
   - Public visitor menu (site navigation, external profiles, constellation trivia launcher).
