@@ -17,10 +17,10 @@
   /** @type {any[] | null} */ let svcGroups = $state(null);
   let closing = false;
 
-  /** @type {HTMLElement} */ let backdrop;
-  /** @type {HTMLElement} */ let panel;
-  /** @type {HTMLInputElement} */ let input;
-  /** @type {HTMLElement} */ let listEl;
+  /** @type {HTMLElement | null} */ let backdrop = $state(null);
+  /** @type {HTMLElement | null} */ let panel = $state(null);
+  /** @type {HTMLInputElement | null} */ let input = $state(null);
+  /** @type {HTMLElement | null} */ let listEl = $state(null);
   let restoreFocus;
 
   const nav = [

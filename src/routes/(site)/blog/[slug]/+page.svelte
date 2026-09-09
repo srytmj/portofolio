@@ -1034,11 +1034,6 @@
   :global([data-blog-theme]) nav[data-article-anim] {
     border-color: var(--blog-border) !important;
   }
-
-  :global([data-blog-theme]) [data-article-anim] .border-white\/10 {
-    border-color: var(--blog-border) !important;
-  }
-
   :global([data-blog-theme]) aside[data-flying-sidebar] .border-l {
     border-color: var(--blog-border) !important;
   }
@@ -1054,73 +1049,12 @@
   :global([data-blog-theme]) aside[data-flying-sidebar] a:hover {
     border-color: var(--blog-accent);
   }
-
-  :global([data-blog-theme]) .text-ash-2,
-  :global([data-blog-theme]) .text-ash-3,
-  :global([data-blog-theme]) .text-white\/70,
-  :global([data-blog-theme]) .text-white\/80 {
-    color: var(--blog-text-muted);
-  }
-
-  :global([data-blog-theme]) .text-white,
-  :global([data-blog-theme]) .text-white\/90 {
-    color: var(--blog-text-primary);
-  }
-
-  :global([data-blog-theme]) .text-emerald-400 {
-    color: var(--blog-accent) !important;
-  }
-
-  :global([data-blog-theme]) .hover\:text-emerald-400:hover,
-  :global([data-blog-theme]) .group:hover .group-hover\:text-emerald-400 {
-    color: var(--blog-accent) !important;
-  }
-
-  :global([data-blog-theme]) .hover\:border-emerald-400:hover {
-    border-color: var(--blog-accent) !important;
-  }
-
   :global([data-blog-theme]) .shadow-2xl,
   :global([data-blog-theme]) .shadow-lg,
-  :global([data-blog-theme]) .shadow-md,
   :global([data-blog-theme]) [class*='shadow-'] {
     box-shadow: none !important;
     text-shadow: none !important;
   }
-
-  :global([data-blog-theme]) .border-emerald-400,
-  :global([data-blog-theme]) .border-emerald-400\/50,
-  :global([data-blog-theme]) .border-emerald-400\/60 {
-    border-color: var(--blog-accent) !important;
-  }
-
-  :global([data-blog-theme]) .bg-emerald-400\/10,
-  :global([data-blog-theme]) .bg-emerald-400\/20 {
-    background-color: var(--blog-accent-subtle) !important;
-  }
-
-  :global([data-blog-theme]) .border-white\/10,
-  :global([data-blog-theme]) .border-white\/15,
-  :global([data-blog-theme]) .border-white\/5 {
-    border-color: var(--blog-border) !important;
-  }
-
-  :global([data-blog-theme]) .bg-ink-1 {
-    background-color: var(--blog-surface) !important;
-  }
-
-  :global([data-blog-theme]) .bg-white\/\[0\.03\],
-  :global([data-blog-theme]) .bg-white\/\[0\.05\],
-  :global([data-blog-theme]) .bg-white\/\[0\.015\] {
-    background-color: var(--blog-input-bg) !important;
-  }
-
-  /* Search modal */
-  :global([data-blog-theme]) .bg-ink-1\/95 {
-    background-color: var(--blog-surface) !important;
-    border-color: var(--blog-border) !important;
-  }
-
   /* Custom scrollbar for TOC & modal */
   .custom-scrollbar::-webkit-scrollbar {
     width: 4px;

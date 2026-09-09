@@ -1132,10 +1132,6 @@
     color: var(--blog-accent) !important;
   }
 
-  /* Interactive Hover Color Enhancements (works in both OLED Dark and Sepia Light) */
-  :global([data-blog-theme]) .hover\:text-emerald-400:hover,
-  :global([data-blog-theme]) .group:hover .group-hover\:text-emerald-400,
-  :global([data-blog-theme]) .group\/link:hover .group-hover\/link\:text-emerald-400,
   :global([data-blog-theme]) [data-home-card]:hover h2,
   :global([data-blog-theme]) [data-category-card]:hover h3,
   :global([data-blog-theme]) [data-category-post-item]:hover h3,
@@ -1157,63 +1153,9 @@
   :global([data-blog-theme]) aside nav button:hover {
     border-color: var(--blog-hover-border) !important;
   }
-
-  /* Micro-typography & Utility Color Overrides for Black & Sepia themes */
-  :global([data-blog-theme]) .text-ash-2,
-  :global([data-blog-theme]) .text-ash-3,
-  :global([data-blog-theme]) .text-white\/70 {
-    color: var(--blog-text-muted);
-  }
-
-  :global([data-blog-theme]) .text-white {
-    color: var(--blog-text-primary);
-  }
-
-  :global([data-blog-theme]) .text-emerald-400 {
-    color: var(--blog-accent);
-  }
-
-  :global([data-blog-theme]) .border-emerald-400,
-  :global([data-blog-theme]) .border-emerald-400\/80,
-  :global([data-blog-theme]) .border-emerald-400\/60,
-  :global([data-blog-theme]) .border-emerald-400\/50,
-  :global([data-blog-theme]) .border-emerald-400\/20,
-  :global([data-blog-theme]) .border-emerald-400\/25 {
-    border-color: var(--blog-accent);
-  }
-
-  :global([data-blog-theme]) .bg-emerald-400 {
-    background-color: var(--blog-accent) !important;
-  }
-
-  :global([data-blog-theme]) .bg-emerald-400\/10,
-  :global([data-blog-theme]) .bg-emerald-400\/15 {
-    background-color: var(--blog-accent-subtle);
-  }
-
-  :global([data-blog-theme]) .border-white\/10,
-  :global([data-blog-theme]) .border-white\/15,
-  :global([data-blog-theme]) .border-white\/5,
-  :global([data-blog-theme]) .border-white\/20,
-  :global([data-blog-theme]) .border-white\/25 {
+  :global([data-blog-theme]) .border-white\/10 {
     border-color: var(--blog-border);
   }
-
-  :global([data-blog-theme]) .bg-ink-1,
-  :global([data-blog-theme]) .bg-ink-1\/80,
-  :global([data-blog-theme]) .bg-ink-1\/50 {
-    background-color: var(--blog-surface);
-  }
-
-  :global([data-blog-theme]) .bg-white\/5,
-  :global([data-blog-theme]) .bg-white\/\[0\.02\] {
-    background-color: var(--blog-input-bg);
-  }
-
-  :global([data-blog-theme]) .border-l.border-white\/15 {
-    border-color: var(--blog-border);
-  }
-
   :global([data-blog-theme]) span.h-6.w-6 {
     border-color: var(--blog-accent) !important;
     background-color: var(--blog-bg) !important;
