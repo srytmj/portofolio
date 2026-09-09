@@ -75,7 +75,89 @@ static/
 
 ---
 
-## 3. Panduan AI Agent: Menulis & Menerbitkan Artikel Blog Baru
+## 3. Panduan Mengedit & Menambah Konten: Skills & Portfolio/Projects
+
+Semua data keahlian (*skills*) dan proyek arsitektur (*portfolio/projects*) dikelola terpusat di file [`src/lib/content/site.js`](file:///c:/Users/saket/Documents/Github/portofolio/src/lib/content/site.js).
+
+### A. Menambah atau Mengedit Keahlian (Tech Stack Matrix)
+
+Array `export const stack` mengelompokkan keahlian ke dalam 4 kluster (*layers*):
+1. `cloud & automation` (code: `'01'`)
+2. `systems & virtualization` (code: `'02'`)
+3. `networking & security` (code: `'03'`)
+4. `application runtime` (code: `'04'`)
+
+#### Schema Objek Skill:
+Setiap item di dalam array `items` wajib memiliki metadata lengkap untuk monitor **Pod 042 Diagnostics**:
+```javascript
+{
+  id: 'NET-05',           // ID taktis unik (INF-xx, CLD-xx, SYS-xx, NET-xx, APP-xx)
+  name: 'BGP Routing',    // Nama teknologi / protokol
+  badge: 'PROD',          // Tipe badge: 'CORE' | 'PROD' | 'DAILY' | 'LAB'
+  readiness: 94,          // Angka 0 - 100 (mempengaruhi bar kemajuan di kartu & inspector)
+  detail: 'Ringkasan kemampuan 1 kalimat untuk kartu mini...',
+  role: 'Peran arsitektur mendalam untuk panel Pod 042 Inspector di sisi kanan...',
+  deployedAt: 'Contoh implementasi nyata (misal: "MikroTik CCR2004, WireGuard mesh, ASN peering")',
+  command: '$ vtysh -c "show ip bgp summary"\nOutput terminal simulator realistis...'
+}
+```
+
+#### Sinkronisasi Jumlah Item (Category Count):
+Jika Anda menambah atau menghapus skill pada layer tertentu, perbarui nilai `count` pada array `categories` di [`src/lib/components/Skills.svelte`](file:///c:/Users/saket/Documents/Github/portofolio/src/lib/components/Skills.svelte):
+```javascript
+const categories = [
+  { id: 'ALL', label: 'ALL CAPABILITIES', count: 19 }, // Update total akumulasi
+  { id: 'cloud', label: '01 // CLOUD & AUTOMATION', count: 5 },
+  { id: 'systems', label: '02 // SYSTEMS & VIRT', count: 4 },
+  { id: 'networking', label: '03 // NETWORKING', count: 5 }, // Update layer terkait
+  { id: 'application', label: '04 // APP RUNTIME', count: 5 }
+];
+```
+
+---
+
+### B. Menambah atau Mengedit Portfolio / Proyek Arsitektur
+
+Array `export const projects` menyimpan seluruh portofolio sistem dan arsitektur yang dibangun.
+
+#### Schema Objek Proyek:
+```javascript
+{
+  slug: 'homelab-k3s-cluster',     // URL slug unik (menjadi /projects/homelab-k3s-cluster)
+  title: 'Homelab K3s Cluster',    // Judul proyek
+  kind: 'Infrastructure',          // Kategori filter: 'Infrastructure' | 'Platform' | 'Web app' | 'Automation'
+  year: '2026',                    // Tahun / rentang waktu (misal: '2026' atau 'Since 2024')
+  summary:
+    'Deskripsi singkat 1-2 kalimat yang tampil pada kartu ringkasan di landing page dan arsip.',
+  detail: [
+    'Paragraf 1: Penjelasan latar belakang, arsitektur perangkat keras, dan kebutuhan sistem.',
+    'Paragraf 2: Rincian software stack, containerization, routing jaringan, dan protokol keamanan.',
+    'Paragraf 3: Strategi penyimpanan, automated backup, serta monitoring observabilitas (Prometheus/Grafana).'
+  ],
+  stack: ['K3s', 'Proxmox VE', 'Tailscale', 'Terraform', 'Longhorn', 'GitHub Actions'],
+  images: [
+    '/projects/homelab-cluster-1.svg', // Aset gambar di folder static/projects/
+    '/projects/homelab-cluster-2.svg'
+  ],
+  links: [
+    { label: 'Repo', href: 'https://github.com/srytmj/homelab' },
+    { label: 'Live Notes', href: '/blog/2026-07-03-membangun-ha-web-server-aws' }
+  ]
+}
+```
+
+#### Aturan Tampilan & Hirarki:
+1. **Landing Page Featured (`Portfolio.svelte`)**:
+   Halaman utama menampilkan **4 proyek teratas** (`projects.slice(0, 4)`). Pastikan 4 proyek unggulan utama selalu diletakkan di urutan paling atas array `projects`.
+2. **Halaman Katalog Lengkap (`/projects`)**:
+   Menampilkan semua item dalam array `projects` dengan pencarian teks dinamis (berdasarkan judul, ringkasan, atau tag tech stack) dan filter kategori taktis.
+3. **Modal Cepat vs Deep Dive**:
+   - Tombol **Quick Specs** membuka dialog modal inspektor tanpa border putih yang menampilkan rincian teknis instan.
+   - Link **Deep Dive →** membuka rute halaman khusus [`/projects/[slug]`](file:///c:/Users/saket/Documents/Github/portofolio/src/routes/%28site%29/projects/%5Bslug%5D/+page.svelte) dengan dokumentasi arsitektural lengkap.
+
+---
+
+## 4. Panduan AI Agent: Menulis & Menerbitkan Artikel Blog Baru
 
 Modul Engineering Journal membaca file Markdown mentah dari `src/posts/*.md` via Vite glob (`import.meta.glob`). Ikuti format ketat di bawah saat membuat atau menyunting artikel.
 
@@ -133,7 +215,7 @@ cover: "/assets/img/posts/260703/cover.png"
 
 ---
 
-## 4. SOP Maintenance & Pemeliharaan Codebase
+## 5. SOP Maintenance & Pemeliharaan Codebase
 
 Setiap AI Agent yang menjalankan tugas pemeliharaan atau debugging wajib mematuhi aturan berikut:
 
@@ -164,22 +246,18 @@ Setiap AI Agent yang menjalankan tugas pemeliharaan atau debugging wajib mematuh
 
 ---
 
-## 5. Panduan Deployment: GitHub Pages & AWS EC2
+## 6. Panduan Deployment: GitHub Pages, AWS EC2, & Homelab Self-Hosted
 
 ### A. Opsi 1: Deploy ke GitHub Pages (Static Hosting)
 
 Aplikasi telah mendukung full prerendering (SSG) via `src/routes/+layout.js` (`export const prerender = true;`).
 
 1. **Konfigurasi Adapter**:
-   Instal `@sveltejs/adapter-static` jika belum ada:
-   ```bash
-   npm install -D @sveltejs/adapter-static
-   ```
-   Perbarui `svelte.config.js`:
+   Pastikan `@sveltejs/adapter-static` terpasang di `svelte.config.js`:
    ```javascript
    import adapter from '@sveltejs/adapter-static';
 
-   const config = {
+   export default {
      kit: {
        adapter: adapter({
          pages: 'build',
@@ -190,7 +268,6 @@ Aplikasi telah mendukung full prerendering (SSG) via `src/routes/+layout.js` (`e
        })
      }
    };
-   export default config;
    ```
 2. **GitHub Actions Workflow** (`.github/workflows/deploy.yml`):
    ```yaml
@@ -349,7 +426,89 @@ echo "Deployment berhasil diperbarui pada $(date)!"
 
 ---
 
-## 6. SOP Menambah & Memodifikasi Fitur (Adding / Modifying Features)
+### C. Opsi 3: Deploy di Homelab Self-Hosted (Docker, Tailscale, & Cloudflare Tunnel)
+
+Untuk hosting di server homelab fisik pribadi (mini-PC, Proxmox VE, Debian bare-metal):
+
+#### 1. Containerization dengan Docker & Nginx Alpine:
+Buat `Dockerfile` di root repositori:
+```dockerfile
+# Stage 1: Build SvelteKit static site
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Stage 2: Serve with lightweight Nginx
+FROM nginx:alpine
+COPY --from=builder /app/build /usr/share/nginx/html
+COPY <<EOF /etc/nginx/conf.d/default.conf
+server {
+    listen 80;
+    server_name localhost;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location / {
+        try_files \$uri \$uri/ /index.html /404.html;
+    }
+
+    location /_app/immutable/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+EOF
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+#### 2. Konfigurasi `docker-compose.yml`:
+```yaml
+services:
+  portfolio:
+    build: .
+    container_name: yorha-portfolio
+    restart: unless-stopped
+    ports:
+      - "3080:80"
+    networks:
+      - proxy-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portfolio.rule=Host(`porto.local`)"
+
+networks:
+  proxy-net:
+    external: true
+```
+
+#### 3. Ingress & Remote Access Homelab:
+- **Cloudflare Zero Trust Tunnel (`cloudflared`)**:
+  Publikasikan portofolio ke internet tanpa membuka port router / port forwarding publik:
+  ```bash
+  cloudflared tunnel route dns <tunnel-id> porto.suryatmaja.dev
+  # Arahkan service ingress ke http://localhost:3080
+  ```
+- **Tailscale Tailnet Private Ingress**:
+  Jika portofolio hanya ingin diakses melalui jaringan privat MagicDNS (*.ts.net):
+  ```bash
+  tailscale serve --bg 3080
+  ```
+- **Konfigurasi Environment Homelab Services**:
+  File `.env` mendefinisikan URL layanan homelab internal yang dibuka melalui Command Palette (Ctrl+K) pemilik:
+  ```bash
+  cp .env.example .env
+  # Isi alamat service tailnet:
+  # PUBLIC_JELLYFIN_URL=http://jellyfin.my-tailnet.ts.net
+  # PUBLIC_PROXMOX_URL=https://pve.my-tailnet.ts.net:8006
+  ```
+
+---
+
+## 7. SOP Menambah & Memodifikasi Fitur (Adding / Modifying Features)
 
 Setiap penambahan fitur baru atau modifikasi fitur yang sudah ada wajib mengikuti alur kerja berikut:
 
@@ -367,7 +526,7 @@ Setiap penambahan fitur baru atau modifikasi fitur yang sudah ada wajib mengikut
 
 ---
 
-## 7. Kewajiban Penggunaan CHANGELOG & Standar Git Commit
+## 8. Kewajiban Penggunaan CHANGELOG & Standar Git Commit
 
 > [!CAUTION]
 > **ATURAN MUTLAK AGEN AI TERKAIT GIT & DOKUMENTASI**:
@@ -379,7 +538,7 @@ Setiap penambahan fitur baru atau modifikasi fitur yang sudah ada wajib mengikut
 > 2. **KEWAJIBAN UPDATE CHANGELOG**:
 >    - Setiap kali melakukan penambahan fitur, perbaikan bug, atau refaktoring kode, AI Agent **WAJIB** mencatat perubahan di [`CHANGELOG.md`](file:///c:/Users/saket/Documents/Github/portofolio/CHANGELOG.md) sebelum melakukan commit.
 >    - Format pencatatan wajib menyertakan:
->      - Waktu WIB (misal: `[18:15 WIB]`)
+>      - Waktu WIB (misal: `[18:25 WIB]`)
 >      - Judul deskriptif perubahan beserta daftar file terkait dalam kurung.
 >      - Rincian latar belakang masalah/kebutuhan, solusi teknis yang diterapkan, dan dampak fungsionalnya.
 > 3. **STANDAR COMMITLINT / CONVENTIONAL COMMITS**:

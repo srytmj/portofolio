@@ -58,7 +58,7 @@ src/
 │   │   ├── LiveClock.svelte        # Real-time WIB (Asia/Jakarta) digital clock
 │   │   ├── ThemeToggle.svelte      # Global OLED / Sepia theme switch
 │   │   ├── CommandPalette.svelte   # Ctrl+K modal launcher
-│   │   ├── ProjectModal.svelte     # Specification inspector modal
+│   │   ├── ProjectModal.svelte     # Specification inspector modal (borderless)
 │   │   └── ResumeModal.svelte      # Interactive curriculum vitae modal
 │   ├── content/
 │   │   └── site.js            # SINGLE SOURCE OF TRUTH: all editable copy and projects
@@ -82,6 +82,41 @@ static/
 ├── favicon-light.svg          # Sepia light theme favicon
 └── cv-suryatmaja.pdf          # Downloadable curriculum vitae
 ```
+
+---
+
+## Content Management (How to Edit Skills, Projects, & Blog)
+
+All public content is decoupled from layout components and lives in structured data files:
+
+### 1. Editing Skills & Tech Stack Matrix
+- **File**: [`src/lib/content/site.js`](./src/lib/content/site.js) (`export const stack`)
+- **Layers**: `cloud & automation`, `systems & virtualization`, `networking & security`, `application runtime`.
+- Each skill entry includes telemetry data for the **Pod 042 System Inspector**:
+  ```javascript
+  {
+    id: 'NET-05',
+    name: 'BGP Routing',
+    badge: 'PROD',          // CORE | PROD | DAILY | LAB
+    readiness: 94,          // 0-100% production readiness
+    detail: 'Brief 1-sentence synopsis for the mini card...',
+    role: 'Detailed architecture description for the inspector...',
+    deployedAt: 'Real-world deployment topology (e.g. MikroTik CCR2004, WireGuard)',
+    command: '$ bgpctl show summary\nTerminal simulator output...'
+  }
+  ```
+- *Note*: If adding/removing skills, update the `count` numbers in `categories` inside [`src/lib/components/Skills.svelte`](./src/lib/components/Skills.svelte).
+
+### 2. Editing Portfolio & Projects
+- **File**: [`src/lib/content/site.js`](./src/lib/content/site.js) (`export const projects`)
+- **Landing Page Featured**: The top 4 items (`projects.slice(0, 4)`) are highlighted on the main page. Put your most important work at the top of the array.
+- **Projects Archive & Modals**: All items are accessible at `/projects` with instant search and category filters.
+- **Deep-Dive Pages**: Each project with a `slug` automatically generates a dedicated technical page at `/projects/[slug]`.
+
+### 3. Publishing New Blog Articles
+- **Directory**: [`src/posts/`](./src/posts/)
+- **File Convention**: `YYYY-MM-DD-slug-title.md` (e.g. `2026-07-03-membangun-ha-web-server-aws.md`)
+- **Features**: YAML frontmatter (`title`, `date`, `description`, `categories`, `tags`, `cover`), Prism.js syntax highlighting with copy buttons, interactive Mermaid.js diagrams, and auto-following Table of Contents (TOC).
 
 ---
 
@@ -171,6 +206,47 @@ For self-hosted production servers running on AWS EC2:
    sudo nginx -t && sudo systemctl reload nginx
    sudo certbot --nginx -d suryatmaja.dev -d www.suryatmaja.dev
    ```
+
+---
+
+### Option 3: Homelab Self-Hosted (Docker, Tailscale, & Cloudflare Tunnel)
+
+For hosting in a local homelab cluster (mini-PC, Proxmox VE, Debian node):
+
+1. **Containerization via Docker**:
+   Build using a lightweight multi-stage Dockerfile:
+   ```dockerfile
+   FROM node:20-alpine AS builder
+   WORKDIR /app
+   COPY package*.json ./
+   RUN npm ci
+   COPY . .
+   RUN npm run build
+
+   FROM nginx:alpine
+   COPY --from=builder /app/build /usr/share/nginx/html
+   EXPOSE 80
+   CMD ["nginx", "-g", "daemon off;"]
+   ```
+2. **Run with Docker Compose (`docker-compose.yml`)**:
+   ```yaml
+   services:
+     portfolio:
+       build: .
+       container_name: yorha-portfolio
+       restart: unless-stopped
+       ports:
+         - "3080:80"
+   ```
+3. **Homelab Remote Access**:
+   - **Cloudflare Zero Trust Tunnel**: Expose publicly without port forwarding:
+     ```bash
+     cloudflared tunnel route dns <tunnel-id> porto.suryatmaja.dev
+     ```
+   - **Tailscale Tailnet Ingress**: Serve privately within your tailnet:
+     ```bash
+     tailscale serve --bg 3080
+     ```
 
 ---
 

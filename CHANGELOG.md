@@ -9,6 +9,18 @@ Format changelog ini mengacu pada [Keep a Changelog](https://keepachangelog.com/
 ## [Unreleased] - 2026-09-09
 
 ### Added
+- **[18:25 WIB] Dokumentasi Panduan Manajemen Konten (Skills & Portfolio) dan Deployment Homelab (`AI_GUIDELINES.md`, `README.md`, `CHANGELOG.md`):**
+  - **Panduan Edit Konten Keahlian (Skills Matrix) & Pod 042 Inspector**:
+    - Dokumentasi schema data `export const stack` di `src/lib/content/site.js` lengkap dengan field `id`, `name`, `badge`, `readiness`, `detail`, `role`, `deployedAt`, dan `command`.
+    - Prosedur sinkronisasi jumlah kartu keahlian (*category count*) pada `src/lib/components/Skills.svelte`.
+  - **Panduan Edit Konten Portfolio & Proyek Arsitektur**:
+    - Dokumentasi schema data `export const projects` di `src/lib/content/site.js` lengkap dengan field `slug`, `title`, `kind`, `year`, `summary`, `detail`, `stack`, `images`, dan `links`.
+    - Aturan 4 proyek teratas sebagai featured showcase di landing page (`Portfolio.svelte`) dan integrasi rute arsip `/projects` serta deep dive `/projects/[slug]`.
+  - **Panduan Deployment Homelab Self-Hosted**:
+    - Penulisan `Dockerfile` multi-stage (Node.js 20 Alpine builder + Nginx Alpine) dan file `docker-compose.yml`.
+    - Integrasi remote access tanpa port forwarding menggunakan **Cloudflare Zero Trust Tunnel** (`cloudflared`) dan **Tailscale Tailnet** (`tailscale serve`).
+    - Konfigurasi environment `.env` untuk integrasi homelab launcher pada Command Palette (Ctrl+K).
+
 - **[18:10 WIB] Overhaul Dokumentasi AI Agent, Deployment Pipeline (GitHub Pages & AWS EC2), & SOP Pemeliharaan (`AI_GUIDELINES.md`, `README.md`, `CHANGELOG.md`):**
   - **Panduan Penulisan Artikel Blog untuk AI Agent**:
     - Spesifikasi format nama file `YYYY-MM-DD-slug.md` dan struktur YAML frontmatter lengkap (`title`, `date`, `description`, `categories`, `tags`, `author`, `published`, `cover`).
