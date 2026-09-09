@@ -24,10 +24,11 @@ void main() {
 export const linesFragmentShader = /* glsl */ `
 precision highp float;
 uniform float uOpacity;
+uniform vec3 uColor;
 varying float vAlpha;
 void main() {
   if (vAlpha < 0.01) discard;
-  gl_FragColor = vec4(vec3(1.0), vAlpha * uOpacity * 0.85);
+  gl_FragColor = vec4(uColor, vAlpha * uOpacity * 0.85);
 }
 `;
 
@@ -71,12 +72,13 @@ void main() {
 export const starsFragmentShader = /* glsl */ `
 precision highp float;
 uniform float uOpacity;
+uniform vec3 uColor;
 varying float vGlow;
 void main() {
   vec2 uv = gl_PointCoord - 0.5;
   float d = length(uv);
   if (d > 0.5) discard;
   float a = smoothstep(0.5, 0.0, d) * clamp(vGlow, 0.0, 1.2) * uOpacity;
-  gl_FragColor = vec4(vec3(1.0), a);
+  gl_FragColor = vec4(uColor, a);
 }
 `;

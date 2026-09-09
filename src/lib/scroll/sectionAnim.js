@@ -137,10 +137,8 @@ export function sectionAnim(node) {
       opacity: 1,
       y: 0,
       filter: 'blur(0px)',
-      duration: 0.8,
-      stagger: 0.06,
-      ease: 'power3.out',
-      delay: 0.1,
+      duration: 0.32,
+      ease: 'power2.out',
       overwrite: true
     });
   };
@@ -189,10 +187,9 @@ export function sectionAnim(node) {
 
     gsap.to(items, {
       opacity: 0,
-      y: dir * 20,
-      filter: 'blur(3px)',
-      duration: 0.35,
-      stagger: 0.03,
+      y: dir * 14,
+      filter: 'blur(2px)',
+      duration: 0.22,
       ease: 'power2.in',
       overwrite: true
     });
@@ -209,8 +206,24 @@ export function sectionAnim(node) {
   });
   queueRefresh();
 
+  let ro;
+  if (typeof ResizeObserver !== 'undefined') {
+    let resizeTimer;
+    ro = new ResizeObserver(() => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        ScrollTrigger.refresh();
+        if (typeof window !== 'undefined') {
+          window.__lenis?.resize();
+        }
+      }, 50);
+    });
+    ro.observe(node);
+  }
+
   return {
     destroy() {
+      if (ro) ro.disconnect();
       st.kill();
       gsap.killTweensOf([...items, ...words, ...titles]);
       if (index) gsap.killTweensOf(index);

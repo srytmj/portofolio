@@ -53,6 +53,8 @@
     ? (constellations.find((c) => c.id === SIGNATURE_ID)?.index ?? -1)
     : -1;
 
+  import { theme } from '$lib/stores/theme.svelte.js';
+
   // Shared reveal state — one array feeds both materials.
   const progress = new Float32Array(MAX_CONST);
   const uOpacity = { value: 1 };
@@ -60,11 +62,17 @@
   const uPixelRatio = { value: dpr };
   const uReducedMotion = { value: reducedMotion ? 1 : 0 };
   const uSignatureGlow = { value: 0 };
+  const uColor = { value: new THREE.Color(theme.current === 'light' ? 0x454138 : 0xdcdacf) };
+
+  $effect(() => {
+    const isLight = theme.current === 'light';
+    uColor.value.setHex(isLight ? 0x454138 : 0xdcdacf);
+  });
 
   const linesMat = new THREE.ShaderMaterial({
     vertexShader: linesVertexShader,
     fragmentShader: linesFragmentShader,
-    uniforms: { uProgress: { value: progress }, uOpacity },
+    uniforms: { uProgress: { value: progress }, uOpacity, uColor },
     transparent: true,
     depthWrite: false
   });
@@ -80,7 +88,8 @@
       uReducedMotion,
       uSignature: { value: signatureIdx },
       uSignatureGlow,
-      uSize: { value: full ? 1 : 0.9 }
+      uSize: { value: full ? 1 : 0.9 },
+      uColor
     },
     transparent: true,
     depthWrite: false

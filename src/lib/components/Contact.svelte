@@ -1,10 +1,43 @@
 <script>
+  import { onMount } from 'svelte';
   import { sectionAnim } from '$lib/scroll/sectionAnim.js';
   import { contact, headings, identity } from '$lib/content/site.js';
   const year = new Date().getFullYear();
 
   let copied = $state(false);
   let copyTimer;
+
+  let visitorCount = $state(null);
+
+  onMount(async () => {
+    try {
+      const res = await fetch('https://api.counterapi.dev/v1/suryatmaja-portfolio/visits/up');
+      if (res.ok) {
+        const data = await res.json();
+        if (data && typeof data.count === 'number') {
+          visitorCount = data.count;
+          localStorage.setItem('visitor_count_cache', String(data.count));
+        }
+      }
+    } catch {
+      // Fallback if offline or network failure
+    }
+
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('visitor_count_cache');
+    }
+
+    if (!visitorCount) {
+      const stored = localStorage.getItem('portfolio_visitor_count');
+      let base = stored ? parseInt(stored, 10) : 0;
+      if (typeof window !== 'undefined' && !sessionStorage.getItem('visited_session')) {
+        base += 1;
+        sessionStorage.setItem('visited_session', '1');
+        localStorage.setItem('portfolio_visitor_count', String(base));
+      }
+      visitorCount = base;
+    }
+  });
 
   async function copyEmail() {
     try {
@@ -26,13 +59,14 @@
   id="contact"
   data-section
   use:sectionAnim
-  class="relative flex min-h-[100svh] flex-col justify-center py-28 sm:py-36"
+  class="relative flex flex-col justify-center py-20 sm:py-28"
 >
   <div class="wrap">
-    <header class="relative mb-14 pb-4">
+    <!-- Header Section -->
+    <header class="relative mb-10 pb-4">
       <div class="flex items-end justify-between gap-4 pb-1">
         <h2
-          class="flex flex-wrap gap-x-[0.28em] text-h2 font-semibold uppercase tracking-tight"
+          class="flex flex-wrap gap-x-[0.28em] text-h2 font-semibold uppercase tracking-tight font-display"
         >
           {#each words as word, i}
             <span class="inline-block overflow-hidden pb-1">
@@ -50,35 +84,90 @@
         <div class="overflow-hidden pb-1">
           <span
             data-anim-badge
-            class="block font-mono text-[11px] font-medium tracking-[0.25em] text-white/40 uppercase will-change-transform"
+            class="block font-mono text-[11px] font-medium tracking-[0.25em] uppercase will-change-transform"
+            style="color: var(--yorha-text-muted);"
           >
             SEC // 05
           </span>
         </div>
       </div>
-      <div class="relative mt-3 h-px w-full overflow-hidden bg-white/10">
+
+      <div class="relative mt-3 h-px w-full overflow-hidden" style="background-color: var(--yorha-border);">
         <span
           data-anim-line
-          class="absolute inset-y-0 left-0 h-full w-full origin-left bg-gradient-to-r from-white/70 via-white/30 to-white/10"
+          class="absolute inset-y-0 left-0 h-full w-full origin-left bg-gradient-to-r from-current/50 via-current/25 to-transparent"
           aria-hidden="true"
         ></span>
         <span
           data-anim-scan
-          class="absolute inset-y-0 -left-28 h-full w-28 bg-gradient-to-r from-transparent via-white to-transparent"
+          class="absolute inset-y-0 -left-28 h-full w-28 bg-gradient-to-r from-transparent via-current to-transparent opacity-40"
           aria-hidden="true"
         ></span>
       </div>
     </header>
 
-    <div class="mt-14 grid gap-12 md:grid-cols-[1.4fr_1fr]">
-      <div data-anim>
-        <p class="max-w-[var(--measure)] text-lead text-white/80">
+    <!-- Intro Prose (Baskervville) & Blog Link Navigation -->
+    <div data-anim class="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+      <div class="max-w-[var(--measure)]">
+        <p class="font-serif text-lead italic leading-relaxed" style="color: var(--yorha-text-primary); opacity: 0.85;">
           {contact.body}
         </p>
-        <div class="mt-10 flex flex-wrap items-center gap-4">
+      </div>
+
+      <a
+        href="/blog"
+        class="yorha-invert-hover group inline-flex items-center gap-2 self-start sm:self-auto border border-current/20 bg-current/5 px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-all duration-150 shrink-0"
+      >
+        <span class="text-[9px]" style="color: var(--yorha-accent);">■</span>
+        <span>ACCESS JOURNAL / BLOG</span>
+        <span class="transition-transform group-hover:translate-x-1">→</span>
+      </a>
+    </div>
+
+    <!-- Symmetrical 3-Card Tactical Channel Grid -->
+    <div data-anim class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5">
+      
+      <!-- CHANNEL 01: Direct Email Dispatch -->
+      <div
+        class="group relative flex flex-col justify-between border border-current/15 p-6 sm:p-7 transition-all duration-150 hover:-translate-y-0.5 hover:border-current/40"
+        style="background-color: var(--yorha-surface);"
+      >
+        <!-- Pixel-Perfect Corner Reticle Brackets -->
+        <span class="pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border-l-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute -top-px -right-px h-2.5 w-2.5 border-r-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute -bottom-px -left-px h-2.5 w-2.5 border-b-2 border-l-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute -bottom-px -right-px h-2.5 w-2.5 border-b-2 border-r-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+
+        <!-- Top Sweep Line on Hover -->
+        <span
+          class="pointer-events-none absolute inset-x-0 top-0 h-px origin-left scale-x-0 transition-transform duration-200 group-hover:scale-x-100"
+          style="background-color: var(--yorha-accent);"
+          aria-hidden="true"
+        ></span>
+
+        <div>
+          <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-wider opacity-60 leading-none">
+            <span>CHANNEL // 01</span>
+            <span class="inline-flex items-center gap-1.5 leading-none" style="color: var(--yorha-accent);">
+              <span class="h-1.5 w-1.5 shrink-0 rounded-full animate-pulse -translate-y-[0.5px]" style="background-color: var(--yorha-accent);"></span>
+              <span class="leading-none">[ DIRECT_INBOX ]</span>
+            </span>
+          </div>
+
+          <h3 class="mt-4 font-display text-lg font-semibold uppercase tracking-wider transition-colors">
+            EMAIL DISPATCH
+          </h3>
+
+          <p class="mt-2 font-serif text-caption opacity-70 italic leading-relaxed">
+            Fastest channel for infrastructure architecture, cloud contracts, or direct consulting.
+          </p>
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-current/10 flex flex-col gap-2.5">
           <a
             href={'mailto:' + contact.email}
-            class="text-h3 font-medium tracking-tight underline decoration-white/20 underline-offset-8 transition-colors hover:decoration-white"
+            class="font-mono text-sm font-medium tracking-tight hover:underline transition-colors select-all truncate"
+            style="color: var(--yorha-accent);"
           >
             {contact.email}
           </a>
@@ -86,59 +175,130 @@
             type="button"
             onclick={copyEmail}
             aria-label="Copy email address"
-            class="group relative inline-flex items-center gap-2 overflow-hidden rounded-md border px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em] outline-none transition-all duration-300 hover:border-white/40 hover:bg-white/10 hover:text-white active:scale-95 focus:outline-none focus-visible:outline-none {copied ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-white/15 bg-white/5'}"
+            class="w-full yorha-invert-hover inline-flex items-center justify-center gap-2 border px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] transition-all cursor-pointer {copied ? 'border-current font-semibold' : 'border-current/20 bg-current/5 hover:border-current/50'}"
+            style={copied ? 'color: var(--yorha-accent);' : ''}
           >
-            <span class="relative flex h-3.5 w-3.5 items-center justify-center">
-              <svg
-                viewBox="0 0 24 24"
-                class="absolute h-3.5 w-3.5 text-white/50 transition-all duration-300 {copied ? '-rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100'}"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-              </svg>
-              <svg
-                viewBox="0 0 24 24"
-                class="absolute h-3.5 w-3.5 text-emerald-400 transition-all duration-300 {copied ? 'rotate-0 scale-100 opacity-100' : 'rotate-90 scale-0 opacity-0'}"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </span>
-            <span class="transition-colors duration-300 {copied ? 'font-semibold text-emerald-400' : 'text-ash-3 group-hover:text-white'}">
-              {copied ? 'copied to clipboard' : 'copy'}
-            </span>
+            <span>{copied ? '[ ┌ COPIED TO BUFFER ┘ ]' : '[ ┌ COPY ADDRESS ┘ ]'}</span>
           </button>
         </div>
       </div>
 
-      <nav class="flex flex-col gap-3">
-        {#each contact.links as link}
-          <a
-            data-anim
-            href={link.href}
-            target={link.href.startsWith('http') ? '_blank' : undefined}
-            rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-            class="flex items-center justify-between border-b border-white/10 py-3 text-sm uppercase tracking-[0.2em] text-ash-3 transition-colors hover:text-white"
-          >
-            {link.label}<span aria-hidden="true">→</span>
-          </a>
-        {/each}
-      </nav>
+      <!-- CHANNEL 02: GitHub Repositories -->
+      <a
+        href="https://github.com/srytmj"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group relative flex flex-col justify-between border border-current/15 p-6 sm:p-7 transition-all duration-150 hover:-translate-y-0.5 hover:border-current/40"
+        style="background-color: var(--yorha-surface);"
+      >
+        <!-- Pixel-Perfect Corner Reticle Brackets -->
+        <span class="pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border-l-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute -top-px -right-px h-2.5 w-2.5 border-r-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute -bottom-px -left-px h-2.5 w-2.5 border-b-2 border-l-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute -bottom-px -right-px h-2.5 w-2.5 border-b-2 border-r-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+
+        <!-- Top Sweep Line on Hover -->
+        <span
+          class="pointer-events-none absolute inset-x-0 top-0 h-px origin-left scale-x-0 transition-transform duration-200 group-hover:scale-x-100"
+          style="background-color: var(--yorha-accent);"
+          aria-hidden="true"
+        ></span>
+
+        <div>
+          <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-wider opacity-60">
+            <span>CHANNEL // 02</span>
+            <span style="color: var(--yorha-accent);">[ GIT+SSH // ONLINE ]</span>
+          </div>
+
+          <h3 class="mt-4 font-display text-lg font-semibold uppercase tracking-wider transition-colors">
+            GITHUB / SRYTMJ
+          </h3>
+
+          <p class="mt-2 font-serif text-caption opacity-70 italic leading-relaxed">
+            Open-source infrastructure, homelab automation pipelines, and systems engineering code.
+          </p>
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-current/10 flex items-center justify-between font-mono text-[11px] uppercase tracking-wider opacity-80 group-hover:opacity-100">
+          <span class="opacity-60 select-all">github.com/srytmj</span>
+          <span class="inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform" style="color: var(--yorha-accent);">
+            EXPLORE →
+          </span>
+        </div>
+      </a>
+
+      <!-- CHANNEL 03: LinkedIn Professional Network -->
+      <a
+        href="https://www.linkedin.com/in/suryatmaja/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group relative flex flex-col justify-between border border-current/15 p-6 sm:p-7 transition-all duration-150 hover:-translate-y-0.5 hover:border-current/40"
+        style="background-color: var(--yorha-surface);"
+      >
+        <!-- Pixel-Perfect Corner Reticle Brackets -->
+        <span class="pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border-l-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute -top-px -right-px h-2.5 w-2.5 border-r-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute -bottom-px -left-px h-2.5 w-2.5 border-b-2 border-l-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute -bottom-px -right-px h-2.5 w-2.5 border-b-2 border-r-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+
+        <!-- Top Sweep Line on Hover -->
+        <span
+          class="pointer-events-none absolute inset-x-0 top-0 h-px origin-left scale-x-0 transition-transform duration-200 group-hover:scale-x-100"
+          style="background-color: var(--yorha-accent);"
+          aria-hidden="true"
+        ></span>
+
+        <div>
+          <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-wider opacity-60">
+            <span>CHANNEL // 03</span>
+            <span style="color: var(--yorha-accent);">[ BGP_PEER // VERIFIED ]</span>
+          </div>
+
+          <h3 class="mt-4 font-display text-lg font-semibold uppercase tracking-wider transition-colors">
+            LINKEDIN / NETWORK
+          </h3>
+
+          <p class="mt-2 font-serif text-caption opacity-70 italic leading-relaxed">
+            Professional trajectory, enterprise networking experience, and career history.
+          </p>
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-current/10 flex items-center justify-between font-mono text-[11px] uppercase tracking-wider opacity-80 group-hover:opacity-100">
+          <span class="opacity-60 select-all">in/suryatmaja</span>
+          <span class="inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform" style="color: var(--yorha-accent);">
+            CONNECT →
+          </span>
+        </div>
+      </a>
+
     </div>
 
-    <p data-anim class="mt-24 text-label uppercase tracking-[0.3em] text-ash-1">
-      © {year} {identity.name}. Built with SvelteKit, Threlte, GSAP, Lenis.
-    </p>
+    <!-- Compact Tactical Status & Bunker Footer Bar -->
+    <div
+      data-anim
+      class="mt-14 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-current/10 pt-6 font-mono text-label uppercase tracking-[0.22em]"
+    >
+      <div class="flex flex-wrap items-center gap-3 opacity-60">
+        <span>PORTOFOLIO_OS v2.6.4</span>
+        <span class="opacity-40">·</span>
+        <span>© {year} {identity.name}</span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <span
+          class="inline-flex items-center justify-center gap-2 border px-3 h-7 font-mono text-[11px] select-none"
+          style="border-color: var(--yorha-accent-border); background-color: var(--yorha-accent-subtle); color: var(--yorha-accent);"
+        >
+          <span class="h-1.5 w-1.5 shrink-0 rounded-full animate-pulse" style="background-color: var(--yorha-accent);"></span>
+          <span class="font-medium tracking-wider uppercase leading-none">COMMISSIONS: OPEN // UTC+7</span>
+        </span>
+
+        {#if visitorCount && visitorCount > 1000}
+          <div class="inline-flex items-center gap-2 border border-current/15 bg-current/[0.02] px-2.5 py-1 opacity-70 leading-none">
+            <span class="leading-none">Visited by {visitorCount.toLocaleString()}</span>
+          </div>
+        {/if}
+      </div>
+    </div>
   </div>
 </footer>

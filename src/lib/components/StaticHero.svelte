@@ -2,16 +2,20 @@
   CSS-only hero fallback: no WebGL, no JS. A quiet star field for low-end /
   no-WebGL / slow-network / reduced-motion devices and for SSR.
 -->
-<div class="absolute inset-0 overflow-hidden bg-black" aria-hidden="true">
+<div class="absolute inset-0 overflow-hidden" style="background-color: var(--yorha-bg);" aria-hidden="true">
   <div class="stars stars-a"></div>
   <div class="stars stars-b"></div>
   <div
-    class="absolute inset-0"
-    style="background: radial-gradient(circle at 50% 45%, rgba(255,255,255,0.05), transparent 55%);"
+    class="hero-radial absolute inset-0"
+    style="background: var(--hero-scrim);"
   ></div>
 </div>
 
 <style>
+  :global([data-theme='light']) .stars {
+    filter: invert(1);
+    opacity: 0.25 !important;
+  }
   .stars {
     position: absolute;
     inset: -50%;

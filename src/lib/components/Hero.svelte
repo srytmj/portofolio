@@ -7,6 +7,7 @@
   import { identity } from '$lib/content/site.js';
   import { ease, dur } from '$lib/motion.js';
   import { detectTier, prefersReducedMotion } from '$lib/utils/device.js';
+  import { setConstellationFigure } from '$lib/stores/constellation.svelte.js';
 
   /** @type {{ heroReady?: boolean }} */
   let { heroReady = true } = $props();
@@ -35,6 +36,7 @@
     activeFigure = fig;
     if (fig) {
       lastRevealedFigure = fig;
+      setConstellationFigure(fig);
     }
   }
 
@@ -110,7 +112,7 @@
   });
 </script>
 
-<section bind:this={section} class="relative bg-black" data-hero>
+<section bind:this={section} class="relative" style="background-color: var(--yorha-bg);" data-hero>
   <div
     bind:this={pinInner}
     class="relative flex h-[100svh] w-full items-center justify-center overflow-hidden"
@@ -130,16 +132,15 @@
       <StaticHero />
     {/if}
 
-    <!-- Readability scrim: darkens the dust field behind the text, offset left
-         to sit under the asymmetric headline. -->
+    <!-- Readability scrim: only visible in dark mode via --hero-scrim, completely disabled in light mode -->
     <div
       class="pointer-events-none absolute inset-0 z-[5]"
-      style="background: radial-gradient(ellipse 64% 48% at 34% 50%, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.42) 44%, rgba(0,0,0,0) 72%);"
+      style="background: var(--hero-scrim);"
     ></div>
 
     <span
-      class="pointer-events-none absolute left-[8vw] top-10 z-10 text-label tracking-[0.35em] text-white/40 sm:left-[9vw]"
-      style="font-family: 'Space Mono', ui-monospace, monospace;"
+      class="pointer-events-none absolute left-[8vw] top-10 z-10 text-label tracking-[0.35em] opacity-40 sm:left-[9vw]"
+      style="font-family: 'Space Mono', ui-monospace, monospace; color: var(--yorha-text-primary);"
       aria-hidden="true">01</span
     >
 
@@ -152,62 +153,69 @@
       </div>
       <div
         data-reveal
-        class="flex max-w-[42ch] flex-col gap-2.5 border-t border-white/15 pt-4 font-serif text-caption italic leading-[1.6] text-white/45 lg:self-center lg:text-right"
+        class="flex max-w-[42ch] flex-col gap-3.5 lg:self-center lg:items-end"
       >
-        {#each identity.trivia as line}
-          <p class="text-balance">{line}</p>
-        {/each}
+        <!-- Quick Shortcut to Blog / Engineering Journal -->
+        <a
+          href="/blog"
+          class="pointer-events-auto group yorha-invert-hover inline-flex items-center gap-2 font-mono text-[11px] tracking-wider uppercase px-3.5 py-1.5 border border-current/20 bg-current/5 transition-all duration-150 cursor-pointer"
+          style="color: var(--yorha-text-primary);"
+        >
+          <span class="text-[9px] text-[var(--yorha-accent)]">■</span>
+          <span>Engineering Journal</span>
+          <span class="text-[10px] transition-transform group-hover:translate-x-1">→</span>
+        </a>
+
+        <div
+          class="flex flex-col gap-2.5 border-t border-current/15 pt-3.5 font-serif text-caption italic leading-[1.6] opacity-60 lg:text-right"
+          style="color: var(--yorha-text-primary);"
+        >
+          {#each identity.trivia as line}
+            <p class="text-balance">{line}</p>
+          {/each}
+        </div>
       </div>
     </div>
 
+    <!-- Bottom atmospheric blend into the content section background -->
+    <div
+      class="pointer-events-none absolute bottom-0 left-0 right-0 h-40 z-[5] bg-gradient-to-b from-transparent via-[var(--yorha-bg)]/50 to-[var(--yorha-bg)]"
+      aria-hidden="true"
+    ></div>
+
     <a
       href="#about"
-      aria-label="Scroll to content"
-      class="scroll-cue absolute bottom-7 left-1/2 z-10 -translate-x-1/2 text-white/45 transition-colors hover:text-white"
+      aria-label="Scroll down to content"
+      class="scroll-beacon absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 p-2 group"
+      style="color: var(--yorha-text-primary);"
     >
-      <svg
-        viewBox="0 0 24 24"
-        class="h-6 w-6"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.6"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M6 9l6 6 6-6" />
-      </svg>
+      <div class="relative h-10 w-[1px] overflow-hidden bg-current opacity-25 transition-opacity duration-300 group-hover:opacity-60">
+        <div class="beacon-beam absolute left-0 w-full bg-gradient-to-b from-transparent via-current to-transparent"></div>
+      </div>
     </a>
-
-    <!-- Name and astronomical coordinates of the constellation (full tier only). -->
-    <div
-      aria-hidden="true"
-      class="pointer-events-none absolute bottom-7 right-7 z-10 flex flex-col items-end gap-1 text-right font-mono transition-opacity duration-500"
-      class:opacity-0={shrink <= 0.5}
-    >
-      <span class="font-serif text-caption italic tracking-wide text-white/90 transition-all duration-300">
-        {currentFigure.name}
-      </span>
-      <span class="text-[10px] tracking-[0.2em] text-white/40 uppercase transition-all duration-300">
-        {currentFigure.coords} · {currentFigure.id}
-      </span>
-    </div>
   </div>
 </section>
 
 <style>
-  .scroll-cue svg {
-    animation: cue 1.9s ease-in-out infinite;
+  .beacon-beam {
+    height: 16px;
+    box-shadow: 0 0 8px 1px var(--yorha-accent-border), 0 0 16px 2px var(--yorha-accent-subtle);
+    animation: flowDown 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
   }
-  @keyframes cue {
-    0%,
-    100% {
-      transform: translateY(0);
-      opacity: 0.55;
+  @keyframes flowDown {
+    0% {
+      top: -18px;
+      opacity: 0;
     }
-    50% {
-      transform: translateY(5px);
+    20% {
       opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      top: 100%;
+      opacity: 0;
     }
   }
 </style>

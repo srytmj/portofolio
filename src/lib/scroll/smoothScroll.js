@@ -19,10 +19,11 @@ export function initSmoothScroll() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return () => {};
 
   const lenis = new Lenis({
-    duration: 1.1,
-    lerp: 0.1,
+    lerp: 0.14,
+    wheelMultiplier: 1.05,
+    touchMultiplier: 1.2,
     smoothWheel: true,
-    touchMultiplier: 1.4,
+    syncTouch: false,
     anchors: true
   });
 
@@ -32,7 +33,7 @@ export function initSmoothScroll() {
     lenis.raf(time * 1000);
   };
   gsap.ticker.add(onTick);
-  gsap.ticker.lagSmoothing(0);
+  gsap.ticker.lagSmoothing(500, 33);
 
   window.__lenis = lenis;
   window.__gsap = gsap;

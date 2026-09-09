@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    :root {
+      --bg: #000000;
+      --border: #222222;
+      --stroke: #DCDACF;
+      --accent: #34D399;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #D1D2C5;
+        --border: #B4B5A6;
+        --stroke: #454138;
+        --accent: #C7634B;
+      }
+    }
+  </style>
+  <!-- YoRHa Tactical Chassis -->
+  <rect width="32" height="32" rx="3" fill="var(--bg)"/>
+  <rect x="0.75" y="0.75" width="30.5" height="30.5" rx="2.5" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+  
+  <!-- Outer Corner Brackets (Targeting Reticle) -->
+  <path d="M4 11V4h7M21 4h7v7M4 21v7h7M21 28h7v-7" fill="none" stroke="var(--stroke)" stroke-width="2" stroke-linecap="square"/>
+  
+  <!-- Telemetry Axis Ticks -->
+  <path d="M16 6v3M16 23v3M6 16h3M23 16h3" stroke="var(--stroke)" stroke-width="1.5" stroke-linecap="square"/>
+  
+  <!-- Central Diamond Reticle -->
+  <polygon points="16,11 21,16 16,21 11,16" fill="none" stroke="var(--stroke)" stroke-width="1.5"/>
+  
+  <!-- Core Node Indicator -->
+  <rect x="14.5" y="14.5" width="3" height="3" fill="var(--accent)"/>
+</svg>

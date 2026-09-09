@@ -112,7 +112,8 @@
 
     function render() {
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = '#ffffff';
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      ctx.fillStyle = isLight ? '#454138' : '#dcdacf';
       for (const d of grid) {
         let rad = d.b * (STEP * 0.78);
         if (mouse.on) {
@@ -158,6 +159,11 @@
       else fallback();
     };
 
+    const themeObserver = new MutationObserver(() => {
+      render();
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-blog-theme'] });
+
     if (!reduce) {
       window.addEventListener('pointermove', onMove, { passive: true });
       window.addEventListener('pointerleave', onLeave);
@@ -166,6 +172,7 @@
 
     return () => {
       cancelAnimationFrame(raf);
+      themeObserver.disconnect();
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerleave', onLeave);
       window.removeEventListener('resize', onResize);
@@ -174,7 +181,8 @@
 </script>
 
 <div
-  class="relative aspect-[3/4] w-full overflow-hidden rounded-lg border border-white/10 bg-black"
+  class="relative aspect-[3/4] w-full overflow-hidden rounded-none border"
+  style="border-color: var(--yorha-border); background-color: var(--yorha-surface);"
 >
   <canvas bind:this={canvas} class="h-full w-full" aria-hidden="true"></canvas>
   <span class="sr-only">{alt}</span>

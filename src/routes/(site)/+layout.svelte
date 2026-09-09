@@ -1,15 +1,42 @@
 <script>
   import { onMount } from 'svelte';
+  import { onNavigate } from '$app/navigation';
   import { identity } from '$lib/content/site.js';
   import SideNav from '$lib/components/SideNav.svelte';
+  import CornerTelemetry from '$lib/components/CornerTelemetry.svelte';
   import CommandPalette from '$lib/components/CommandPalette.svelte';
+  import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+  import { theme } from '$lib/stores/theme.svelte.js';
+
   let { children } = $props();
 
   let activeId = $state('');
 
   const sectionIds = ['about', 'skills', 'portfolio', 'contact'];
 
+  onNavigate((navigation) => {
+    if (!document.startViewTransition) {
+      window.scrollTo(0, 0);
+      window.__lenis?.scrollTo(0, { immediate: true });
+      return;
+    }
+
+    return new Promise((resolve) => {
+      document.startViewTransition(async () => {
+        try {
+          resolve();
+          await navigation.complete;
+        } finally {
+          window.scrollTo(0, 0);
+          window.__lenis?.scrollTo(0, { immediate: true });
+        }
+      });
+    });
+  });
+
   onMount(() => {
+    theme.init();
+
     let stopSmooth = () => {};
     let alive = true;
     import('$lib/scroll/smoothScroll.js').then(({ initSmoothScroll }) => {
@@ -55,36 +82,30 @@
   <meta name="twitter:image" content="/og-preview.png" />
 </svelte:head>
 
-<button
-  type="button"
-  aria-label="Open Command Palette"
-  onclick={() => {
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('open-command-palette'));
-    }
-  }}
-  class="fixed right-6 top-6 z-40 group flex items-center gap-3 p-4 -m-4 font-mono text-[10px] uppercase tracking-[0.2em] text-white/50 opacity-0 transition-all duration-300 hover:text-white hover:opacity-100 focus:outline-none focus-visible:opacity-100 sm:right-10 sm:top-8"
->
-  <span class="hidden sm:inline">MENU</span>
-  <span class="flex items-center gap-1.5 border border-white/15 bg-black/20 px-2 py-1 backdrop-blur-sm transition-colors group-hover:border-white/30">
-    <svg
-      viewBox="0 0 24 24"
-      class="h-3 w-3"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.8"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="11" cy="11" r="8" />
-      <line x1="21" y1="21" x2="16.65" y2="16.65" />
-    </svg>
-    <span>⌘K</span>
-  </span>
-</button>
+<!-- Top Right Tactical HUD Bar: Theme Switcher & Command Palette -->
+<div class="fixed right-4 top-4 sm:right-10 sm:top-7 z-40 flex items-center gap-2 sm:gap-3 pointer-events-auto">
+  <ThemeToggle />
+
+  <button
+    type="button"
+    aria-label="Open Command Palette"
+    onclick={() => {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('open-command-palette'));
+      }
+    }}
+    class="group flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] opacity-70 hover:opacity-100 transition-opacity focus:outline-none"
+    style="color: var(--yorha-text-primary);"
+  >
+    <span class="hidden sm:inline">MENU</span>
+    <span class="flex items-center border border-current/20 bg-black/20 px-2 py-0.5 backdrop-blur-sm transition-colors group-hover:border-current/40">
+      <span>⌘K</span>
+    </span>
+  </button>
+</div>
 
 <SideNav {activeId} />
+<CornerTelemetry {activeId} />
 <CommandPalette />
 
 <main id="top">

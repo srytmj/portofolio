@@ -6,7 +6,7 @@
   /** @type {{ activeId?: string }} */
   let { activeId = '' } = $props();
 
-  const blogUrl = 'https://blog.suryatmaja.dev';
+  const blogUrl = '/blog';
   const items = [
     // 01 is the hero itself (the "01" marker on that screen); sections start at 02.
     { key: 'home', label: 'Top', num: '' },
@@ -14,7 +14,7 @@
     { key: 'skills', label: 'Skills', num: '03' },
     { key: 'portfolio', label: 'Portfolio', num: '04' },
     { key: 'contact', label: 'Contact', num: '05' },
-    { key: 'blog', label: 'Blog', num: '', external: true }
+    { key: 'blog', label: 'Blog', num: '06', external: false }
   ];
 
   const reduce = () =>
@@ -30,7 +30,6 @@
     gsap.set(nav.querySelectorAll('[data-num]'), { width: 0, marginRight: 0, autoAlpha: 0 });
     gsap.set(nav.querySelectorAll('[data-label]'), { opacity: 0.4 });
     gsap.set(nav.querySelector('[data-star]'), { opacity: 0.6, transformOrigin: '50% 50%' });
-    gsap.set(nav.querySelectorAll('[data-ext]'), { autoAlpha: 0, x: -4 });
     mounted = true;
   });
 
@@ -109,16 +108,6 @@
       ease: ease.ui,
       overwrite: 'auto'
     });
-
-    const ext = el.querySelector('[data-ext]');
-    if (ext)
-      gsap.to(ext, {
-        autoAlpha: entering ? 1 : 0,
-        x: entering ? 0 : -4,
-        duration: dur.xs,
-        ease: ease.ui,
-        overwrite: 'auto'
-      });
   }
 </script>
 
@@ -130,44 +119,24 @@
   {#each items as it}
     <a
       data-key={it.key}
-      href={it.external ? blogUrl : it.key === 'home' ? '#top' : `#${it.key}`}
+      href={it.key === 'blog' ? '/blog' : it.key === 'home' ? '/#top' : `/#${it.key}`}
       target={it.external ? '_blank' : undefined}
       rel={it.external ? 'noopener noreferrer' : undefined}
       aria-current={it.key === activeId ? 'true' : undefined}
       onpointerenter={(e) => hover(e.currentTarget, true)}
       onpointerleave={(e) => hover(e.currentTarget, false)}
-      class="group flex items-center whitespace-nowrap py-0.5 text-[11px] uppercase tracking-[0.18em] text-white [text-shadow:0_1px_10px_rgba(0,0,0,0.9)] {it.key ===
+      class="group flex items-center whitespace-nowrap py-0.5 text-[11px] uppercase tracking-[0.18em] transition-colors {it.key ===
       'home'
         ? 'mb-1'
         : ''}"
+      style="color: var(--yorha-text-primary);"
     >
       {#if it.key === 'home'}
-        <svg
-          data-star
-          viewBox="0 0 24 24"
-          class="h-3.5 w-3.5"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.7"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M12 1.5 L14.4 9.6 L22.5 12 L14.4 14.4 L12 22.5 L9.6 14.4 L1.5 12 L9.6 9.6 Z" />
-        </svg>
+        <span data-star class="inline-block text-xs leading-none font-mono" style="color: var(--yorha-accent);">✦</span>
         <span class="sr-only">Back to top</span>
       {:else}
-        <span data-num class="overflow-hidden font-mono text-[0.85em] text-ash-3">{it.num}</span
-        ><span data-label>{it.label}</span>{#if it.external}<svg
-            data-ext
-            viewBox="0 0 24 24"
-            class="ml-1 h-2.5 w-2.5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.4"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"><path d="M7 17 L17 7 M8 7 h9 v9" /></svg
-          >{/if}
+        <span data-num class="overflow-hidden font-mono text-[0.85em] mr-1.5" style="color: var(--yorha-text-muted);">{it.num}</span>
+        <span data-label>{it.label}</span>
       {/if}
     </a>
   {/each}

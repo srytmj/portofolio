@@ -3,7 +3,7 @@
   import { gsap } from 'gsap';
   import { portal } from '$lib/actions/portal.js';
   import { ease, dur, stagger } from '$lib/motion.js';
-  import { contact } from '$lib/content/site.js';
+  import { contact, projects } from '$lib/content/site.js';
   import { trivia } from '$lib/palette/trivia.js';
   import { isOwner, unlock } from '$lib/palette/owner.js';
 
@@ -71,12 +71,51 @@
         hint: `Jump to ${n.label.toLowerCase()}`,
         run: () => goSection(n.id)
       });
+
+    list.push({
+      section: 'Pages',
+      label: 'Projects Archive',
+      hint: 'Explore all 6 architectures and shipped systems',
+      run: () => {
+        close();
+        window.location.href = '/projects';
+      }
+    });
+
+    list.push({
+      section: 'Pages',
+      label: 'Blog / Engineering Journal',
+      hint: 'Technical notes on cloud, homelab & systems',
+      run: () => {
+        close();
+        window.location.href = '/blog';
+      }
+    });
+
+    for (const p of projects) {
+      list.push({
+        section: 'Projects',
+        label: p.title,
+        hint: `${p.kind} (${p.year}) — ${p.stack.slice(0, 3).join(', ')}`,
+        run: () => {
+          close();
+          window.location.href = `/projects/${p.slug}`;
+        }
+      });
+    }
     for (const l of contact.links)
       list.push({
         section: 'Links',
         label: l.label,
         hint: l.href.replace(/^mailto:/, '').replace(/^https?:\/\//, ''),
-        run: () => openExternal(l.href)
+        run: () => {
+          close();
+          if (l.href.startsWith('/')) {
+            window.location.href = l.href;
+          } else {
+            openExternal(l.href);
+          }
+        }
       });
     for (const t of trivia)
       list.push({
@@ -141,15 +180,8 @@
     tick().then(() => {
       input?.focus();
       if (reduce || !panel) return;
-      gsap
-        .timeline({ defaults: { ease: ease.out } })
-        .from(backdrop, { autoAlpha: 0, duration: dur.xs })
-        .from(panel, { y: -14, scale: 0.975, autoAlpha: 0, duration: dur.sm }, '-=0.08')
-        .from(
-          gsap.utils.toArray(panel.querySelectorAll('[data-m]')),
-          { y: 8, autoAlpha: 0, duration: dur.sm, stagger: stagger.tight },
-          '-=0.24'
-        );
+      gsap.from(backdrop, { autoAlpha: 0, duration: 0.14 });
+      gsap.from(panel, { y: -8, autoAlpha: 0, duration: 0.16, ease: 'power2.out', clearProps: 'all' });
     });
   }
 
@@ -161,14 +193,14 @@
       show = false;
       return;
     }
-    gsap.to(panel, { y: -10, scale: 0.98, autoAlpha: 0, duration: dur.xs, ease: ease.in });
+    gsap.to(panel, { y: -6, autoAlpha: 0, duration: 0.14, ease: 'power2.in' });
     gsap.to(backdrop, {
       autoAlpha: 0,
-      duration: dur.xs,
-      ease: ease.in,
+      duration: 0.14,
+      ease: 'power2.in',
       onComplete: () => (show = false)
     });
-    setTimeout(() => (show = false), 260); // safety net if a frame never lands
+    setTimeout(() => (show = false), 220); // safety net if a frame never lands
   }
 
   function flashUnlock() {
@@ -233,36 +265,46 @@
   <div
     bind:this={backdrop}
     use:portal
-    class="fixed inset-0 z-[1000] flex items-start justify-center bg-black/70 px-4 pt-[14vh] backdrop-blur-md"
+    class="fixed inset-0 z-[1000] flex items-start justify-center px-4 pt-[14vh] backdrop-blur-md"
+    style="background-color: var(--yorha-backdrop);"
     onclick={close}
     role="presentation"
   >
     <div
       bind:this={panel}
-      class="flex max-h-[62vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-white/12 bg-ink-1 font-sans shadow-2xl shadow-black/60"
+      class="relative flex max-h-[62vh] w-full max-w-lg flex-col overflow-hidden rounded-none border font-sans"
+      style="background-color: var(--yorha-surface); border-color: var(--yorha-border); color: var(--yorha-text-primary);"
       onclick={(e) => e.stopPropagation()}
       role="dialog"
       aria-modal="true"
       aria-label="Command palette"
       tabindex="-1"
     >
-      <div data-m class="flex items-center gap-3 border-b border-white/10 px-4">
-        <span class="text-ash-2" aria-hidden="true">⌕</span>
+      <!-- Tactical Corner Brackets -->
+      <span class="pointer-events-none absolute -top-px -left-px h-3 w-3 border-l-2 border-t-2 z-30" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
+      <span class="pointer-events-none absolute -top-px -right-px h-3 w-3 border-r-2 border-t-2 z-30" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
+      <span class="pointer-events-none absolute -bottom-px -left-px h-3 w-3 border-b-2 border-l-2 z-30" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
+      <span class="pointer-events-none absolute -bottom-px -right-px h-3 w-3 border-b-2 border-r-2 z-30" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
+
+      <div data-m class="flex items-center gap-3 border-b px-4" style="border-color: var(--yorha-border); background-color: var(--yorha-bg);">
+        <span class="font-mono text-xs font-bold" style="color: var(--yorha-accent);" aria-hidden="true">&gt;_</span>
         <input
           bind:this={input}
           bind:value={query}
           oninput={() => (sel = 0)}
           type="text"
-          placeholder={owner ? 'Search services and pages' : 'Search the sky and pages'}
-          class="w-full rounded-md bg-transparent py-4 text-sm text-white placeholder:text-ash-2 focus:outline-none"
+          placeholder={owner ? 'SEARCH SERVICES AND NODES' : 'SEARCH PAGES, ARCHIVES, OR SYSTEMS'}
+          class="w-full rounded-none bg-transparent py-3.5 font-mono text-xs uppercase placeholder:normal-case focus:outline-none"
+          style="color: var(--yorha-text-primary);"
           autocomplete="off"
           autocapitalize="off"
           spellcheck="false"
         />
         {#if owner}
           <span
-            class="shrink-0 rounded-full border border-white/15 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-ash-3"
-            >homelab</span
+            class="shrink-0 rounded-none border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+            style="border-color: var(--yorha-accent-border); background-color: var(--yorha-accent-subtle); color: var(--yorha-accent);"
+            >HOMELAB</span
           >
         {/if}
       </div>
@@ -273,33 +315,35 @@
         data-lenis-prevent
       >
         {#if filtered.length === 0}
-          <p class="px-4 py-6 text-center text-xs text-ash-2">
+          <p class="px-4 py-6 text-center text-xs" style="color: var(--yorha-text-muted);">
             Nothing matches “{query}”.
           </p>
         {/if}
         {#each sections as [label, items] (label)}
           <p
             data-m
-            class="px-4 pb-1 pt-3 font-mono text-[10px] uppercase tracking-[0.22em] text-ash-1"
+            class="px-4 pb-1 pt-3 font-mono text-[10px] uppercase tracking-[0.22em]"
+            style="color: var(--yorha-text-muted);"
           >
             {label}
           </p>
           {#each items as e (e.section + e.label)}
+            {@const isSelected = e.i === sel}
             <button
               data-m
-              data-sel={e.i === sel}
+              data-sel={isSelected}
               disabled={e.disabled}
               onclick={() => e.run?.()}
               onpointermove={() => (sel = e.i)}
-              class="flex w-full items-center gap-3 px-4 py-2 text-left transition-colors disabled:opacity-35 {e.i ===
-              sel
-                ? 'bg-white/10'
-                : 'hover:bg-white/5'}"
+              class="flex w-full items-center gap-3 px-4 py-2 text-left transition-colors duration-150 rounded-none disabled:opacity-35 cursor-pointer"
+              style={isSelected
+                ? 'background-color: var(--yorha-invert-bg); color: var(--yorha-invert-text);'
+                : 'color: var(--yorha-text-primary);'}
             >
-              <span class="shrink-0 text-sm text-white/90">{e.label}</span>
-              <span class="truncate text-xs text-ash-2">{e.hint}</span>
-              {#if e.i === sel && !e.disabled}
-                <span class="ml-auto shrink-0 text-xs text-ash-3" aria-hidden="true"
+              <span class="shrink-0 text-sm font-medium" style={isSelected ? 'color: var(--yorha-invert-text);' : 'color: var(--yorha-text-primary);'}>{e.label}</span>
+              <span class="truncate text-xs" style={isSelected ? 'color: var(--yorha-invert-text); opacity: 0.7;' : 'color: var(--yorha-text-muted);'}>{e.hint}</span>
+              {#if isSelected && !e.disabled}
+                <span class="ml-auto shrink-0 text-xs font-bold" aria-hidden="true" style="color: var(--yorha-invert-text);"
                   >↵</span
                 >
               {/if}
@@ -310,10 +354,11 @@
 
       <div
         data-m
-        class="flex items-center justify-between border-t border-white/10 px-4 py-2.5 font-mono text-[10px] uppercase tracking-widest text-ash-1"
+        class="flex items-center justify-between border-t px-4 py-2.5 font-mono text-[10px] uppercase tracking-widest"
+        style="border-color: var(--yorha-border); color: var(--yorha-text-muted);"
       >
         <span>↑↓ move · ↵ open · esc close</span>
-        <span>⌘K</span>
+        <span style="color: var(--yorha-accent);">⌘K</span>
       </div>
     </div>
   </div>

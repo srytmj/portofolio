@@ -127,65 +127,30 @@ build time**, so run `npm run build` again after editing `.env`. (To set them at
 runtime with no rebuild, switch to `@sveltejs/adapter-node` and read from
 `$env/dynamic/public`.)
 
-## If you're an AI reading this
+## AI Agent & Developer Guidelines
 
-You are probably here to add a service, add a project, or change some copy. Do
-the smallest edit that fits the pattern already in the file. This owner keeps a
-detailed working memory of the project outside the repo, so don't restate the
-architecture here — just keep this section accurate.
+For AI coding agents working on this project (Antigravity, Claude, Cursor, Copilot, etc.), comprehensive instructions, architectural rules, blog authoring guides, and active roadmap tracking are maintained in:
 
-**Ground rules**
+👉 **[AI_GUIDELINES.md](./AI_GUIDELINES.md)**
 
-- Content lives in data files, not components. Copy → `src/lib/content/site.js`.
-  Homelab services → `src/lib/panel/services.js`. Constellation facts →
-  `src/lib/palette/trivia.js`. Never hard-code a URL in a `.svelte` file.
-- Writing style: plain and direct. No em-dashes, no marketing filler ("seamless",
-  "immersive experience", "leverage"), no exclamation marks. Match the terse
-  voice already in `site.js`.
-- Don't reintroduce things this owner already rejected: scroll-snap between
-  sections, per-character / cursor / strike-through hero name effects, an
-  always-on constellation web, a pull-quote in About, a top header bar. If in
-  doubt, ask.
-- Keep web images small (resize before committing — a 4.8 MB photo once crashed
-  the dev server).
+**Key Ground Rules for AI Agents:**
+- **Content lives in data files, not components**: Copy → `src/lib/content/site.js`. Homelab services → `src/lib/panel/services.js`. Constellation facts → `src/lib/palette/trivia.js`. Never hardcode copy into `.svelte` files.
+- **Design Philosophy**: Brutalist, flat, `rounded-none` (zero border radius), and zero-shadow aesthetic inspired by **YoRHa (NieR: Automata OS)**.
+- **Dark Mode Telemetry**: Preserve neon emerald accents (`#34D399`) for live network indicators, telemetry clocks, and active status dots.
+- **Blog Engine**: Articles live in `src/posts/YYYY-MM-DD-slug.md` with YAML frontmatter, supporting Prism.js syntax highlighting and Mermaid.js architecture diagrams.
+- **Always verify build**: `npm run build` must pass cleanly before finishing any turn.
 
-**Add a homelab service**
+## Deployment & Production
 
-1. `src/lib/panel/services.js` — add `svc('Name', 'PUBLIC_NAME_URL')` to the
-   right group (or add a new group object with `label` + `items`).
-2. `.env.example` — add `PUBLIC_NAME_URL=` under the matching comment header.
-3. Tell the owner to add the real value to their `.env` and rebuild. The palette
-   shows the row greyed out until then; no code change needed once the var is set.
+```bash
+# Build the application
+npm run build
 
-**Add / edit a project**
+# Preview production build locally
+npm run preview
+```
 
-- `src/lib/content/site.js` → `projects[]`. Fields: `title`, `kind`, `year`,
-  `summary`, optional `detail[]` (paragraphs), `stack[]`, `images[]`
-  (`/projects/*.svg` placeholders in `static/projects/`, any aspect ratio),
-  `links[]` (`{ label, href }`). The card grid and the modal are fully
-  data-driven — no component edit.
+The application uses SvelteKit with `@sveltejs/adapter-auto`. It can easily be adapted for:
+- **Static Hosting (Cloudflare Pages, GitHub Pages, Vercel, S3)**: via `@sveltejs/adapter-static` (all routes support SSG/prerendering).
+- **Self-Hosted Homelab (Docker / Node server)**: via `@sveltejs/adapter-node`.
 
-**Change the palette passphrase**
-
-- Only `const PASSPHRASE` in `src/lib/palette/owner.js`. Anyone already unlocked
-  stays unlocked (their `localStorage` flag persists).
-
-**After adding or removing a route folder**
-
-- Restart the dev server and clear caches, or Tailwind won't emit new class
-  values and Vite will 500 on the stale route:
-  ```bash
-  rm -rf .svelte-kit/generated node_modules/.vite && npm run dev
-  ```
-
-**Before you finish**
-
-- `npm run build` must pass. Pre-existing a11y warnings on `ProjectModal` /
-  `CommandPalette` (dialog role, click-without-keydown) are known and fine.
-
-## Next steps
-
-- Replace placeholder projects and links in `src/lib/content/site.js`
-- Pick a deploy adapter (`@sveltejs/adapter-static` for a pure static host) — currently `adapter-auto`
-- Add real project detail pages / images
-- Decide on a mobile trigger for the command palette

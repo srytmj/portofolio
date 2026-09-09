@@ -38,10 +38,390 @@
 :root {
   color-scheme: dark;
 
+  /* Dedicated typography for blog posts reading view */
+  --font-blog-head: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-blog-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-blog-code: 'Fira Code', ui-monospace, monospace;
+
   /* Layout — one container, one gutter, everything aligns to them. */
   --container: 72rem;
   --gutter: clamp(1.25rem, 5vw, 2.5rem);
   --measure: 65ch;
+
+  /* Default YoRHa Design Tokens: Dark (OLED Tactical) */
+  --yorha-bg: #000000;
+  --yorha-surface: #080808;
+  --yorha-surface-elevated: #0f0f0f;
+  --yorha-text-primary: #dcdacf;
+  --yorha-text-muted: #686760;
+  --yorha-text-faint: #44433e;
+  --yorha-border: #1e1e1e;
+  --yorha-border-subtle: rgba(255, 255, 255, 0.08);
+  --yorha-border-highlight: #45433d;
+  --yorha-accent: #34d399;
+  --yorha-accent-subtle: rgba(52, 211, 153, 0.12);
+  --yorha-accent-border: rgba(52, 211, 153, 0.35);
+  --yorha-invert-bg: #dcdacf;
+  --yorha-invert-text: #000000;
+  --yorha-backdrop: rgba(0, 0, 0, 0.88);
+  --hero-scrim: radial-gradient(ellipse 64% 48% at 34% 50%, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.42) 44%, transparent 72%);
+
+  /* Blog Theme Mapping (OLED Black Mode) */
+  --blog-bg: #000000;
+  --blog-surface: #080808;
+  --blog-text-primary: #dcdacf;
+  --blog-text-muted: #686760;
+  --blog-border: #1e1e1e;
+  --blog-code-bg: #0d0d0d;
+  --blog-code-text: #dcdacf;
+  --blog-accent: #34d399;
+  --blog-accent-hover: #6ee7b7;
+  --blog-accent-subtle: rgba(52, 211, 153, 0.12);
+  --blog-accent-border: rgba(52, 211, 153, 0.35);
+  --blog-card-hover: rgba(255, 255, 255, 0.03);
+  --blog-input-bg: rgba(255, 255, 255, 0.04);
+
+  /* YoRHa Exact Cross Grid Token (Dark Mode Default) */
+  --cross-line: rgba(255, 255, 255, 0.07);
+}
+
+/* YoRHa Dark Mode / OLED Tactical */
+:root[data-theme='dark'],
+[data-theme='dark'],
+:root[data-blog-theme='dark'],
+[data-blog-theme='dark'] {
+  color-scheme: dark;
+  --yorha-bg: #000000;
+  --yorha-surface: #080808;
+  --yorha-surface-elevated: #0f0f0f;
+  --yorha-text-primary: #dcdacf;
+  --yorha-text-muted: #686760;
+  --yorha-text-faint: #44433e;
+  --yorha-border: #1e1e1e;
+  --yorha-border-subtle: rgba(255, 255, 255, 0.08);
+  --yorha-border-highlight: #45433d;
+  --yorha-accent: #34d399;
+  --yorha-accent-subtle: rgba(52, 211, 153, 0.12);
+  --yorha-accent-border: rgba(52, 211, 153, 0.35);
+  --yorha-invert-bg: #dcdacf;
+  --yorha-invert-text: #000000;
+  --yorha-backdrop: rgba(0, 0, 0, 0.88);
+  --hero-scrim: radial-gradient(ellipse 64% 48% at 34% 50%, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.42) 44%, transparent 72%);
+
+  --blog-bg: #000000;
+  --blog-surface: #080808;
+  --blog-text-primary: #dcdacf;
+  --blog-text-muted: #686760;
+  --blog-border: #1e1e1e;
+  --blog-code-bg: #0d0d0d;
+  --blog-code-text: #dcdacf;
+  --blog-accent: #34d399;
+  --blog-accent-hover: #6ee7b7;
+  --blog-accent-subtle: rgba(52, 211, 153, 0.12);
+  --blog-accent-border: rgba(52, 211, 153, 0.35);
+  --blog-card-hover: rgba(255, 255, 255, 0.03);
+  --blog-input-bg: rgba(255, 255, 255, 0.04);
+  --blog-hover-border: rgba(220, 218, 207, 0.4);
+  --blog-hover-top-line: rgba(220, 218, 207, 0.85);
+
+  /* YoRHa Exact Cross Grid Token (Dark Mode) */
+  --cross-line: rgba(255, 255, 255, 0.07);
+}
+
+/* YoRHa Light Mode / Bunker Archive */
+:root[data-theme='light'],
+[data-theme='light'],
+:root[data-blog-theme='sepia'],
+[data-blog-theme='sepia'] {
+  color-scheme: light;
+  --yorha-bg: #d1d2c5;
+  --yorha-surface: #c5c6b8;
+  --yorha-surface-elevated: #bcbdad;
+  --yorha-text-primary: #454138;
+  --yorha-text-muted: #7d796c;
+  --yorha-text-faint: #9c998d;
+  --yorha-border: #b4b5a6;
+  --yorha-border-subtle: rgba(69, 65, 56, 0.15);
+  --yorha-border-highlight: #8e8f80;
+  --yorha-accent: #c7634b;
+  --yorha-accent-subtle: rgba(199, 99, 75, 0.12);
+  --yorha-accent-border: rgba(199, 99, 75, 0.35);
+  --yorha-invert-bg: #454138;
+  --yorha-invert-text: #d1d2c5;
+  --yorha-backdrop: rgba(69, 65, 56, 0.55);
+  --hero-scrim: none;
+
+  --blog-bg: #d1d2c5;
+  --blog-surface: #c5c6b8;
+  --blog-text-primary: #454138;
+  --blog-text-muted: #7d796c;
+  --blog-border: #b4b5a6;
+  --blog-code-bg: #c0c1b3;
+  --blog-code-text: #454138;
+  --blog-accent: #c7634b;
+  --blog-accent-hover: #b0533c;
+  --blog-accent-subtle: rgba(199, 99, 75, 0.12);
+  --blog-accent-border: rgba(199, 99, 75, 0.35);
+  --blog-card-hover: rgba(69, 65, 56, 0.05);
+  --blog-input-bg: rgba(197, 198, 184, 0.7);
+  --blog-hover-border: #8e8f80;
+  --blog-hover-top-line: #454138;
+
+  /* Light Mode (Krem YoRHa) */
+  --cross-line: rgba(0, 0, 0, 0.06);
+}
+
+/* ==========================================================================
+   Pola Grid Persis Seperti Gambar (Exact Cross Grid - 3px)
+   ========================================================================== */
+.exact-cross-grid,
+.yorha-pattern,
+.yorha-tech-bg {
+  position: relative;
+  background-color: var(--yorha-bg) !important;
+  background-size: 3px 3px, 3px 3px !important;
+  background-position: center center !important;
+  background-image: 
+    linear-gradient(to right, var(--cross-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--cross-line) 1px, transparent 1px) !important;
+}
+
+/* Support attaching directly to <body> */
+body.exact-cross-grid,
+body.yorha-pattern,
+body.yorha-tech-bg {
+  background-attachment: fixed, fixed !important;
+}
+
+/* Specific for Blog Post Reader: Radial Vignette Fade out over reading text */
+.yorha-tech-bg-reader {
+  position: relative;
+  background-color: var(--blog-bg);
+}
+
+.yorha-tech-bg-reader::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-size: 3px 3px, 3px 3px;
+  background-position: center center;
+  background-image: 
+    linear-gradient(to right, var(--cross-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--cross-line) 1px, transparent 1px);
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, transparent 20%, rgba(0, 0, 0, 0.4) 55%, black 90%);
+  -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, transparent 20%, rgba(0, 0, 0, 0.4) 55%, black 90%);
+}
+
+/* YoRHa Base Body & Smooth Transitions */
+body {
+  background-color: var(--yorha-bg);
+  color: var(--yorha-text-primary);
+}
+
+/* Custom Plus Cursor (YoRHa HUD) */
+@media (pointer: fine) {
+  html.custom-cursor-active,
+  html.custom-cursor-active *,
+  html.custom-cursor-active *::before,
+  html.custom-cursor-active *::after {
+    cursor: none !important;
+  }
+}
+
+.theme-transitioning,
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+  transition-property: background-color, border-color, color, fill, stroke !important;
+  transition-duration: 380ms !important;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* YoRHa Menu Solid Block Invert Hover */
+.yorha-invert-hover {
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+:root[data-theme='dark'] .yorha-invert-hover:hover,
+:root:not([data-theme='light']) .yorha-invert-hover:hover {
+  background-color: #dcdacf !important;
+  color: #000000 !important;
+  border-color: #dcdacf !important;
+}
+:root[data-theme='light'] .yorha-invert-hover:hover {
+  background-color: #454138 !important;
+  color: #d1d2c5 !important;
+  border-color: #454138 !important;
+}
+
+/* ==========================================================================
+   PRISM SYNTAX HIGHLIGHTING (Dark & Sepia Modes)
+   ========================================================================== */
+.code-block pre code {
+  font-family: var(--font-blog-code) !important;
+}
+
+/* Black / OLED Mode Syntax Tokens */
+:root[data-blog-theme='dark'] .token.comment,
+:root[data-blog-theme='dark'] .token.prolog,
+:root[data-blog-theme='dark'] .token.doctype,
+:root[data-blog-theme='dark'] .token.cdata {
+  color: #768390;
+  font-style: italic;
+}
+:root[data-blog-theme='dark'] .token.punctuation {
+  color: #adbac7;
+}
+:root[data-blog-theme='dark'] .token.property,
+:root[data-blog-theme='dark'] .token.tag,
+:root[data-blog-theme='dark'] .token.boolean,
+:root[data-blog-theme='dark'] .token.number,
+:root[data-blog-theme='dark'] .token.constant,
+:root[data-blog-theme='dark'] .token.symbol {
+  color: #6cb6ff;
+}
+:root[data-blog-theme='dark'] .token.selector,
+:root[data-blog-theme='dark'] .token.attr-name,
+:root[data-blog-theme='dark'] .token.string,
+:root[data-blog-theme='dark'] .token.char,
+:root[data-blog-theme='dark'] .token.builtin {
+  color: #96d0ff;
+}
+:root[data-blog-theme='dark'] .token.operator,
+:root[data-blog-theme='dark'] .token.entity,
+:root[data-blog-theme='dark'] .token.url,
+:root[data-blog-theme='dark'] .token.variable {
+  color: #f47067;
+}
+:root[data-blog-theme='dark'] .token.atrule,
+:root[data-blog-theme='dark'] .token.attr-value,
+:root[data-blog-theme='dark'] .token.keyword {
+  color: #f47067;
+  font-weight: 600;
+}
+:root[data-blog-theme='dark'] .token.function,
+:root[data-blog-theme='dark'] .token.class-name {
+  color: #dcbdfb;
+}
+:root[data-blog-theme='dark'] .token.regex,
+:root[data-blog-theme='dark'] .token.important {
+  color: #e3b341;
+}
+
+/* Warm Sepia Mode Syntax Tokens */
+:root[data-blog-theme='sepia'] .token.comment,
+:root[data-blog-theme='sepia'] .token.prolog,
+:root[data-blog-theme='sepia'] .token.doctype,
+:root[data-blog-theme='sepia'] .token.cdata {
+  color: #8c786a;
+  font-style: italic;
+}
+:root[data-blog-theme='sepia'] .token.punctuation {
+  color: #574032;
+}
+:root[data-blog-theme='sepia'] .token.property,
+:root[data-blog-theme='sepia'] .token.tag,
+:root[data-blog-theme='sepia'] .token.boolean,
+:root[data-blog-theme='sepia'] .token.number,
+:root[data-blog-theme='sepia'] .token.constant,
+:root[data-blog-theme='sepia'] .token.symbol {
+  color: #0550ae;
+}
+:root[data-blog-theme='sepia'] .token.selector,
+:root[data-blog-theme='sepia'] .token.attr-name,
+:root[data-blog-theme='sepia'] .token.string,
+:root[data-blog-theme='sepia'] .token.char,
+:root[data-blog-theme='sepia'] .token.builtin {
+  color: #116329;
+}
+:root[data-blog-theme='sepia'] .token.operator,
+:root[data-blog-theme='sepia'] .token.entity,
+:root[data-blog-theme='sepia'] .token.url,
+:root[data-blog-theme='sepia'] .token.variable {
+  color: #a02c00;
+}
+:root[data-blog-theme='sepia'] .token.atrule,
+:root[data-blog-theme='sepia'] .token.attr-value,
+:root[data-blog-theme='sepia'] .token.keyword {
+  color: #a02c00;
+  font-weight: 600;
+}
+:root[data-blog-theme='sepia'] .token.function,
+:root[data-blog-theme='sepia'] .token.class-name {
+  color: #6f42c1;
+}
+:root[data-blog-theme='sepia'] .token.regex,
+:root[data-blog-theme='sepia'] .token.important {
+  color: #8250df;
+}
+
+/* ==========================================================================
+   COMPREHENSIVE SEPIA MODE UTILITY OVERRIDES (Fix unreadable white text without killing hover)
+   ========================================================================== */
+:root[data-blog-theme='sepia'] .text-white,
+:root[data-blog-theme='sepia'] .text-white\/90,
+:root[data-blog-theme='sepia'] .text-white\/80 {
+  color: var(--blog-text-primary);
+}
+:root[data-blog-theme='sepia'] .text-white\/70,
+:root[data-blog-theme='sepia'] .text-ash-2,
+:root[data-blog-theme='sepia'] .text-ash-3 {
+  color: var(--blog-text-muted);
+}
+:root[data-blog-theme='sepia'] .border-white\/5,
+:root[data-blog-theme='sepia'] .border-white\/10,
+:root[data-blog-theme='sepia'] .border-white\/15,
+:root[data-blog-theme='sepia'] .border-white\/20,
+:root[data-blog-theme='sepia'] .border-white\/25 {
+  border-color: var(--blog-border);
+}
+:root[data-blog-theme='sepia'] .bg-black {
+  background-color: var(--blog-bg);
+}
+:root[data-blog-theme='sepia'] .bg-ink-1,
+:root[data-blog-theme='sepia'] .bg-ink-1\/80,
+:root[data-blog-theme='sepia'] .bg-ink-1\/50 {
+  background-color: var(--blog-surface);
+}
+
+/* Eliminate ALL shadows and text-shadows from ALL components in both Dark and Sepia modes in Blog */
+:root[data-blog-theme] *,
+:root[data-blog-theme] *::before,
+:root[data-blog-theme] *::after,
+[data-blog-theme] *,
+[data-blog-theme] *::before,
+[data-blog-theme] *::after {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* Ensure accent background dots/badges follow theme */
+:root[data-blog-theme] .bg-emerald-400 {
+  background-color: var(--blog-accent) !important;
+}
+
+/* Ensure vibrant interactive hover colors in both themes! */
+:root[data-blog-theme] .hover\:text-emerald-400:hover,
+:root[data-blog-theme] .group:hover .group-hover\:text-emerald-400,
+:root[data-blog-theme] .group\/link:hover .group-hover\/link\:text-emerald-400,
+:root[data-blog-theme] [data-home-card]:hover h2,
+:root[data-blog-theme] [data-category-card]:hover h3,
+:root[data-blog-theme] [data-category-post-item]:hover h3,
+:root[data-blog-theme] [data-tag-post-item]:hover h3,
+:root[data-blog-theme] [data-archive-item]:hover .group-hover\:text-emerald-400,
+:root[data-blog-theme] [data-archive-item] a:hover .text-body {
+  color: var(--blog-accent) !important;
+}
+
+:root[data-blog-theme] [data-home-card]:hover,
+:root[data-blog-theme] [data-category-card]:hover,
+:root[data-blog-theme] [data-category-post-item]:hover,
+:root[data-blog-theme] [data-tag-post-item]:hover,
+:root[data-blog-theme] [data-archive-item] a:hover,
+:root[data-blog-theme] [data-tag-pill]:hover,
+:root[data-blog-theme] aside nav button:hover {
+  border-color: var(--blog-hover-border) !important;
 }
 
 /* Centred content column. Use in place of `mx-auto max-w-6xl px-6 sm:px-10`. */
@@ -50,6 +430,10 @@
   max-width: var(--container);
   margin-inline: auto;
   padding-inline: var(--gutter);
+}
+
+html {
+  scrollbar-gutter: stable;
 }
 
 html,
@@ -62,8 +446,19 @@ body {
 /* Prose reads in the serif; everything structural (headings, nav, labels,
    buttons, the uppercase micro-type) is Epilogue. */
 body {
+  width: 100%;
   font-family: var(--font-serif);
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+/* Utility to hide scrollbars while allowing smooth scrolling */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 h1,
@@ -162,4 +557,39 @@ html.lenis body {
   60% { transform: translate(3px, 1px) }
   80% { transform: translate(3px, -1px) }
   100% { transform: translate(0) }
+}
+
+/* Page View Transitions */
+@keyframes vt-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-16px);
+    filter: blur(4px);
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+::view-transition-old(root) {
+  animation: 250ms cubic-bezier(0.16, 1, 0.3, 1) both vt-fade-out;
+}
+
+::view-transition-new(root) {
+  animation: 350ms cubic-bezier(0.16, 1, 0.3, 1) both vt-fade-in;
 }

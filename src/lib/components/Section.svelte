@@ -41,21 +41,22 @@
         <div class="overflow-hidden pb-1">
           <span
             data-anim-badge
-            class="block font-mono text-[11px] font-medium tracking-[0.25em] text-white/40 uppercase will-change-transform"
+            class="block font-mono text-[11px] font-medium tracking-[0.25em] uppercase will-change-transform"
+            style="color: var(--yorha-text-muted);"
           >
             {sectionCodes[id] ?? 'SEC // 00'}
           </span>
         </div>
       </div>
-      <div class="relative mt-3 h-px w-full overflow-hidden bg-white/10">
+      <div class="relative mt-3 h-px w-full overflow-hidden" style="background-color: var(--yorha-border);">
         <span
           data-anim-line
-          class="absolute inset-y-0 left-0 h-full w-full origin-left bg-gradient-to-r from-white/70 via-white/30 to-white/10"
+          class="absolute inset-y-0 left-0 h-full w-full origin-left bg-gradient-to-r from-current/50 via-current/25 to-transparent"
           aria-hidden="true"
         ></span>
         <span
           data-anim-scan
-          class="absolute inset-y-0 -left-28 h-full w-28 bg-gradient-to-r from-transparent via-white to-transparent"
+          class="absolute inset-y-0 -left-28 h-full w-28 bg-gradient-to-r from-transparent via-current to-transparent opacity-40"
           aria-hidden="true"
         ></span>
       </div>
