@@ -8,7 +8,60 @@ Format changelog ini mengacu pada [Keep a Changelog](https://keepachangelog.com/
 
 ## [Unreleased] - 2026-09-09
 
+### Added
+- **[18:10 WIB] Overhaul Dokumentasi AI Agent, Deployment Pipeline (GitHub Pages & AWS EC2), & SOP Pemeliharaan (`AI_GUIDELINES.md`, `README.md`, `CHANGELOG.md`):**
+  - **Panduan Penulisan Artikel Blog untuk AI Agent**:
+    - Spesifikasi format nama file `YYYY-MM-DD-slug.md` dan struktur YAML frontmatter lengkap (`title`, `date`, `description`, `categories`, `tags`, `author`, `published`, `cover`).
+    - Panduan integrasi diagram arsitektur Mermaid.js dan syntax highlighting Prism.js beserta identifier bahasa yang didukung.
+    - Struktur penyimpanan aset gambar artikel di `static/assets/img/posts/` dan integrasi Table of Contents (TOC) otomatis.
+  - **SOP Maintenance & Pemeliharaan Codebase**:
+    - Aturan mutlak larangan `clearProps: 'all'` pada elemen dengan inline styles (wajib gunakan `clearProps: 'transform,opacity'`).
+    - Prosedur sinkronisasi `ScrollTrigger.refresh()` dan `window.__lenis?.resize()` pada setiap perubahan ukuran DOM dinamis.
+    - Aturan konsistensi Svelte 5 Runes murni (`$state`, `$derived`, `$effect`, `$props`).
+  - **Panduan Lengkap Deployment Produksi**:
+    - **GitHub Pages**: Konfigurasi `@sveltejs/adapter-static` dengan `prerender = true` dan workflow otomatis GitHub Actions `.github/workflows/deploy.yml`.
+    - **AWS EC2 (Ubuntu Linux)**: Konfigurasi Security Group (port 80, 443, 22), instalasi Nginx, Node.js 20 LTS, PM2 Process Manager, setup Nginx server block dengan caching immutable assets, SSL otomatis Certbot Let's Encrypt, dan script deployment otomatis `deploy.sh`.
+  - **Kewajiban Penggunaan CHANGELOG & Standar Git Commit**:
+    - Mewajibkan AI Agent memperbarui `CHANGELOG.md` pada setiap perubahan kode.
+    - Menetapkan standar format pesan commit Conventional Commits / Commitlint.
+    - Menegaskan aturan kontributor tunggal: dilarang keras menambahkan bot AI atau Antigravity sebagai co-author/contributor.
+
+- **[17:07 WIB] Implementasi Custom Plus Cursor dengan Dynamic Color Inversion (`CustomCursor.svelte`, `+layout.svelte`, `src/app.css`):**
+  - **Bentuk Plus (`+`) Crosshair Taktis**:
+    - Menghadirkan kursor SVG tanda tambah minimalis presisi tinggi (20px x 20px) yang titik potong sumbunya tepat berada di koordinat klik pointer.
+  - **Efek Inversi Warna Dinamis (`mix-blend-mode: difference`)**:
+    - Kursor otomatis ter-invert secara matematis terhadap warna elemen di bawahnya: tampil putih di atas background hitam OLED, dan ter-invert menjadi hitam/charcoal saat melintasi elemen terang, teks, atau button hover.
+  - **Responsivitas Interaktif & Tactile Feedback**:
+    - Kursor otomatis membesar (`scale: 1.4`) saat hover ke elemen interaktif (`<a>`, `<button>`, `<input>`, `.cursor-pointer`) dan mengecil sejenak (`scale: 0.85`) saat diklik (`mousedown`).
+  - **Proteksi Mobile & Performa 0-Latency**:
+    - Kursor hanya aktif pada perangkat bermouse (`@media (pointer: fine)`). Transformasi diproses langsung via GPU (`translate3d` & `will-change: transform`) tanpa lag frame.
+
 ### Changed
+- **[17:30 WIB] Penonaktifan Border Putih pada Project Modal Dialog (`ProjectModal.svelte`, `ResumeModal.svelte`):**
+  - **Menonaktifkan Border Luar Panel**:
+    - Mengganti kelas `border` menjadi `border-0` dan menyetel `border: none;` serta menambahkan scoped style `div[role="dialog"] { border: none !important; }` pada panel modal.
+    - Mengubah `clearProps: 'all'` menjadi `clearProps: 'transform,opacity'` pada animasi masuk modal agar GSAP tidak menghapus deklarasi style panel setelah animasi selesai.
+    - Mempertahankan reticle corner brackets aksen amber pada empat sudut modal tanpa ada garis putih pembatas yang mengelilingi kotak modal.
+
+- **[17:28 WIB] Perbaikan Bug Border Putih Kartu Proyek Akibat clearProps GSAP (`projects/+page.svelte`, `Skills.svelte`):**
+  - **Penyebab**: Fungsi `clearProps: 'all'` pada animasi filter kartu menghapus seluruh atribut `style` inline (`border-color` dan `background-color`), sehingga border kartu jatuh ke warna teks bawaan Tailwind (`currentColor` = putih terang).
+  - **Solusi**: Mengubah seluruh `clearProps: 'all'` menjadi `clearProps: 'transform,opacity'` pada handler filter dan search `$effect`, serta menambahkan aturan scoped CSS `:global([data-card-anim])` untuk mengunci warna border kartu ke `var(--yorha-border)`.
+
+- **[17:14 WIB] Perbaikan Bug Scroll Delay Tech Skills & Transisi Latar Belakang Hero ke About (`sectionAnim.js`, `Skills.svelte`, `Hero.svelte`, `+page.svelte`):**
+  - **Perbaikan Scroll Delay pada Filter Kategori**:
+    - Menambahkan `ResizeObserver` pada action `sectionAnim` agar setiap perubahan tinggi elemen section langsung memperbarui koordinat `ScrollTrigger` dan batas scroll `Lenis`.
+    - Menambahkan pemanggilan langsung `ScrollTrigger.refresh()` dan `window.__lenis?.resize()` di `Skills.svelte` saat filter diklik sehingga seksi Portfolio langsung muncul tepat waktu tanpa jeda.
+  - **Transisi Latar Belakang Hero ke About yang Mulus**:
+    - Menambahkan gradien transisi vertikal lembut di bagian bawah pin Hero (`Hero.svelte`) yang membaurkan canvas 3D ke latar belakang YoRHa.
+    - Menambahkan batas taktis YoRHa HUD (`SYS_ENGAGE // SECTOR_02_MONITOR`) dengan indikator pulsa amber di antara Hero dan About.
+    - Menambahkan *grid dissolve mask* setinggi ~260px di bagian atas kontainer konten agar kisi grid 3px meluruh masuk secara bertahap tanpa potongan garis tajam.
+
+- **[17:04 WIB] Pembaruan Pola Grid Latar Belakang Menjadi Exact Cross Grid 3px (`src/app.css`, `+page.svelte`, `projects/+page.svelte`, `blog/+page.svelte`):**
+  - Mengubah pola background kisi garis menjadi *exact cross grid* dua lapis (`linear-gradient` vertikal & horizontal 1px) dengan ukuran kotak mikro rapat **3px x 3px**.
+  - Mengonfigurasi variabel `--cross-line` pada Dark Mode (`rgba(255, 255, 255, 0.07)`) dan Light Mode (`rgba(0, 0, 0, 0.06)`).
+  - Memastikan background grid membentang penuh 100% (*edge-to-edge*) pada halaman `/projects` dan `/blog` tanpa terpotong batas kontainer `.wrap`.
+  - Memberikan latar belakang solid (`var(--yorha-surface)`) pada seluruh kartu keahlian dan panel diagnostik Pod 042 agar pola grid tidak tembus di belakang teks.
+  - Menjaga *radial vignette mask* pada pembaca artikel blog agar area teks tetap bersih dan nyaman dibaca.
 - **[12:59 WIB] Auto-Scroll Table of Contents (TOC) di Blog Reader Mengikuti Progres Baca Pengguna (`blog/[slug]/+page.svelte`):**
   - **Auto-Follow Heading Aktif pada Daftar Isi Panjang**:
     - Menyelesaikan masalah daftar isi artikel panjang (seperti *Apa-apa aja tentang Fighting Game*) yang melebihi batas tinggi `max-h-[50vh]`, di mana sebelumnya pengguna harus men-scroll manual container TOC untuk melihat heading yang sedang aktif.

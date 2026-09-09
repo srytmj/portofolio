@@ -1,156 +1,195 @@
-# porto-web
+# porto-web — Bakti Surya Atmaja (Maja)
 
-Immersive portfolio — SvelteKit + Threlte (Three.js) + GSAP ScrollTrigger + Lenis.
+Personal production engineering portfolio, technical architecture archive, and engineering journal built with **SvelteKit**, **Threlte (Three.js)**, **Tailwind CSS v4**, **GSAP ScrollTrigger**, and **Lenis Smooth Scroll**.
+
+Designed in an uncompromising **YoRHa Military Android OS (NieR: Automata)** aesthetic merged with **3D Interactive Celestial Constellations (IAU 89 Figures)**.
 
 ```bash
 npm install
 npm run dev      # http://localhost:5173
-npm run build
+npm run build    # production build
+npm run preview  # preview built site locally
 ```
 
-> **3D layer:** this is a SvelteKit app, so the Three.js layer uses **Threlte**
-> (`@threlte/core`), the Svelte renderer for Three.js. *TresJS is Vue-only and
-> cannot be used here* — Threlte is its Svelte equivalent.
+---
 
-## Structure
+## Key Highlights & Architecture
+
+- **YoRHa Military OS Visual Language**:
+  - **Zero Rounded (`rounded-none`)**: Pure 90° brutalist corners across all cards, modals, buttons, badges, inputs, and imagery.
+  - **Zero Shadow / Flat**: Elimination of soft elevation drop-shadows in favor of razor-sharp hairline borders and tactical HUD corner brackets (`[ ┌ ┐ └ ┘ ]`).
+  - **3px Technical Cross-Grid Background**: Dense micro-crosshair background grid (`background-size: 3px 3px`) running edge-to-edge across Home, Projects, and Blog pages.
+  - **Seamless Atmospheric Hero Transition**: Smooth 260px grid dissolve mask and tactical HUD telemetry seam (`SYS_ENGAGE // SECTOR_02_MONITOR`) bridging the 3D celestial canvas into the content matrix.
+  - **Interactive Crosshair Plus Custom Cursor**: Pixel-perfect SVG plus (`+`) cursor utilizing `mix-blend-mode: difference` for real-time mathematical color inversion over light/dark surfaces, scaling up dynamically on interactive targets (`scale: 1.4`).
+- **Interactive 3D Celestial Sky (Hero)**:
+  - Powered by **Threlte** (`@threlte/core`) with custom GLSL shaders.
+  - Pointer proximity reveals true IAU constellation line figures and brightens star clusters across all 89 constellations (data derived from `d3-celestial`).
+  - Automatic tier degradation: `full` (desktop/dedicated GPU), `lite` (mobile/integrated GPU), and `static` (CSS-only starfield for low-power, SSR, or `prefers-reduced-motion`).
+- **Engineering Journal (Blog Engine)**:
+  - Markdown-driven publishing via Vite eager glob (`import.meta.glob('/src/posts/*.md')`).
+  - Full syntax highlighting powered by Prism.js with copy-to-clipboard buttons and language badges.
+  - Interactive Mermaid.js architectural flowchart and sequence rendering.
+  - Dual reading mode: OLED Black and Sepia Bunker Archive.
+  - Responsive Table of Contents (TOC) with scroll-spy and auto-following viewport synchronization.
+- **Projects & Production Architecture Archive**:
+  - Filterable production archive by classification (`cloud`, `homelab`, `fullstack`, `automation`, `systems`).
+  - Real-time search query filtering with zero-stagger instantaneous transitions.
+  - Tactical specification inspector modal dialog with deep-dive routing (`/projects/[slug]`).
+- **Tactical Command Palette (Ctrl+K / ⌘K)**:
+  - Public visitor menu (site navigation, external profiles, constellation trivia launcher).
+  - Owner-exclusive homelab infrastructure launcher (unlocked via passphrase and protected by Tailscale tailnet).
+
+---
+
+## Directory Structure
 
 ```
 src/
-  app.css                       Tailwind v4 theme (monochrome tokens) + Lenis + reduced-motion
-  routes/
-    +layout.svelte              minimal shell: app.css + fonts (shared by every route)
-    +layout.js                  prerender = true (applies to all routes)
-    (site)/+layout.svelte       the portfolio chrome: SideNav, CommandPalette, Lenis init, scroll-spy, <main>
-    (site)/+page.svelte         Hero + content sections  →  served at /
-  lib/
-    panel/services.js           homelab service list, one URL per env var
-    palette/
-      owner.js                  owner unlock (localStorage flag + passphrase)
-      trivia.js                 constellation facts shown in the public palette
-    content/site.js             all editable copy (identity, about, skills, projects, contact)
-    data/
-      constellations.lines.json   d3-celestial IAU figure lines (RA/Dec), 89 constellations
-      constellation-names.json    abbreviation to full name
-    three/
-      constellationData.js        builds merged line + star geometry from the data
-      shaders/constellations.glsl.js  progressive figure reveal + twinkling stars
-    scroll/
-      heroTransition.js         GSAP ScrollTrigger, pin + scrub, mode full|lite|static
-      smoothScroll.js           Lenis, wired into GSAP ticker (no-op under reduced-motion)
-    actions/reveal.js           IntersectionObserver reveal action (reduced-motion aware)
-    utils/device.js             tier detection: full | lite | static (+ ?tier= override)
-    components/
-      Hero.svelte               orchestrates canvas + name + transition, owns shrink/dormant state
-      HeroCanvas.svelte         <Canvas> (Threlte) wrapper, owns dpr / downgrade
-      hero/Constellations.svelte  star field + figure reveal, useTask loop, FPS watchdog
-      HeroName.svelte           avant-garde variable-font / skew distortion typography
-      StaticHero.svelte         CSS-only star field (also SSR / no-JS)
-      Section.svelte About.svelte Skills.svelte Portfolio.svelte Contact.svelte
-      CommandPalette.svelte      Ctrl+K palette — public (nav + constellation trivia) / owner (homelab)
+├── app.css                    # Tailwind v4 variables, 3px tech grid, custom cursor rules
+├── app.html                   # HTML document root, dynamic SVG favicons, boot-cover
+├── posts/                     # Markdown source files for engineering journal articles
+├── lib/
+│   ├── blog/                  # Blog post parser (posts.js) & theme store (blogTheme.js)
+│   ├── components/            # UI components (Hero, About, Skills, Portfolio, Contact)
+│   │   ├── hero/              # Constellations.svelte (Threlte render loop & FPS watchdog)
+│   │   ├── CustomCursor.svelte     # Inverting crosshair plus custom cursor
+│   │   ├── LeftEdgeReturn.svelte   # Left margin hover trigger to return to Hero
+│   │   ├── CornerTelemetry.svelte  # Astronomy HUD & LiveClock in bottom-left
+│   │   ├── LiveClock.svelte        # Real-time WIB (Asia/Jakarta) digital clock
+│   │   ├── ThemeToggle.svelte      # Global OLED / Sepia theme switch
+│   │   ├── CommandPalette.svelte   # Ctrl+K modal launcher
+│   │   ├── ProjectModal.svelte     # Specification inspector modal
+│   │   └── ResumeModal.svelte      # Interactive curriculum vitae modal
+│   ├── content/
+│   │   └── site.js            # SINGLE SOURCE OF TRUTH: all editable copy and projects
+│   ├── panel/
+│   │   └── services.js        # Homelab service endpoints (backed by env vars)
+│   ├── scroll/
+│   │   ├── heroTransition.js  # GSAP pin & scrub transition choreography
+│   │   ├── sectionAnim.js     # ScrollTrigger per section with ResizeObserver
+│   │   └── smoothScroll.js    # Lenis smooth scroll wired to GSAP ticker
+│   └── stores/                # Svelte 5 state stores (theme, constellation)
+├── routes/
+│   ├── +layout.svelte         # Global layout shell (CustomCursor, fonts, app.css)
+│   ├── (site)/
+│   │   ├── +page.svelte       # Landing page (Hero, About, Skills, Portfolio, Contact)
+│   │   ├── blog/              # Blog index (/blog) and article reader (/blog/[slug])
+│   │   └── projects/          # Projects archive (/projects) & deep dive (/projects/[slug])
+static/
+├── assets/                    # Static image assets, covers, avatars
+├── favicon.svg                # Default YoRHa reticle favicon
+├── favicon-dark.svg           # OLED dark theme favicon
+├── favicon-light.svg          # Sepia light theme favicon
+└── cv-suryatmaja.pdf          # Downloadable curriculum vitae
 ```
 
-## Hero — constellations
+---
 
-A monochrome star field. When the pointer moves near a constellation, its real
-IAU figure lines draw in and its stars brighten; move away and it fades back to
-plain stars. Pointer off the page = just stars. Touch devices auto-cycle through
-the figures (brightest first). All 89 figures, data from
-[d3-celestial](https://github.com/ofrohn/d3-celestial).
+## Deployment Guide
 
-Each figure has a `uProgress` value (0..1) driven by pointer proximity on the
-CPU; the shader reveals line segments in draw order and lifts star brightness
-from it. On scroll the whole sky shrinks and fades (`shrink`, scrubbed by
-ScrollTrigger).
+### Option 1: GitHub Pages (Static Hosting)
 
-## Fallback behaviour — works on any device
+All routes support static site generation (SSG) with `prerender = true`.
 
-The tier is decided in `src/lib/utils/device.js` **before Three.js is downloaded**,
-so weak devices never pay for the WebGL bundle at all.
+1. **Install Static Adapter**:
+   ```bash
+   npm install -D @sveltejs/adapter-static
+   ```
+2. **Update `svelte.config.js`**:
+   ```javascript
+   import adapter from '@sveltejs/adapter-static';
 
-| tier | when | hero |
-|---|---|---|
-| `full` | desktop + discrete/capable GPU | ~3200 background stars, antialiased lines, near-native dpr, pointer reveal, pinned scroll transition |
-| `lite` | mobile, integrated GPU (Intel/Adreno/Mali/…), coarse pointer, ≤6 cores, 3G | ~1400 stars, dpr 1, touch auto-cycle, gentler transition |
-| `static` | no WebGL, ≤4 cores, ≤3 GB RAM, `save-data`, 2G, or `prefers-reduced-motion` — **and SSR / no-JS** | `StaticHero.svelte`, CSS-only star field, no pin |
+   export default {
+     kit: {
+       adapter: adapter({
+         pages: 'build',
+         assets: 'build',
+         fallback: '404.html',
+         precompress: false,
+         strict: true
+       })
+     }
+   };
+   ```
+3. **Build & Deploy via GitHub Actions**:
+   Push to `main` branch with a GitHub Actions workflow uploading the `build/` artifact to GitHub Pages.
 
-Runtime safety nets (`hero/Constellations.svelte`):
+---
 
-- **FPS watchdog** — samples frame time in ~1 s windows; first drops star count / twinkle / dpr, then falls back to `static` if it still can't hold 30 fps.
-- **`webglcontextlost`** — mobile browsers killing the GL context under memory pressure → clean fall back to `static` instead of a frozen canvas.
-- `<Canvas renderMode>` flips to `manual` and the sky hides once the hero scrolls fully out of view (`dormant`).
-- QA overrides: `?tier=full|lite|static|auto`, `?watchdog=off`, live FPS on `canvas.dataset.fps`.
+### Option 2: AWS EC2 (Ubuntu Linux Production)
 
-`prefers-reduced-motion` also stops the drift and twinkle, disables the name animation and the touch auto-cycle, drops the scroll pin, disables Lenis, and collapses reveal transitions. Pointer reveal still works.
-The prerendered HTML already contains the static hero + all content, so the site is fully readable with JS disabled or on the slowest connection.
+For self-hosted production servers running on AWS EC2:
 
-## Command palette (Ctrl+K / ⌘K)
+1. **Security Group Configuration**:
+   - Inbound **Port 80 (HTTP)**: `0.0.0.0/0`
+   - Inbound **Port 443 (HTTPS)**: `0.0.0.0/0`
+   - Inbound **Port 22 (SSH)**: Your Administrator IP
+2. **Server Setup (Ubuntu 22.04 / 24.04 LTS)**:
+   ```bash
+   # Update packages & install dependencies
+   sudo apt update && sudo apt upgrade -y
+   sudo apt install -y nginx git curl certbot python3-certbot-nginx
 
-One palette, two menus, decided by whether the visitor is the owner.
-`src/lib/components/CommandPalette.svelte`, mounted once in `(site)/+layout.svelte`.
-Desktop only — there is no mobile trigger yet.
+   # Install Node.js 20 LTS
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+   sudo apt install -y nodejs
+   ```
+3. **Deploy & Build**:
+   ```bash
+   sudo mkdir -p /var/www/portfolio
+   sudo chown -R $USER:$USER /var/www/portfolio
+   git clone https://github.com/srytmj/portofolio.git /var/www/portfolio
+   cd /var/www/portfolio
+   npm ci
+   npm run build
+   ```
+4. **Nginx Configuration (`/etc/nginx/sites-available/portfolio`)**:
+   ```nginx
+   server {
+       server_name suryatmaja.dev www.suryatmaja.dev;
+       root /var/www/portfolio/build;
+       index index.html;
 
-| | public visitor | owner |
-|---|---|---|
-| menu | **Navigate** (jump to sections) · **Links** (blog, GitHub, LinkedIn, email) · **The night sky** (constellation facts — picking one loads the hero centred on that figure via `?find=`) | **only** the homelab launcher: every service grouped (Projects / Media / Tools / Infra) |
-| source | `src/lib/palette/trivia.js` + `src/lib/content/site.js` | `src/lib/panel/services.js`, loaded with a dynamic `import()` so it never sits in the main bundle |
+       location / {
+           try_files $uri $uri/ $uri.html /404.html;
+       }
 
-### Owner unlock
+       location /_app/immutable/ {
+           expires 1y;
+           add_header Cache-Control "public, immutable";
+       }
 
-There is no backend and no login. "Owner" is a single `localStorage` flag
-(`porto_owner`) set once per device: open the palette, type the passphrase,
-press Enter. It sticks until you clear site data. A visitor never has the flag
-and only ever sees the public menu.
+       location /assets/ {
+           expires 30d;
+           add_header Cache-Control "public";
+       }
+   }
+   ```
+5. **SSL Certificate**:
+   ```bash
+   sudo ln -s /etc/nginx/sites-available/portfolio /etc/nginx/sites-enabled/
+   sudo nginx -t && sudo systemctl reload nginx
+   sudo certbot --nginx -d suryatmaja.dev -d www.suryatmaja.dev
+   ```
 
-- **Passphrase** lives at the top of `src/lib/palette/owner.js`
-  (`const PASSPHRASE`). Change it to rotate access. Currently `sudo`.
-- **Not a secret gate.** The real access control is your **Tailscale tailnet** —
-  every service URL is a `*.ts.net` subdomain that only resolves for devices on
-  your tailnet, so someone reading the service names out of the built JS still
-  can't reach anything.
-- To clear owner mode on a device, run `localStorage.removeItem('porto_owner')`
-  in its console (or use `lock()` from `owner.js`).
-
-### Service URLs (env vars)
-
-Every link's `href` comes from an env var — nothing is hard-coded. One
-`PUBLIC_<SERVICE>_URL` per service (SvelteKit's `PUBLIC_` prefix = exposed to
-the client via `$env/static/public`).
-
-```bash
-cp .env.example .env
-# then fill each line, e.g.:
-#   PUBLIC_JELLYFIN_URL=http://jellyfin.<your-tailnet>.ts.net
-```
-
-A var left blank shows as a greyed-out "no url set" row. These are **baked in at
-build time**, so run `npm run build` again after editing `.env`. (To set them at
-runtime with no rebuild, switch to `@sveltejs/adapter-node` and read from
-`$env/dynamic/public`.)
+---
 
 ## AI Agent & Developer Guidelines
 
-For AI coding agents working on this project (Antigravity, Claude, Cursor, Copilot, etc.), comprehensive instructions, architectural rules, blog authoring guides, and active roadmap tracking are maintained in:
+If you are an AI Coding Agent (Antigravity, Claude, Cursor, Copilot, etc.) working on this repository, you **MUST** review:
 
 👉 **[AI_GUIDELINES.md](./AI_GUIDELINES.md)**
 
-**Key Ground Rules for AI Agents:**
-- **Content lives in data files, not components**: Copy → `src/lib/content/site.js`. Homelab services → `src/lib/panel/services.js`. Constellation facts → `src/lib/palette/trivia.js`. Never hardcode copy into `.svelte` files.
-- **Design Philosophy**: Brutalist, flat, `rounded-none` (zero border radius), and zero-shadow aesthetic inspired by **YoRHa (NieR: Automata OS)**.
-- **Dark Mode Telemetry**: Preserve neon emerald accents (`#34D399`) for live network indicators, telemetry clocks, and active status dots.
-- **Blog Engine**: Articles live in `src/posts/YYYY-MM-DD-slug.md` with YAML frontmatter, supporting Prism.js syntax highlighting and Mermaid.js architecture diagrams.
-- **Always verify build**: `npm run build` must pass cleanly before finishing any turn.
+**Critical Rules:**
+- **Zero-Stagger Motion**: Animations must be instantaneous and simultaneous (`0.16s - 0.22s`). Domino delays and scale bounces are prohibited.
+- **GSAP `clearProps` Safeguard**: Never use `clearProps: 'all'` on elements with inline styles; always use `clearProps: 'transform,opacity'` to avoid wiping out border and surface colors.
+- **Changelog Obligation**: Any meaningful change, feature addition, or bugfix **must** be recorded in [`CHANGELOG.md`](./CHANGELOG.md) before committing.
+- **Git Attribution**: AI agents must never add themselves as authors or co-authors. All commits must be 100% attributed to the repository owner (`Maja <suryatmaja.dev@gmail.com>`).
+- **Commitlint Standard**: All commit messages must follow Conventional Commits (e.g. `feat: ...`, `fix: ...`, `docs: ...`).
 
-## Deployment & Production
+---
 
-```bash
-# Build the application
-npm run build
+## License & Copyright
 
-# Preview production build locally
-npm run preview
-```
-
-The application uses SvelteKit with `@sveltejs/adapter-auto`. It can easily be adapted for:
-- **Static Hosting (Cloudflare Pages, GitHub Pages, Vercel, S3)**: via `@sveltejs/adapter-static` (all routes support SSG/prerendering).
-- **Self-Hosted Homelab (Docker / Node server)**: via `@sveltejs/adapter-node`.
-
+© 2026 **Bakti Surya Atmaja**. All rights reserved.
+All source code, design systems, and written articles are proprietary unless specified otherwise.
