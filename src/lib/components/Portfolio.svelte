@@ -20,19 +20,12 @@
     }
   }
 
-  // Page scroll lock lives here (not in the modal) so it always releases.
+  // Stop Lenis page scroll when modal is open without altering body overflow or scrollbar gutter
   $effect(() => {
-    if (typeof document === 'undefined') return;
+    if (typeof window === 'undefined') return;
     if (open !== null) {
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      const prev = document.body.style.overflow;
-      const prevPad = document.body.style.paddingRight;
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
-      document.body.style.overflow = 'hidden';
       window.__lenis?.stop();
       return () => {
-        document.body.style.overflow = prev;
-        document.body.style.paddingRight = prevPad;
         window.__lenis?.start();
       };
     }
@@ -51,7 +44,7 @@
         data-anim
         type="button"
         onclick={() => (open = i)}
-        class="group relative flex flex-col justify-between gap-8 rounded-none border border-current/15 p-8 text-left outline-none ring-0 transition-all duration-150 hover:border-current/50 hover:bg-current/[0.03] hover:-translate-y-0.5 focus:outline-none focus:ring-0 focus-visible:outline-none sm:p-10 cursor-pointer"
+        class="group relative flex flex-col justify-between gap-6 sm:gap-8 rounded-none border border-current/15 p-6 text-left outline-none ring-0 transition-all duration-150 hover:border-current/50 hover:bg-current/[0.03] hover:-translate-y-0.5 focus:outline-none focus:ring-0 focus-visible:outline-none sm:p-10 cursor-pointer"
         style="background-color: var(--yorha-surface);"
       >
         <!-- Tactical Reticle Brackets on Hover -->

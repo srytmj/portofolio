@@ -1,8 +1,7 @@
 <script>
   import { tick, onMount } from 'svelte';
-  import { gsap } from 'gsap';
+  import { fade, fly } from 'svelte/transition';
   import { portal } from '$lib/actions/portal.js';
-  import { ease, dur, stagger } from '$lib/motion.js';
   import { contact, projects } from '$lib/content/site.js';
   import { trivia } from '$lib/palette/trivia.js';
   import { isOwner, unlock } from '$lib/palette/owner.js';
@@ -179,9 +178,6 @@
     show = true;
     tick().then(() => {
       input?.focus();
-      if (reduce || !panel) return;
-      gsap.from(backdrop, { autoAlpha: 0, duration: 0.14 });
-      gsap.from(panel, { y: -8, autoAlpha: 0, duration: 0.16, ease: 'power2.out', clearProps: 'all' });
     });
   }
 
@@ -189,33 +185,15 @@
     if (!show || closing) return;
     closing = true;
     /** @type {HTMLElement} */ (restoreFocus)?.focus?.();
-    if (reduce || !panel) {
-      show = false;
-      return;
-    }
-    gsap.to(panel, { y: -6, autoAlpha: 0, duration: 0.14, ease: 'power2.in' });
-    gsap.to(backdrop, {
-      autoAlpha: 0,
-      duration: 0.14,
-      ease: 'power2.in',
-      onComplete: () => (show = false)
-    });
-    setTimeout(() => (show = false), 220); // safety net if a frame never lands
+    show = false;
   }
 
   function flashUnlock() {
     if (!input || reduce) return;
-    gsap.fromTo(
-      input,
-      { boxShadow: '0 0 0 0 rgba(255,255,255,0)' },
-      {
-        boxShadow: '0 0 0 2px rgba(255,255,255,0.55)',
-        duration: 0.2,
-        yoyo: true,
-        repeat: 1,
-        ease: 'power1.inOut'
-      }
-    );
+    input.classList.add('ring-2', 'ring-white/55');
+    setTimeout(() => {
+      input.classList.remove('ring-2', 'ring-white/55');
+    }, 400);
   }
 
   function onKey(e) {
@@ -263,16 +241,16 @@
 
 {#if show}
   <div
-    bind:this={backdrop}
     use:portal
+    transition:fade={{ duration: 150 }}
     class="fixed inset-0 z-[1000] flex items-start justify-center px-4 pt-[14vh] backdrop-blur-md"
     style="background-color: var(--yorha-backdrop);"
     onclick={close}
     role="presentation"
   >
     <div
-      bind:this={panel}
-      class="relative flex max-h-[62vh] w-full max-w-lg flex-col overflow-hidden rounded-none border font-sans"
+      transition:fly={{ y: -8, duration: 150 }}
+      class="relative flex max-h-[62vh] w-full max-w-lg flex-col overflow-hidden rounded-none border font-sans bg-black"
       style="background-color: var(--yorha-surface); border-color: var(--yorha-border); color: var(--yorha-text-primary);"
       onclick={(e) => e.stopPropagation()}
       role="dialog"

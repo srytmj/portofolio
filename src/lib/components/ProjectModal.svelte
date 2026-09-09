@@ -1,8 +1,8 @@
 <script>
   import { onMount, tick } from 'svelte';
-  import { gsap } from 'gsap';
+  import { fade, fly } from 'svelte/transition';
+  import { cubicOut } from 'svelte/easing';
   import { portal } from '$lib/actions/portal.js';
-  import { ease, dur, stagger } from '$lib/motion.js';
 
   /** @type {{ project: any, index?: number, onClose: () => void }} */
   let { project, index = 0, onClose } = $props();
@@ -17,18 +17,11 @@
   const rest = paras.slice(1);
   const images = project.images ?? [];
 
-  /** @type {HTMLElement} */ let backdrop;
   /** @type {HTMLElement} */ let panel;
   let restoreFocus;
-  let closing = false;
 
   function close() {
-    if (closing) return;
-    closing = true;
-    if (reduce) return onClose();
-    gsap.to(panel, { autoAlpha: 0, y: 16, duration: dur.xs, ease: ease.in });
-    gsap.to(backdrop, { autoAlpha: 0, duration: dur.xs, ease: ease.in, onComplete: onClose });
-    setTimeout(onClose, 340); // safety net if a frame never lands
+    onClose();
   }
 
   function key(e) {
@@ -52,12 +45,6 @@
 
   onMount(() => {
     restoreFocus = document.activeElement;
-
-    if (!reduce) {
-      gsap.from(backdrop, { autoAlpha: 0, duration: 0.16 });
-      gsap.from(panel, { autoAlpha: 0, y: 8, duration: 0.18, ease: 'power2.out', clearProps: 'transform,opacity' });
-    }
-
     tick().then(() => panel?.querySelector('button')?.focus());
     return () => {
       /** @type {HTMLElement} */ (restoreFocus)?.focus?.();
@@ -69,16 +56,17 @@
 
 <!-- Full-bleed takeover, portalled to <body>. -->
 <div
-  bind:this={backdrop}
   use:portal
-  class="fixed inset-0 z-[999] overscroll-contain p-0 backdrop-blur-md sm:p-6 lg:p-10 flex flex-col items-center justify-center"
+  transition:fade={{ duration: reduce ? 0 : 150 }}
+  class="fixed inset-0 z-[999] overflow-hidden overscroll-contain p-0 backdrop-blur-md sm:p-6 lg:p-10 flex flex-col items-center justify-center"
   style="background-color: var(--yorha-backdrop);"
   onclick={close}
   role="presentation"
 >
   <div
     bind:this={panel}
-    class="relative flex h-full max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden border-0 font-mono outline-none ring-0 rounded-none"
+    transition:fly={{ y: reduce ? 0 : 10, duration: reduce ? 0 : 180, easing: cubicOut }}
+    class="relative flex h-full max-h-screen sm:max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden border-0 font-mono outline-none ring-0 rounded-none shadow-2xl"
     style="background-color: var(--yorha-surface); border: none; color: var(--yorha-text-primary);"
     onclick={(e) => e.stopPropagation()}
     role="dialog"
@@ -97,15 +85,15 @@
     <header class="flex items-center justify-between border-b px-4 py-3 sm:px-6 shrink-0 font-mono" style="border-color: var(--yorha-border); background-color: var(--yorha-bg);">
       <div class="flex items-center gap-2.5 text-[11px] uppercase tracking-wider">
         <span class="inline-block h-2 w-2 rounded-none animate-pulse" style="background-color: var(--yorha-accent);"></span>
-        <span class="font-medium" style="color: var(--yorha-text-primary);">POD // SPEC_INSPECTOR_{num}</span>
-        <span class="border px-1.5 py-0.5 text-[9px]" style="border-color: var(--yorha-border); color: var(--yorha-text-muted);">[{project.kind}]</span>
+        <span class="font-medium truncate max-w-[170px] sm:max-w-none" style="color: var(--yorha-text-primary);">POD // SPEC_{num}</span>
+        <span class="border px-1.5 py-0.5 text-[9px] shrink-0" style="border-color: var(--yorha-border); color: var(--yorha-text-muted);">[{project.kind}]</span>
       </div>
       <div class="flex items-center gap-3">
         <span class="hidden sm:inline font-mono text-[10px] tracking-widest" style="color: var(--yorha-text-muted);">[ ESC TO DISMISS ]</span>
         <button
           type="button"
           onclick={close}
-          class="grid h-7 w-7 place-items-center border font-mono text-xs transition-colors cursor-pointer rounded-none yorha-invert-hover"
+          class="grid h-8 w-8 place-items-center border font-mono text-sm transition-colors cursor-pointer rounded-none yorha-invert-hover"
           style="border-color: var(--yorha-border); background-color: var(--yorha-surface); color: var(--yorha-text-primary);"
           aria-label="Close modal"
         >
@@ -115,11 +103,11 @@
     </header>
 
     <!-- Modal Content Grid -->
-    <div class="flex-1 overflow-y-auto lg:grid lg:grid-cols-[minmax(18rem,28%)_1fr] lg:overflow-hidden">
+    <div class="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden lg:grid lg:grid-cols-[minmax(18rem,28%)_1fr] touch-pan-y" style="-webkit-overflow-scrolling: touch;">
       
       <!-- LEFT — index, title, spec sheet -->
       <aside
-        class="flex flex-col gap-6 border-b px-7 py-8 sm:px-8 lg:h-full lg:overflow-y-auto lg:border-b-0 lg:border-r lg:py-10"
+        class="flex flex-col gap-6 border-b px-5 py-6 sm:px-8 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:border-b-0 lg:border-r lg:py-10 no-scrollbar"
         style="background-color: var(--yorha-surface); border-color: var(--yorha-border);"
         data-lenis-prevent
       >
@@ -188,8 +176,8 @@
 
       <!-- RIGHT — the narrative -->
       <div
-        class="flex flex-col gap-6 py-8 px-7 sm:px-10 lg:h-full lg:overflow-y-auto lg:py-10 lg:px-12"
-        style="background-color: var(--yorha-surface);"
+        class="flex flex-col gap-6 py-6 px-5 sm:py-8 sm:px-10 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:py-10 lg:px-12 touch-pan-y custom-scrollbar"
+        style="background-color: var(--yorha-surface); -webkit-overflow-scrolling: touch;"
         data-lenis-prevent
       >
         <!-- Lead summary with tactical accent line -->
@@ -256,5 +244,15 @@
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--yorha-border);
   }
 </style>

@@ -11,35 +11,75 @@
 </script>
 
 <Section id="about" title={headings.about}>
-  <div class="grid gap-10 md:grid-cols-[260px_1fr] md:gap-16">
-    <div data-anim class="max-w-[260px] space-y-4">
-      <div>
-        {#if about.portrait}
-          <HalftonePortrait src={about.portrait} alt={about.name || 'Bakti Surya Atmaja'} />
-        {:else}
-          <SnakePlaceholder />
-        {/if}
-      </div>
+  <div class="grid gap-8 md:grid-cols-[260px_1fr] md:gap-16">
+    <div data-anim class="w-full max-w-sm sm:max-w-[260px] mx-auto md:mx-0 space-y-3 sm:space-y-4">
+      <div class="flex sm:flex-col items-stretch sm:items-start gap-3.5 sm:gap-4">
+        <div class="w-24 sm:w-36 md:w-full shrink-0">
+          {#if about.portrait}
+            <HalftonePortrait src={about.portrait} alt={about.name || 'Bakti Surya Atmaja'} />
+          {:else}
+            <SnakePlaceholder />
+          {/if}
+        </div>
 
-      <!-- System Telemetry: Node Status & Region -->
-      <div class="flex flex-col gap-1.5 font-mono text-[11px] tracking-[0.16em]">
-        {#if about.status}
-          <div class="inline-flex items-center gap-2 text-[10px] opacity-80 leading-none">
-            <span class="relative flex h-2 w-2 shrink-0 -translate-y-[0.5px]">
-              <span class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style="background-color: var(--yorha-accent);"></span>
-              <span class="relative inline-flex h-2 w-2 rounded-full" style="background-color: var(--yorha-accent);"></span>
-            </span>
-            <span class="leading-none">{about.status}</span>
+        <!-- Mobile-Only Compact Column: Node 01, Location, Open for Opportunities, & View CV aligned with photo -->
+        <div class="flex-1 flex flex-col justify-between min-w-0 py-0.5 sm:hidden font-mono">
+          <div class="space-y-1.5">
+            <!-- Node 01 Status -->
+            {#if about.status}
+              <div class="inline-flex items-center gap-1.5 text-[9.5px] opacity-85 leading-none">
+                <span class="relative flex h-1.5 w-1.5 shrink-0 -translate-y-[0.5px]">
+                  <span class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style="background-color: var(--yorha-accent);"></span>
+                  <span class="relative inline-flex h-1.5 w-1.5 rounded-full" style="background-color: var(--yorha-accent);"></span>
+                </span>
+                <span class="leading-none truncate font-medium">{about.status}</span>
+              </div>
+            {/if}
+
+            <!-- Location -->
+            <div class="text-[9px] opacity-50 tracking-[0.16em] uppercase">
+              LOC: {about.location}
+            </div>
+
+            <!-- Under Node 01: Open for Opportunities -->
+            {#if availability}
+              <div class="pt-0.5 flex items-center gap-1.5 text-[9.5px] uppercase tracking-wider font-semibold" style="color: var(--yorha-accent);">
+                <span class="h-1.5 w-1.5 shrink-0 rounded-full" style="background-color: var(--yorha-accent);"></span>
+                <span class="leading-none truncate">{availability.status}</span>
+              </div>
+            {/if}
           </div>
-        {/if}
-        <div class="text-[10px] opacity-50 tracking-[0.18em] uppercase">
-          LOC: {about.location}
+
+          <!-- View CV button aligned with photo area and under Node 01 -->
+          <button
+            type="button"
+            onclick={() => (showResume = true)}
+            class="yorha-invert-hover inline-flex items-center justify-center rounded-none border border-current/20 bg-current/5 py-1.5 px-2 font-mono text-[9.5px] tracking-wider uppercase transition-all duration-150 cursor-pointer w-full mt-2"
+          >
+            <span>[ VIEW RESUME / CV ]</span>
+          </button>
+        </div>
+
+        <!-- Tablet / Desktop Telemetry: Node Status & Region -->
+        <div class="hidden sm:flex flex-col gap-1.5 font-mono text-[11px] tracking-[0.16em]">
+          {#if about.status}
+            <div class="inline-flex items-center gap-2 text-[10px] opacity-80 leading-none">
+              <span class="relative flex h-2 w-2 shrink-0 -translate-y-[0.5px]">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" style="background-color: var(--yorha-accent);"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full" style="background-color: var(--yorha-accent);"></span>
+              </span>
+              <span class="leading-none">{about.status}</span>
+            </div>
+          {/if}
+          <div class="text-[10px] opacity-50 tracking-[0.18em] uppercase">
+            LOC: {about.location}
+          </div>
         </div>
       </div>
 
-      <!-- Availability Card -->
+      <!-- Availability Card (Tablet / Desktop only) -->
       {#if availability}
-        <div class="relative rounded-none border border-current/15 p-3.5 bg-current/[0.02] font-mono text-[11px] space-y-2 transition-all duration-200 hover:border-current/40 group">
+        <div class="hidden sm:block relative rounded-none border border-current/15 p-3.5 bg-current/[0.02] font-mono text-[11px] space-y-2 transition-all duration-200 hover:border-current/40 group">
           <span class="pointer-events-none absolute -top-px -left-px h-1.5 w-1.5 border-l border-t border-current opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
           <span class="pointer-events-none absolute -top-px -right-px h-1.5 w-1.5 border-r border-t border-current opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
           <span class="pointer-events-none absolute -bottom-px -left-px h-1.5 w-1.5 border-b border-l border-current opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
@@ -62,8 +102,8 @@
         </div>
       {/if}
 
-      <!-- Resume / CV Action -->
-      <div>
+      <!-- Resume / CV Action (Tablet / Desktop only) -->
+      <div class="hidden sm:block">
         <button
           type="button"
           onclick={() => (showResume = true)}

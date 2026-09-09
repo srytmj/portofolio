@@ -8,7 +8,116 @@ Format changelog ini mengacu pada [Keep a Changelog](https://keepachangelog.com/
 
 ## [Unreleased] - 2026-09-09
 
+### Fixed
+- **[20:00 WIB] Penyelamatan & Penyempurnaan Animasi Filter Node Projects, Tombol Navigasi Blog, dan Animasi Filter Node Blog (`projects/+page.svelte`, `blog/+page.svelte`):**
+  - **Animasi Cascade Staggered pada Filter Nodes Halaman Proyek (`projects/+page.svelte`)**:
+    - Membungkus grid proyek dengan blok reaktif `{#key `${selectedKind}-${searchQuery}`}` dan menerapkan transisi Svelte bawaan `in:fly={{ y: reduce ? 0 : 20, duration: reduce ? 0 : 280, delay: reduce ? 0 : i * 40, easing: cubicOut }}` pada setiap kartu proyek.
+    - Menghapus class CSS `transition-all duration-200` pada kartu proyek yang sebelumnya bertabrakan dengan interpolasi transform/opacity JS/GSAP (sehingga animasi terlihat tidak jalan atau dibatalkan browser).
+    - Menghapus ketergantungan pada query selector manual DOM dan race condition `tick()` / Svelte 5 DOM node reuse, sehingga setiap kali pengguna mengklik tombol filter `ALL`, `INFRASTRUCTURE`, `AUTOMATION`, `SYSTEMS`, dsb., kartu-kartu proyek dijamin 100% meluncur masuk secara berurutan (*staggered cascade*) dengan sangat mulus.
+  - **Kerapian Bilah Navigasi Sidebar Halaman Blog Desktop (`blog/+page.svelte`)**:
+    - Memperbaiki kontainer `<nav>` dengan menambahkan `lg:items-stretch lg:overflow-visible` serta menerapkan `lg:w-full px-3.5 py-2.5` pada tombol navigasi sidebar (`01 Home`, `02 Categories`, `03 Tags`, `04 Archive`).
+    - *Root cause*: Sebelumnya `<nav>` memiliki `items-center` yang membuat tombol menyusut selebar teksnya masing-masing di layar desktop monitor, tampak tidak rata dan bergerigi di tengah kolom. Sekarang seluruh tombol membentang penuh 100% dari tepi ke tepi kolom sidebar dengan panah `→` rata kanan sempurna dan presisi taktis khas konsol komando YoRHa.
+  - **Animasi Masuk Berirama (*Staggered Cascade*) pada Seluruh Filter Node Halaman Blog (`blog/+page.svelte`)**:
+    - **Filter Tag Cepat & Paginasi Beranda (`Home View`)**: Membungkus daftar kartu dengan `{#key `${homeFilterTag}-${currentPage}-${searchQuery}`}` dan menyematkan `in:fly={{ y: reduce ? 0 : 18, duration: reduce ? 0 : 250, delay: reduce ? 0 : i * 35, easing: cubicOut }}` serta membersihkan `transition-all duration-200`. Saat memilih tag cepat (`[ all ]`, `[ linux ]`, `[ devops ]`, dsb.) atau berpindah halaman paginasi, kartu artikel meluncur masuk berurutan secara nyata.
+    - **Grid Kategori & Subgroup Filter (`Categories View`)**: Menambahkan animasi masuk `in:fly` berurutan pada kartu kategori, serta membungkus daftar artikel subkategori dengan `{#key `${selectedCategory.name}-${selectedSubcategory}`}` sehingga saat mengklik filter subgroup (`All`, subkategori tertentu), artikel yang cocok langsung mengalir masuk dengan animasi staggered.
+    - **Tag Cloud & Detail Tag (`Tags View`)**: Menambahkan `in:fly` berurutan pada pill tag cloud dan membungkus daftar post tag dengan `{#key selectedTag}` agar saat tag diklik, seluruh artikel terkait muncul dengan animasi cascade.
+    - **Timeline Arsip (`Archive View`)**: Membungkus grup tahun arsip dengan `{#key activeTab}` dan transisi `in:fly` berjenjang.
+- **[19:50 WIB] Audit Menyeluruh Navigasi PC & Eliminasi Pemotongan Tombol Filter Node (`SideNav.svelte`, `Skills.svelte`, `projects/+page.svelte`):**
+  - **Penyempurnaan Pemusatan Vertikal & Smooth Scrolling SideNav pada Layout PC (`SideNav.svelte`)**:
+    - Memperbaiki kalkulasi transform GSAP pada `<nav>` SideNav dengan menyematkan `yPercent: -50` secara eksplisit pada `gsap.set()` dan `gsap.to()`. Sebelumnya pengaturan `xPercent` oleh GSAP menimpa class CSS `-translate-y-1/2`, menyebabkan bilah navigasi turun terlalu rendah di layar monitor PC.
+    - Menambahkan fungsi `handleNavClick` untuk smooth scrolling via Lenis (`window.__lenis.scrollTo()`) langsung ke target section (`#about`, `#skills`, `#portfolio`, `#contact`, `#top`) saat berada di beranda. Sebelumnya tautan berawalan slash `/#about` memicu intersep router `onNavigate` SvelteKit yang me-reset scroll ke titik `(0, 0)` secara kasar.
+  - **Eliminasi Bug Pemotongan Tombol & Reticle Filter Node (`Skills.svelte`, `projects/+page.svelte`):**
+    - Menambahkan `pt-2` dan `sm:overflow-visible` pada kontainer tombol filter node di section Skills dan Projects.
+    - *Root cause*: Keberadaan `overflow-x-auto` tanpa jarak atas memotong bagian atas tombol sebesar 2px ketika tombol terangkat ke atas saat di-hover (`hover:-translate-y-0.5`) dan memotong garis reticle sudut saat tombol berstatus aktif (`-top-px`).
+- **[19:46 WIB] Penyelamatan Stabilitas Section Skills, Animasi Node Filter & Accordion, Stagger Filter Proyek, dan Penonaktifan Cursor Touch di Mobile (`CustomCursor.svelte`, `app.css`, `Skills.svelte`, `projects/+page.svelte`):**
+  - **Penonaktifan Total Custom Cursor pada Perangkat Sentuh Ponsel (`CustomCursor.svelte`, `app.css`)**:
+    - Membatasi inisialisasi custom cursor hanya pada perangkat yang memiliki kapabilitas pointer presisi dan hover sejati `(hover: hover) and (pointer: fine)`.
+    - Menambahkan penangan event `touchstart` yang langsung mematikan flag visibilitas kursor dan mengabaikan event mouse tiruan (*synthetic mousemove*) saat layar sentuh diusap.
+    - Menambahkan override CSS `@media (hover: none), (pointer: coarse) { .custom-cursor-wrapper { display: none !important; } }` dan `cursor: auto !important` di `app.css`.
+  - **Penyelamatan Stabilitas Scroll Section Skills di Ponsel & Tablet (`Skills.svelte`)**:
+    - Menghapus pemanggilan destruktif `ScrollTrigger.refresh()` pada saat filter node atau toggle accordion diklik.
+    - *Root cause*: Pemanggilan `ScrollTrigger.refresh()` saat pengguna sedang berada di tengah halaman memicu *unpinning* sementara pada Hero ScrollTrigger di atasnya, yang mengubah kalkulasi offset scroll dan menyebabkan posisi section Skills bergeser/meloncat secara acak.
+    - Menggantinya dengan `window.__lenis?.resize()` yang aman dan menjaga posisi scroll viewport tetap terkunci kokoh di tempatnya.
+  - **Penambahan Animasi Staggered pada Filter Node & Transisi Masuk Expand/Minimize Skills (`Skills.svelte`)**:
+    - Menambahkan penanda `data-skill-layer` pada kontainer layer dan menyematkan animasi masuk berirama (*staggered cascade*) GSAP (`y: 12, opacity: 0` → `y: 0, opacity: 1, stagger: 0.05`) saat memilih filter kategori node keahlian.
+    - Menerapkan transisi masuk `in:fly={{ y: -4, duration: 160 }}` untuk chip ringkasan saat layer diminimalkan dan `in:fly={{ y: 8, duration: 180 }}` untuk grid kartu saat diekspansi (hanya transisi masuk murni tanpa transisi keluar bersamaan, sehingga menghasilkan animasi meluncur mulus 100% bebas dari bug penumpukan tinggi elemen).
+  - **Penambahan Animasi Staggered pada Filter Nodes Halaman Proyek (`projects/+page.svelte`)**:
+    - Memperbarui fungsi `setKind()` dan efek pencarian dengan animasi masuk beruntun GSAP (`y: 12, opacity: 0` → `y: 0, opacity: 1, duration: 0.24, stagger: 0.04, ease: 'power2.out'`), memberikan umpan balik visual yang jelas, taktis, dan responsif saat berganti kategori.
+- **[19:40 WIB] Auto-Scroll ke Atas saat Paginasi di Mobile & Tablet serta Penyesuaian Ukuran Judul Blog Reader (`blog/+page.svelte`, `blog/[slug]/+page.svelte`):**
+  - **Auto-Scroll ke Pucuk Atas saat Ganti Halaman Paginasi & Filter Tag (`blog/+page.svelte`)**:
+    - Menambahkan mekanisme scroll otomatis (`window.__lenis.scrollTo(0, { duration: 0.5 })` / `window.scrollTo({ top: 0, behavior: 'smooth' })`) pada fungsi `goToPage()` dan `setHomeFilterTag()` khusus untuk tampilan ponsel dan tablet (`window.innerWidth < 1024`).
+    - Sebelumnya, pengguna yang berada di bawah (dekat tombol paginasi) akan tetap tertinggal di dasar halaman saat beralih ke halaman 2, 3, dst. Kini posisi layar otomatis meluncur kembali ke atas menampilkan kartu-kartu baru dari awal.
+  - **Pengecilan Proporsional Judul Blog Reader pada Tablet & Ponsel (`blog/[slug]/+page.svelte`)**:
+    - Mengubah ukuran judul `H1` artikel dari `text-h1` kaku (`clamp(2.4rem, ...)` yang memakan ruang vertikal berlebih) menjadi `text-xl sm:text-2xl md:text-3xl lg:text-h1 font-bold leading-snug sm:leading-tight` dengan padding sorotan `px-1.5 sm:px-2 py-0.5`.
+    - Di layar ponsel, judul kini hanya memakan 1-2 baris ringkas sehingga pembaca dapat langsung melihat deskripsi, kategori, tags, dan isi artikel tanpa harus scroll berlebihan.
+- **[19:35 WIB] Perbaikan Animasi Accordion Skills & Pembukaan Kunci Touch-Scroll Halaman Blog Mobile (`Skills.svelte`, `blog/+page.svelte`):**
+  - **Eliminasi Glitch/Height Jumping pada Accordion Skills (`Skills.svelte`)**:
+    - Menghapus `transition:fly` pada blok kondisional Svelte chip ringkasan dan grid kartu.
+    - *Root cause*: Penggunaan transisi `fly` keluar dan masuk secara simultan menyebabkan elemen keluar dan elemen masuk berada bersamaan di DOM flow selama durasi transisi (~180ms). Hal ini menggandakan tinggi kontainer seketika, mendorong kartu ke bawah, dan membuat perhitungan tinggi dinamis `ScrollTrigger` dan `Lenis` bergetar/meloncat (*awkward animation*).
+    - Pergantian instan tanpa jeda transisi tumpang-tindih menghasilkan ekspansi dan minimisasi layer yang sangat responsif, stabil, dan bebas glitch visual.
+  - **Penyelesaian Bug Macet Touch-Scroll pada Halaman Blog Mobile (`blog/+page.svelte`)**:
+    - Menghapus atribut `data-lenis-prevent` dari 6 kontainer daftar internal (katalog beranda, grid kategori, daftar post kategori, grid tags, daftar post tag, dan timeline arsip).
+    - Membatasi aturan layout viewport kaku 100vh (`overflow-hidden`, `min-h-0`, dan internal `overflow-y-auto`) hanya berlaku pada layar desktop (`lg:`).
+    - *Root cause*: Pada desktop, halaman blog didesain sebagai 100vh HUD dua kolom dengan scroll mandiri di panel kanan. Namun di perangkat smartphone, pembatasan `overflow-hidden` pada elemen `<main>` dipadukan dengan `data-lenis-prevent` pada kontainer bertingkat mencegat semua event gesture sentuhan jari (`touchstart`/`touchmove`). Akibatnya, saat pengunjung menyentuh dan menggeser layar di area kartu blog, halaman sama sekali tidak bisa digulirkan.
+    - Dengan penyesuaian ini, di layar smartphone pengguna dapat bebas mengusap kartu manapun untuk men-scroll halaman ke atas/bawah secara natural, sementara di layar desktop tampilan 100vh HUD dual-panel tetap terjaga sempurna.
+
 ### Added
+- **[19:38 WIB] Pemisahan Baris Mandiri untuk Kategori & Tags di Halaman Blog Reader (`blog/[slug]/+page.svelte`):**
+  - Memisahkan elemen metadata kategori dan tags artikel ke dalam **2 baris terpisah secara mandiri** (`2 dedicated rows`) pada semua resolusi layar (smartphone, tablet, dan desktop).
+  - **Baris 1: `[ CATEGORY ]`**: Menampilkan chip kategori interaktif yang terhubung langsung ke filter tab Kategori di `/blog?category=...`, lengkap dengan styling YoRHa invert-hover.
+  - **Baris 2: `[ TAGS ]`**: Menampilkan deretan badge tag interaktif dengan format `#{tag}` yang terhubung langsung ke filter tab Tags di `/blog?tag=...`.
+  - Merapikan baris paling atas header artikel sehingga murni hanya menampilkan tanggal dan estimasi waktu baca (`date · readingTime`) secara bersih tanpa terjejali teks kategori.
+  - Menyelaraskan posisi awal badge pada layar tablet dan desktop menggunakan lebar tetap `sm:w-24`, dengan fleksibilitas pembungkusan otomatis (*natural wrapping*) di layar smartphone.
+
+- **[19:25 WIB] Penyelamatan & Pengaktifan Menyeluruh Animasi pada Layar Tablet & Smartphone (`device.js`, `sectionAnim.js`, `Skills.svelte`, `projects/+page.svelte`, `blog/+page.svelte`, `SnakePlaceholder.svelte`):**
+  - **Perbaikan Deteksi Kemampuan Hardware (`device.js`)**:
+    - Memperbaiki `detectTier()` yang sebelumnya salah mengklasifikasikan hampir seluruh tablet dan smartphone modern (iOS Safari, iPadOS, Android) ke dalam tier `'static'` karena pembatasan `cores <= 4`.
+    - Mengaktifkan tier `'lite'` (dan `'full'` pada tablet bertenaga tinggi) sehingga **IntroSequence (opening cinematic)**, **Hero Three.js Constellations**, **auto-cycling perbintangan interaktif pada layar sentuh**, dan **GSAP pinned scroll choreography** kini aktif sepenuhnya pada tablet dan ponsel.
+  - **Stabilisasi & Peremajaan Animasi Scroll Section (`sectionAnim.js`)**:
+    - Memperbarui pemicu ScrollTrigger dari `top 78%` menjadi `top 88%` dan menghapus pemotongan dini `end: 'bottom 22%'` yang sebelumnya menyebabkan teks dan kartu tiba-tiba memudar buram saat pengguna sedang membaca di layar sempit.
+    - Menambahkan `stagger: 0.05` pada animasi masuk konten section agar kartu, paragraf, dan statistik muncul mengalir secara berirama (*rippling staggered entrance*).
+    - Memastikan pemeriksaan `st.progress > 0` saat mount sehingga tidak ada section yang tertinggal dalam kondisi `opacity: 0`.
+  - **Staggered Entrance pada Arsip Proyek (`projects/+page.svelte`)**:
+    - Menghadirkan animasi masuk awal kartu proyek saat halaman arsip dibuka pertama kali.
+  - **Pembersihan `clearProps` pada Blog (`blog/+page.svelte`)**:
+    - Mengganti `clearProps: 'all'` menjadi `clearProps: 'transform,opacity'` sesuai aturan SOP maintenance agar tidak menghapus style inline CSS.
+- **[19:15 WIB] Penyempurnaan Khusus Pengalaman Mobile: About Sebaris, Auto-Minimize Skills dengan Ringkasan, Contact 2-in-1, Pangkas Scroll Hero, & Sembunyikan Back-to-Hero (`About.svelte`, `Skills.svelte`, `Contact.svelte`, `heroTransition.js`, `Section.svelte`, `LeftEdgeReturn.svelte`):**
+  - **About Section (`About.svelte`)**:
+    - Menata *Open for Opportunities* dan tombol *[ VIEW RESUME / CV ]* berada **sebaris sejajar dengan area foto** di sebelah kanan dan **posisinya persis di bawah Node 01 Status & Lokasi**, sehingga seluruh blok identitas mobile muat dalam tinggi kanvas foto tanpa membutuhkan card terpisah di bawahnya.
+    - Menjaga tampilan kartu availability penuh dengan role tags tetap rapi untuk resolusi tablet dan desktop (`hidden sm:block`).
+  - **Skills Matrix (`Skills.svelte`)**:
+    - **Otomatis Terminimalkan Penuh Secara Default**: Menginisialisasi `collapsedLayers` dengan semua layer keahlian (`stack.map(l => l.layer)`), sehingga saat halaman pertama kali dibuka, semua layer langsung dalam posisi *minimized* yang rapi.
+    - **Ringkasan Konten Taktis saat Terlipat**: Ketika suatu layer terminimalkan, sistem menampilkan deretan pill/chip interaktif ringkas yang memuat nama keahlian dan badgenya (`Go [CORE]`, `SvelteKit [FRONTEND]`, `Docker [CONTAINER]`, dll). Pengguna dapat langsung men-tap chip keahlian untuk memicu inspeksi Pod 042 tanpa harus membuka kartu penuh.
+  - **Contact Section (`Contact.svelte`)**:
+    - **Menggabungkan GitHub & LinkedIn Menjadi 1 Kartu Terpadu**: Mengubah grid 3 kartu menjadi **2 kartu simetris** (`md:grid-cols-2`). Kartu Channel 02 kini menggabungkan kanal GitHub dan LinkedIn dalam sub-card ringkas berdampingan, menghemat ruang scroll vertikal di layar smartphone secara signifikan.
+  - **Pangkas Jarak Scroll Hero ke About (`heroTransition.js` & `Section.svelte`)**:
+    - Mengurangi jarak pin scroll hero pada layar ponsel dari `+=110%/+=140%` menjadi **`+=40%`** (dan `+=60%` di tablet), membuat transisi dari Hero ke About terasa jauh lebih cepat dan tidak memakan scroll kosong berlebih.
+    - Menyesuaikan vertical padding dasar pada `Section.svelte` menjadi `py-12 sm:py-24 md:py-36` dan margin header `mb-8 sm:mb-14` untuk merapatkan jarak antar section di layar mobile.
+  - **Sembunyikan Trigger Back-to-Hero pada Mobile (`LeftEdgeReturn.svelte`)**:
+    - Menambahkan `hidden md:flex` pada kapsul navigasi tepi kiri (*LeftEdgeReturn*), sehingga fitur "Return to Hero Section" tidak muncul atau mengganggu layar sempit pengguna smartphone pada halaman `/projects` dan `/blog`.
+- **[18:50 WIB] Overhaul Layout Responsif untuk Mobile Smartphone & Tablet (`+layout.svelte`, `SideNav.svelte`, `CornerTelemetry.svelte`, `Skills.svelte`, `Portfolio.svelte`, `ProjectModal.svelte`, `projects/+page.svelte`, `blog/+page.svelte`, `blog/[slug]/+page.svelte`):**
+  - **Global HUD & Navigasi Responsif**:
+    - `SideNav.svelte`: Disembunyikan pada layar tablet portrait dan mobile smartphone (`hidden lg:flex`) guna mencegah tabrakan visual dan tumpang-tindih dengan container konten utama.
+    - `CornerTelemetry.svelte`: Disembunyikan pada layar sempit (`hidden sm:block`) agar tidak menutupi tombol interaktif dan drawer bawah pada smartphone.
+    - Top Right HUD Bar (`+layout.svelte`): Menampilkan tombol taktis `[ MENU ]` yang jelas dan mudah dijangkau jempol pada mobile, serta tetap menampilkan pintasan `⌘K` pada desktop.
+    - `CommandPalette.svelte`: Menyesuaikan ukuran font input pencarian menjadi `text-base sm:text-xs` (mencegah Safari iOS melakukan *auto-zoom* saat fokus input) dan memperbarui petunjuk kontrol bawah menjadi *thumb-friendly*.
+  - **Skills Matrix & Pod 042 Inspector**:
+    - Layout split 2 kolom pada Tablet (`md:grid-cols-12`) sehingga kartu dan inspector tetap berdampingan.
+    - Menghadirkan **Mobile Tactical Bottom Sheet Drawer** (`use:portal` + animasi transisi `fly`/`fade`) pada smartphone yang otomatis muncul saat kartu keahlian di-tap, memecahkan masalah inspector yang sebelumnya tertimbun 18 kartu ke bawah.
+    - Menambahkan banner melayang ringkas (*Sticky Pod Mini Bar*) di bagian bawah layar smartphone dengan status target aktif dan tombol `[ SPECS ↗ ]`.
+    - Chip filter kategori keahlian diubah menjadi *horizontal smooth scroll* (`overflow-x-auto no-scrollbar sm:flex-wrap`).
+  - **Portfolio & Project Quick Specs Modal**:
+    - `Portfolio.svelte`: Penyesuaian padding kartu menjadi `p-6 sm:p-10` agar nyaman dibaca di layar 360px–420px.
+    - `ProjectModal.svelte`: Dioptimalkan menjadi **Full-screen Tactical Mobile Sheet** (`max-h-screen sm:max-h-[92vh]`) dengan scrolling inersia halus (`-webkit-overflow-scrolling: touch;`), tombol close besar 32px x 32px, dan tombol aksi case study yang mudah ditekan satu tangan.
+  - **Halaman Arsip Proyek (`projects/+page.svelte`)**:
+    - Input pencarian responsif (`text-base sm:text-xs`) bebas dari masalah auto-zoom iOS.
+    - Filter kategori proyek diubah menjadi *horizontal scrollable chips* tanpa scrollbar kaku.
+    - Padding kartu proyek disesuaikan (`p-5 sm:p-7 sm:p-8`) untuk estetika optimal di smartphone dan tablet.
+  - **Blog Index & Blog Reader (`blog/+page.svelte` & `blog/[slug]/+page.svelte`)**:
+    - Navigasi tab utama (`01 Home`, `02 Categories`, `03 Tags`, `04 Archive`) diubah menjadi **Horizontal Segmented Rail** yang dapat digeser mulus di ponsel.
+    - Quick tag filter pills dibuat dapat di-scroll horizontal tanpa membuat layout melebar ke samping.
+    - Pembaca artikel (`blog/[slug]`): Menghadirkan floating tactical toolbar ganda di pojok kanan bawah ponsel: tombol **`[ TOC ]`** (Daftar Isi) dan **`[ ↑ TOP ]`**.
+    - Mengintegrasikan **Mobile TOC Bottom Sheet Drawer** yang menampilkan daftar bab artikel saat tombol `[ TOC ]` ditekan, dan otomatis meluncur ke bab tujuan begitu dipilih.
 - **[18:25 WIB] Dokumentasi Panduan Manajemen Konten (Skills & Portfolio) dan Deployment Homelab (`AI_GUIDELINES.md`, `README.md`, `CHANGELOG.md`):**
   - **Panduan Edit Konten Keahlian (Skills Matrix) & Pod 042 Inspector**:
     - Dokumentasi schema data `export const stack` di `src/lib/content/site.js` lengkap dengan field `id`, `name`, `badge`, `readiness`, `detail`, `role`, `deployedAt`, dan `command`.

@@ -12,7 +12,7 @@
   type="button"
   onclick={toggle}
   aria-label={theme.current === 'light' ? 'Switch to OLED Tactical Mode' : 'Switch to Bunker Archive Mode'}
-  class="group inline-flex items-center gap-1.5 px-2 py-1 border border-current/20 hover:border-current bg-transparent transition-all duration-150 cursor-pointer font-mono text-[10px] uppercase tracking-wider select-none {className}"
+  class="group inline-flex items-center gap-1.5 px-2 py-1 border-0 bg-transparent opacity-80 hover:opacity-100 transition-opacity duration-150 cursor-pointer font-mono text-[10px] uppercase tracking-wider select-none {className}"
   style="color: var(--yorha-accent);"
   title={theme.current === 'light' ? 'BUNKER // LIGHT [ACTIVE] - Click for OLED Tactical' : 'OLED // DARK [ACTIVE] - Click for Bunker Archive'}
 >

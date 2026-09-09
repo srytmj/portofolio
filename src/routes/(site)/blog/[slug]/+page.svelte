@@ -1,9 +1,11 @@
 <script>
   import { onMount, tick } from 'svelte';
+  import { fade, fly } from 'svelte/transition';
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { gsap } from 'gsap';
   import { ease, dur } from '$lib/motion.js';
+  import { portal } from '$lib/actions/portal.js';
   import LeftEdgeReturn from '$lib/components/LeftEdgeReturn.svelte';
   import { blogTheme } from '$lib/blog/blogTheme.js';
 
@@ -14,6 +16,8 @@
   const allPosts = $derived(data.allPosts || []);
   const newerPost = $derived(data.newerPost);
   const olderPost = $derived(data.olderPost);
+
+  let isMobileTocOpen = $state(false);
 
   // Table of contents & ScrollSpy state
   let activeHeading = $state('');
@@ -406,16 +410,10 @@
             <time datetime={post.date}>{post.date}</time>
             <span>·</span>
             <span>{post.readingTime}</span>
-            {#if post.categories && post.categories.length > 0}
-              <span>·</span>
-              <span class="uppercase tracking-widest font-semibold" style="color: var(--blog-accent);">
-                {post.categories.join(' / ')}
-              </span>
-            {/if}
           </div>
 
-          <h1 class="blog-heading text-h1 tracking-tight leading-tight">
-            <span class="bg-white text-black px-2 py-0.5 box-decoration-clone inline" style="color: #000000;">
+          <h1 class="blog-heading text-xl sm:text-2xl md:text-3xl lg:text-h1 font-bold tracking-tight leading-snug sm:leading-tight">
+            <span class="bg-white text-black px-1.5 sm:px-2 py-0.5 box-decoration-clone inline" style="color: #000000;">
               {post.title}
             </span>
           </h1>
@@ -426,17 +424,51 @@
             </p>
           {/if}
 
-          {#if post.tags && post.tags.length > 0}
-            <div class="flex flex-wrap gap-1.5 pt-2">
-              {#each post.tags as tag}
-                <a
-                  href={`/blog?tag=${encodeURIComponent(tag)}`}
-                  class="font-mono text-[10px] px-2 py-0.5 border rounded-none transition-colors"
-                  style="background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-muted);"
-                >
-                  #{tag}
-                </a>
-              {/each}
+          <!-- Metadata Rows: Category & Tags separated into 2 distinct rows across all layouts -->
+          {#if (post.categories && post.categories.length > 0) || (post.tags && post.tags.length > 0)}
+            <div class="pt-3 border-t space-y-2.5 font-mono text-xs" style="border-color: var(--blog-border);">
+              <!-- Row 1: Category -->
+              {#if post.categories && post.categories.length > 0}
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <span class="text-[10px] uppercase tracking-wider font-semibold shrink-0 sm:w-24" style="color: var(--blog-accent);">
+                    [ CATEGORY ]
+                  </span>
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    {#each post.categories as cat, idx}
+                      <a
+                        href={`/blog?category=${encodeURIComponent(cat)}`}
+                        class="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 border rounded-none transition-colors yorha-invert-hover cursor-pointer"
+                        style="background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-primary);"
+                      >
+                        {cat}
+                      </a>
+                      {#if idx < post.categories.length - 1}
+                        <span class="text-[10px] opacity-40 font-mono">/</span>
+                      {/if}
+                    {/each}
+                  </div>
+                </div>
+              {/if}
+
+              <!-- Row 2: Tags -->
+              {#if post.tags && post.tags.length > 0}
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <span class="text-[10px] uppercase tracking-wider font-semibold shrink-0 sm:w-24" style="color: var(--blog-text-muted);">
+                    [ TAGS ]
+                  </span>
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    {#each post.tags as tag}
+                      <a
+                        href={`/blog?tag=${encodeURIComponent(tag)}`}
+                        class="font-mono text-[10px] px-2 py-0.5 border rounded-none transition-colors yorha-invert-hover cursor-pointer"
+                        style="background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-muted);"
+                      >
+                        #{tag}
+                      </a>
+                    {/each}
+                  </div>
+                </div>
+              {/if}
             </div>
           {/if}
         </header>
@@ -712,16 +744,84 @@
   </div>
 {/if}
 
-<!-- Mobile Quick Back to Top Button -->
-<button
-  type="button"
-  onclick={scrollToTop}
-  class="lg:hidden fixed bottom-6 right-6 z-40 p-3 font-mono text-xs backdrop-blur-sm cursor-pointer transition-all rounded-none yorha-invert-hover border"
-  style="background-color: var(--blog-surface); border-color: var(--blog-accent); color: var(--blog-accent);"
-  title="Back to top"
->
-  ↑ TOP
-</button>
+<!-- Mobile Tactical Quick Navigation Toolbar (TOC & Back to Top) -->
+<div class="lg:hidden fixed bottom-6 right-4 sm:right-6 z-40 flex items-center gap-2">
+  {#if post.toc && post.toc.length > 0}
+    <button
+      type="button"
+      onclick={() => (isMobileTocOpen = true)}
+      class="px-3 py-2.5 font-mono text-xs backdrop-blur-md cursor-pointer transition-all rounded-none yorha-invert-hover border shadow-lg"
+      style="background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-primary);"
+      title="Table of Contents"
+    >
+      [ TOC ]
+    </button>
+  {/if}
+  <button
+    type="button"
+    onclick={scrollToTop}
+    class="px-3 py-2.5 font-mono text-xs backdrop-blur-md cursor-pointer transition-all rounded-none yorha-invert-hover border shadow-lg"
+    style="background-color: var(--blog-surface); border-color: var(--blog-accent); color: var(--blog-accent);"
+    title="Back to top"
+  >
+    ↑ TOP
+  </button>
+</div>
+
+<!-- Mobile Tactical TOC Bottom Sheet Drawer -->
+{#if isMobileTocOpen}
+  <div
+    use:portal
+    transition:fade={{ duration: 150 }}
+    class="fixed inset-0 z-50 flex flex-col justify-end bg-black/80 backdrop-blur-sm lg:hidden p-0"
+    onclick={() => (isMobileTocOpen = false)}
+    role="presentation"
+  >
+    <div
+      transition:fly={{ y: 200, duration: 200 }}
+      class="relative w-full max-h-[75vh] overflow-y-auto border-t p-5 font-mono text-xs flex flex-col gap-4 shadow-2xl rounded-none"
+      style="background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-primary);"
+      onclick={(e) => e.stopPropagation()}
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
+      data-lenis-prevent
+    >
+      <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--blog-border);">
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full animate-pulse" style="background-color: var(--blog-accent);"></span>
+          <span class="font-bold tracking-wider text-[11px] uppercase">[ CONTENTS // {post.toc?.length || 0} SECTIONS ]</span>
+        </div>
+        <button
+          type="button"
+          onclick={() => (isMobileTocOpen = false)}
+          class="border px-2 py-1 text-[10px] font-mono tracking-wider uppercase transition-colors yorha-invert-hover cursor-pointer"
+          style="border-color: var(--blog-border); background-color: var(--blog-bg); color: var(--blog-text-primary);"
+        >
+          [ ✕ CLOSE ]
+        </button>
+      </div>
+
+      <nav class="space-y-1.5 max-h-[50vh] overflow-y-auto py-1">
+        {#each post.toc as item}
+          <a
+            href={`#${item.id}`}
+            onclick={(e) => {
+              isMobileTocOpen = false;
+              scrollToHeading(e, item.id);
+            }}
+            class="block py-2 px-3 border-l-2 text-xs transition-colors rounded-none {item.depth === 3 ? 'ml-3 text-[11px]' : ''}"
+            style={activeHeading === item.id
+              ? 'border-color: var(--blog-accent); color: var(--blog-accent); font-weight: 600; background-color: var(--blog-accent-subtle);'
+              : 'border-color: var(--blog-border); color: var(--blog-text-muted); background-color: var(--blog-bg);'}
+          >
+            <span class="truncate block">{item.text}</span>
+          </a>
+        {/each}
+      </nav>
+    </div>
+  </div>
+{/if}
 
 <style>
   /* ==========================================================================

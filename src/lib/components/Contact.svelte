@@ -59,11 +59,11 @@
   id="contact"
   data-section
   use:sectionAnim
-  class="relative flex flex-col justify-center py-20 sm:py-28"
+  class="relative flex flex-col justify-center py-12 sm:py-24"
 >
   <div class="wrap">
     <!-- Header Section -->
-    <header class="relative mb-10 pb-4">
+    <header class="relative mb-6 sm:mb-10 pb-3 sm:pb-4">
       <div class="flex items-end justify-between gap-4 pb-1">
         <h2
           class="flex flex-wrap gap-x-[0.28em] text-h2 font-semibold uppercase tracking-tight font-display"
@@ -107,7 +107,7 @@
     </header>
 
     <!-- Intro Prose (Baskervville) & Blog Link Navigation -->
-    <div data-anim class="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+    <div data-anim class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6">
       <div class="max-w-[var(--measure)]">
         <p class="font-serif text-lead italic leading-relaxed" style="color: var(--yorha-text-primary); opacity: 0.85;">
           {contact.body}
@@ -116,7 +116,7 @@
 
       <a
         href="/blog"
-        class="yorha-invert-hover group inline-flex items-center gap-2 self-start sm:self-auto border border-current/20 bg-current/5 px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-all duration-150 shrink-0"
+        class="yorha-invert-hover group inline-flex items-center gap-2 self-start sm:self-auto border border-current/20 bg-current/5 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] transition-all duration-150 shrink-0"
       >
         <span class="text-[9px]" style="color: var(--yorha-accent);">■</span>
         <span>ACCESS JOURNAL / BLOG</span>
@@ -124,12 +124,12 @@
       </a>
     </div>
 
-    <!-- Symmetrical 3-Card Tactical Channel Grid -->
-    <div data-anim class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5">
+    <!-- Symmetrical 2-Card Tactical Channel Grid -->
+    <div data-anim class="mt-6 sm:mt-10 grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-5">
       
       <!-- CHANNEL 01: Direct Email Dispatch -->
       <div
-        class="group relative flex flex-col justify-between border border-current/15 p-6 sm:p-7 transition-all duration-150 hover:-translate-y-0.5 hover:border-current/40"
+        class="group relative flex flex-col justify-between border border-current/15 p-4 sm:p-6 sm:p-7 transition-all duration-150 hover:-translate-y-0.5 hover:border-current/40"
         style="background-color: var(--yorha-surface);"
       >
         <!-- Pixel-Perfect Corner Reticle Brackets -->
@@ -154,19 +154,19 @@
             </span>
           </div>
 
-          <h3 class="mt-4 font-display text-lg font-semibold uppercase tracking-wider transition-colors">
+          <h3 class="mt-2.5 sm:mt-4 font-display text-base sm:text-lg font-semibold uppercase tracking-wider transition-colors">
             EMAIL DISPATCH
           </h3>
 
-          <p class="mt-2 font-serif text-caption opacity-70 italic leading-relaxed">
+          <p class="mt-1.5 sm:mt-2 font-serif text-caption opacity-70 italic leading-relaxed line-clamp-2 sm:line-clamp-none">
             Fastest channel for infrastructure architecture, cloud contracts, or direct consulting.
           </p>
         </div>
 
-        <div class="mt-8 pt-4 border-t border-current/10 flex flex-col gap-2.5">
+        <div class="mt-4 sm:mt-8 pt-3 sm:pt-4 border-t border-current/10 flex flex-col gap-2">
           <a
             href={'mailto:' + contact.email}
-            class="font-mono text-sm font-medium tracking-tight hover:underline transition-colors select-all truncate"
+            class="font-mono text-xs sm:text-sm font-medium tracking-tight hover:underline transition-colors select-all truncate"
             style="color: var(--yorha-accent);"
           >
             {contact.email}
@@ -175,7 +175,7 @@
             type="button"
             onclick={copyEmail}
             aria-label="Copy email address"
-            class="w-full yorha-invert-hover inline-flex items-center justify-center gap-2 border px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] transition-all cursor-pointer {copied ? 'border-current font-semibold' : 'border-current/20 bg-current/5 hover:border-current/50'}"
+            class="w-full yorha-invert-hover inline-flex items-center justify-center gap-2 border px-2.5 py-1.5 sm:px-3 sm:py-2 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.16em] transition-all cursor-pointer {copied ? 'border-current font-semibold' : 'border-current/20 bg-current/5 hover:border-current/50'}"
             style={copied ? 'color: var(--yorha-accent);' : ''}
           >
             <span>{copied ? '[ ┌ COPIED TO BUFFER ┘ ]' : '[ ┌ COPY ADDRESS ┘ ]'}</span>
@@ -183,12 +183,9 @@
         </div>
       </div>
 
-      <!-- CHANNEL 02: GitHub Repositories -->
-      <a
-        href="https://github.com/srytmj"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="group relative flex flex-col justify-between border border-current/15 p-6 sm:p-7 transition-all duration-150 hover:-translate-y-0.5 hover:border-current/40"
+      <!-- CHANNEL 02: Combined Codespace & Network (GitHub + LinkedIn) -->
+      <div
+        class="group relative flex flex-col justify-between border border-current/15 p-4 sm:p-6 sm:p-7 transition-all duration-150 hover:-translate-y-0.5 hover:border-current/40"
         style="background-color: var(--yorha-surface);"
       >
         <!-- Pixel-Perfect Corner Reticle Brackets -->
@@ -205,78 +202,68 @@
         ></span>
 
         <div>
-          <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-wider opacity-60">
+          <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-wider opacity-60 leading-none">
             <span>CHANNEL // 02</span>
-            <span style="color: var(--yorha-accent);">[ GIT+SSH // ONLINE ]</span>
+            <span style="color: var(--yorha-accent);">[ EXTERNAL_NODES ]</span>
           </div>
 
-          <h3 class="mt-4 font-display text-lg font-semibold uppercase tracking-wider transition-colors">
-            GITHUB / SRYTMJ
+          <h3 class="mt-2.5 sm:mt-4 font-display text-base sm:text-lg font-semibold uppercase tracking-wider transition-colors">
+            CODESPACE & PROFILES
           </h3>
 
-          <p class="mt-2 font-serif text-caption opacity-70 italic leading-relaxed">
-            Open-source infrastructure, homelab automation pipelines, and systems engineering code.
+          <p class="mt-1.5 sm:mt-2 font-serif text-caption opacity-70 italic leading-relaxed line-clamp-2 sm:line-clamp-none">
+            Open-source infrastructure code repositories and professional career trajectory.
           </p>
         </div>
 
-        <div class="mt-8 pt-4 border-t border-current/10 flex items-center justify-between font-mono text-[11px] uppercase tracking-wider opacity-80 group-hover:opacity-100">
-          <span class="opacity-60 select-all">github.com/srytmj</span>
-          <span class="inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform" style="color: var(--yorha-accent);">
-            EXPLORE →
-          </span>
+        <!-- 2-in-1 Compact Sub-Links for GitHub & LinkedIn -->
+        <div class="mt-4 sm:mt-8 pt-3 sm:pt-4 border-t border-current/10 flex flex-col gap-2">
+          <!-- GitHub Sub-Card -->
+          <a
+            href="https://github.com/srytmj"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group/item flex items-center justify-between px-3 py-2 border border-current/15 bg-current/[0.02] hover:border-current/40 hover:bg-current/5 transition-all font-mono"
+          >
+            <div class="flex items-center gap-2">
+              <span class="text-[9px]" style="color: var(--yorha-accent);">■</span>
+              <div class="flex flex-col">
+                <span class="text-xs font-semibold tracking-tight">GITHUB / SRYTMJ</span>
+                <span class="text-[9px] opacity-50 select-all">github.com/srytmj</span>
+              </div>
+            </div>
+            <span class="text-[10px] uppercase tracking-wider group-hover/item:translate-x-1 transition-transform" style="color: var(--yorha-accent);">
+              EXPLORE →
+            </span>
+          </a>
+
+          <!-- LinkedIn Sub-Card -->
+          <a
+            href="https://www.linkedin.com/in/suryatmaja/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group/item flex items-center justify-between px-3 py-2 border border-current/15 bg-current/[0.02] hover:border-current/40 hover:bg-current/5 transition-all font-mono"
+          >
+            <div class="flex items-center gap-2">
+              <span class="text-[9px]" style="color: var(--yorha-accent);">■</span>
+              <div class="flex flex-col">
+                <span class="text-xs font-semibold tracking-tight">LINKEDIN / SURYATMAJA</span>
+                <span class="text-[9px] opacity-50 select-all">linkedin.com/in/suryatmaja</span>
+              </div>
+            </div>
+            <span class="text-[10px] uppercase tracking-wider group-hover/item:translate-x-1 transition-transform" style="color: var(--yorha-accent);">
+              CONNECT →
+            </span>
+          </a>
         </div>
-      </a>
-
-      <!-- CHANNEL 03: LinkedIn Professional Network -->
-      <a
-        href="https://www.linkedin.com/in/suryatmaja/"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="group relative flex flex-col justify-between border border-current/15 p-6 sm:p-7 transition-all duration-150 hover:-translate-y-0.5 hover:border-current/40"
-        style="background-color: var(--yorha-surface);"
-      >
-        <!-- Pixel-Perfect Corner Reticle Brackets -->
-        <span class="pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border-l-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute -top-px -right-px h-2.5 w-2.5 border-r-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute -bottom-px -left-px h-2.5 w-2.5 border-b-2 border-l-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute -bottom-px -right-px h-2.5 w-2.5 border-b-2 border-r-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-
-        <!-- Top Sweep Line on Hover -->
-        <span
-          class="pointer-events-none absolute inset-x-0 top-0 h-px origin-left scale-x-0 transition-transform duration-200 group-hover:scale-x-100"
-          style="background-color: var(--yorha-accent);"
-          aria-hidden="true"
-        ></span>
-
-        <div>
-          <div class="flex items-center justify-between font-mono text-[10px] uppercase tracking-wider opacity-60">
-            <span>CHANNEL // 03</span>
-            <span style="color: var(--yorha-accent);">[ BGP_PEER // VERIFIED ]</span>
-          </div>
-
-          <h3 class="mt-4 font-display text-lg font-semibold uppercase tracking-wider transition-colors">
-            LINKEDIN / NETWORK
-          </h3>
-
-          <p class="mt-2 font-serif text-caption opacity-70 italic leading-relaxed">
-            Professional trajectory, enterprise networking experience, and career history.
-          </p>
-        </div>
-
-        <div class="mt-8 pt-4 border-t border-current/10 flex items-center justify-between font-mono text-[11px] uppercase tracking-wider opacity-80 group-hover:opacity-100">
-          <span class="opacity-60 select-all">in/suryatmaja</span>
-          <span class="inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform" style="color: var(--yorha-accent);">
-            CONNECT →
-          </span>
-        </div>
-      </a>
+      </div>
 
     </div>
 
     <!-- Compact Tactical Status & Bunker Footer Bar -->
     <div
       data-anim
-      class="mt-14 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-current/10 pt-6 font-mono text-label uppercase tracking-[0.22em]"
+      class="mt-8 sm:mt-14 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 border-t border-current/10 pt-4 sm:pt-6 font-mono text-label uppercase tracking-[0.22em]"
     >
       <div class="flex flex-wrap items-center gap-3 opacity-60">
         <span>PORTOFOLIO_OS v2.6.4</span>

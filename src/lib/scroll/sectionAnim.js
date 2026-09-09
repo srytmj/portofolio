@@ -137,9 +137,11 @@ export function sectionAnim(node) {
       opacity: 1,
       y: 0,
       filter: 'blur(0px)',
-      duration: 0.32,
+      duration: 0.4,
+      stagger: 0.05,
       ease: 'power2.out',
-      overwrite: true
+      overwrite: true,
+      clearProps: 'filter'
     });
   };
 
@@ -197,13 +199,20 @@ export function sectionAnim(node) {
 
   const st = ScrollTrigger.create({
     trigger: node,
-    start: 'top 78%',
-    end: 'bottom 22%',
+    start: 'top 88%',
+    end: 'bottom top',
     onEnter: show,
     onEnterBack: show,
-    onLeave: () => hide(-1),
     onLeaveBack: () => hide(1)
   });
+
+  // If section is already within or past viewport on initial mount, trigger entrance immediately
+  requestAnimationFrame(() => {
+    if (st.progress > 0) {
+      show();
+    }
+  });
+
   queueRefresh();
 
   let ro;

@@ -31,7 +31,7 @@
   When active, the return capsule illuminates and allows instant click to return to the Hero section.
 -->
 <aside
-  class="fixed left-0 top-0 bottom-0 z-40 pointer-events-none flex items-center pl-2 sm:pl-4 lg:pl-6"
+  class="hidden md:flex fixed left-0 top-0 bottom-0 z-40 pointer-events-none items-center pl-2 sm:pl-4 lg:pl-6"
   aria-label="Return to Hero section"
 >
   <button

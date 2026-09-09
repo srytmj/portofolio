@@ -8,9 +8,10 @@
   let isSupported = $state(false);
 
   onMount(() => {
-    // Only activate for devices with a fine pointer (mouse / trackpad)
-    const finePointerQuery = window.matchMedia('(pointer: fine)');
-    if (!finePointerQuery.matches) {
+    // Strictly activate for desktop devices with true hover capability and a fine pointer (mouse / trackpad)
+    // Never activate on mobile smartphones or touch tablets
+    const hasHoverAndFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (!hasHoverAndFinePointer) {
       return;
     }
 
@@ -19,8 +20,18 @@
 
     let mouseX = -100;
     let mouseY = -100;
+    let isTouchInteracting = false;
+
+    const onTouchStart = () => {
+      isTouchInteracting = true;
+      isVisible = false;
+    };
 
     const onMouseMove = (e) => {
+      if (isTouchInteracting) {
+        isVisible = false;
+        return;
+      }
       mouseX = e.clientX;
       mouseY = e.clientY;
       if (!isVisible) {
@@ -43,11 +54,13 @@
     };
 
     const onMouseDown = () => {
+      if (isTouchInteracting) return;
       isDown = true;
     };
 
     const onMouseUp = () => {
       isDown = false;
+      isTouchInteracting = false;
     };
 
     const onMouseLeave = () => {
@@ -55,9 +68,12 @@
     };
 
     const onMouseEnter = () => {
-      isVisible = true;
+      if (!isTouchInteracting) {
+        isVisible = true;
+      }
     };
 
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('mousedown', onMouseDown, { passive: true });
     window.addEventListener('mouseup', onMouseUp, { passive: true });
@@ -66,6 +82,7 @@
 
     return () => {
       document.documentElement.classList.remove('custom-cursor-active');
+      window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('mouseup', onMouseUp);
@@ -141,5 +158,15 @@
   /* When mouse is pressed down, scale down slightly */
   .custom-cursor-wrapper.is-down .custom-cursor-cross {
     transform: scale(0.85);
+  }
+
+  /* Strictly hide on touch devices */
+  @media (hover: none), (pointer: coarse) {
+    .custom-cursor-wrapper {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
   }
 </style>

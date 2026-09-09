@@ -26,7 +26,8 @@
 
   onMount(() => {
     // Hidden until a section is in view (the hero shows nothing).
-    gsap.set(nav, { autoAlpha: 0, xPercent: -10 });
+    // Maintain yPercent: -50 so vertical centering is never overwritten by GSAP!
+    gsap.set(nav, { autoAlpha: 0, xPercent: -10, yPercent: -50 });
     gsap.set(nav.querySelectorAll('[data-num]'), { width: 0, marginRight: 0, autoAlpha: 0 });
     gsap.set(nav.querySelectorAll('[data-label]'), { opacity: 0.4 });
     gsap.set(nav.querySelector('[data-star]'), { opacity: 0.6, transformOrigin: '50% 50%' });
@@ -42,6 +43,7 @@
     gsap.to(nav, {
       autoAlpha: visible ? 1 : 0,
       xPercent: visible ? 0 : -10,
+      yPercent: -50,
       duration: d,
       ease: ease.out,
       overwrite: true
@@ -63,7 +65,7 @@
       if (num)
         gsap.to(num, {
           width: on ? 'auto' : 0,
-          marginRight: on ? 10 : 0,
+          marginRight: on ? 8 : 0,
           autoAlpha: on ? 1 : 0,
           duration: d,
           ease: 'power3.out',
@@ -109,23 +111,42 @@
       overwrite: 'auto'
     });
   }
+
+  function handleNavClick(e, it) {
+    if (it.key === 'blog') return;
+
+    if (typeof window !== 'undefined' && window.location.pathname === '/') {
+      e.preventDefault();
+      const targetId = it.key === 'home' ? 'top' : it.key;
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        if (window.__lenis) {
+          window.__lenis.scrollTo(targetEl, { offset: 0, duration: 1 });
+        } else {
+          targetEl.scrollIntoView({ behavior: 'smooth' });
+        }
+        history.pushState(null, '', it.key === 'home' ? '#top' : `#${it.key}`);
+      }
+    }
+  }
 </script>
 
 <nav
   bind:this={nav}
   aria-label="Sections"
-  class="invisible fixed left-7 top-1/2 z-50 flex -translate-y-1/2 flex-col gap-[18px] sm:left-14"
+  class="invisible hidden lg:flex fixed left-7 top-1/2 z-50 flex-col gap-[18px] sm:left-14"
 >
   {#each items as it}
     <a
       data-key={it.key}
-      href={it.key === 'blog' ? '/blog' : it.key === 'home' ? '/#top' : `/#${it.key}`}
+      href={it.key === 'blog' ? '/blog' : it.key === 'home' ? '#top' : `/#${it.key}`}
       target={it.external ? '_blank' : undefined}
       rel={it.external ? 'noopener noreferrer' : undefined}
       aria-current={it.key === activeId ? 'true' : undefined}
+      onclick={(e) => handleNavClick(e, it)}
       onpointerenter={(e) => hover(e.currentTarget, true)}
       onpointerleave={(e) => hover(e.currentTarget, false)}
-      class="group flex items-center whitespace-nowrap py-0.5 text-[11px] uppercase tracking-[0.18em] transition-colors {it.key ===
+      class="group flex items-center whitespace-nowrap py-0.5 text-[11px] uppercase tracking-[0.18em] transition-colors cursor-pointer {it.key ===
       'home'
         ? 'mb-1'
         : ''}"
@@ -135,7 +156,7 @@
         <span data-star class="inline-block text-xs leading-none font-mono" style="color: var(--yorha-accent);">✦</span>
         <span class="sr-only">Back to top</span>
       {:else}
-        <span data-num class="overflow-hidden font-mono text-[0.85em] mr-1.5" style="color: var(--yorha-text-muted);">{it.num}</span>
+        <span data-num class="overflow-hidden font-mono text-[0.85em]" style="color: var(--yorha-text-muted);">{it.num}</span>
         <span data-label>{it.label}</span>
       {/if}
     </a>

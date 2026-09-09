@@ -1,5 +1,5 @@
 <script>
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
   import { gsap } from 'gsap';
   import ProjectModal from '$lib/components/ProjectModal.svelte';
   import LeftEdgeReturn from '$lib/components/LeftEdgeReturn.svelte';
@@ -9,67 +9,49 @@
   let searchQuery = $state('');
   let selectedKind = $state('all');
   let open = $state(null);
-  let hasMounted = $state(false);
-  let cardsGridEl = $state(null);
+
+  const reduce =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   onMount(() => {
     window.scrollTo(0, 0);
     window.__lenis?.scrollTo(0, { immediate: true });
-    hasMounted = true;
+    
+    // Initial animation
+    if (!reduce) {
+      gsap.fromTo(
+        '[data-project-card]',
+        { y: 24, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, stagger: 0.05, ease: 'power2.out', clearProps: 'all' }
+      );
+    }
   });
 
-  // Explicit handler to animate cards synchronously when category filter is clicked
-  async function setKind(kind) {
+  // Explicit handler when category filter is clicked
+  function setKind(kind) {
     if (selectedKind === kind) return;
     selectedKind = kind;
-    await tick();
-    if (cardsGridEl) {
-      const cards = cardsGridEl.querySelectorAll('[data-card-anim]');
-      if (cards.length) {
-        gsap.killTweensOf(cards);
-        gsap.fromTo(
-          cards,
-          { y: 4, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.16,
-            ease: 'power2.out',
-            clearProps: 'transform,opacity'
-          }
-        );
-      }
-    }
+    animateGrid();
   }
 
-  let prevSearch = $state('');
-  // Re-animate cards only when search query actually changes
   $effect(() => {
-    const q = searchQuery;
-    if (!hasMounted || typeof document === 'undefined') return;
-
-    if (q !== prevSearch) {
-      prevSearch = q;
-      tick().then(() => {
-        if (cardsGridEl) {
-          const cards = cardsGridEl.querySelectorAll('[data-card-anim]');
-          if (!cards.length) return;
-          gsap.killTweensOf(cards);
-          gsap.fromTo(
-            cards,
-            { y: 4, opacity: 0 },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.16,
-              ease: 'power2.out',
-              clearProps: 'transform,opacity'
-            }
-          );
-        }
-      });
-    }
+    // When search query changes, trigger animation
+    searchQuery;
+    animateGrid();
   });
+
+  function animateGrid() {
+    if (reduce) return;
+    requestAnimationFrame(() => {
+      gsap.killTweensOf('[data-project-card]');
+      gsap.fromTo(
+        '[data-project-card]',
+        { y: 16, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.35, stagger: 0.04, ease: 'power2.out', clearProps: 'all' }
+      );
+    });
+  }
 
   // Extract all unique project kinds/categories
   const allKinds = $derived.by(() => {
@@ -132,7 +114,7 @@
         type="search"
         bind:value={searchQuery}
         placeholder="Search projects, architecture, tech stack (Laravel, Docker, AWS, Go, PostgreSQL)..."
-        class="w-full rounded-none border px-4 py-3 font-mono text-xs outline-none transition-colors"
+        class="w-full rounded-none border px-4 py-3 font-mono text-base sm:text-xs outline-none transition-colors"
         style="background-color: var(--yorha-surface); border-color: var(--yorha-border); color: var(--yorha-text-primary);"
       />
       {#if searchQuery}
@@ -148,8 +130,8 @@
     </div>
 
     <!-- Category Filters (Tactical Brackets & Block Invert) -->
-    <div class="flex flex-wrap items-center gap-1.5 pt-1 font-mono text-[10px] uppercase tracking-wider">
-      <span class="mr-1 select-none flex items-center gap-1.5" style="color: var(--yorha-text-muted);">
+    <div class="flex items-center gap-1.5 pt-2 pb-1 font-mono text-[10px] uppercase tracking-wider overflow-x-auto sm:overflow-visible sm:flex-wrap no-scrollbar">
+      <span class="mr-1 select-none shrink-0 flex items-center gap-1.5" style="color: var(--yorha-text-muted);">
         <span class="inline-block h-1.5 w-1.5" style="background-color: var(--yorha-accent);"></span>
         FILTER:
       </span>
@@ -158,7 +140,7 @@
         <button
           type="button"
           onclick={() => setKind(kind)}
-          class="group relative px-2.5 py-1 transition-all duration-150 border cursor-pointer rounded-none {active
+          class="group relative shrink-0 px-2.5 py-1 transition-all duration-150 border cursor-pointer rounded-none {active
             ? 'font-medium'
             : 'hover:opacity-80'}"
           style={active
@@ -176,18 +158,18 @@
   </div>
 
   <!-- Projects Grid -->
-  <div bind:this={cardsGridEl} class="grid gap-6 sm:grid-cols-2 max-w-5xl">
-    {#if filteredProjects.length === 0}
-      <div class="col-span-full py-16 text-center font-mono text-sm border p-8 rounded-none" style="background-color: var(--yorha-surface); border-color: var(--yorha-border); color: var(--yorha-text-muted);">
-        No projects match the specified search query or category filter.
-      </div>
-    {:else}
-      {#each filteredProjects as p, i (p.slug)}
-        <div
-          data-card-anim
-          class="group relative flex flex-col justify-between gap-6 rounded-none border p-7 sm:p-8 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
-          style="background-color: var(--yorha-surface); border-color: var(--yorha-border);"
-        >
+    <div class="grid gap-6 sm:grid-cols-2 max-w-5xl">
+      {#if filteredProjects.length === 0}
+        <div class="col-span-full py-16 text-center font-mono text-sm border p-8 rounded-none" style="background-color: var(--yorha-surface); border-color: var(--yorha-border); color: var(--yorha-text-muted);">
+          No projects match the specified search query or category filter.
+        </div>
+      {:else}
+        {#each filteredProjects as p, i (p.slug)}
+          <div
+            data-project-card
+            class="group relative flex flex-col justify-between gap-6 rounded-none border p-5 sm:p-7 sm:p-8 transition-colors duration-150 hover:-translate-y-0.5 cursor-pointer"
+            style="background-color: var(--yorha-surface); border-color: var(--yorha-border);"
+          >
           <!-- Tactical Reticle Brackets on Hover -->
           <span class="pointer-events-none absolute -top-px -left-px h-2 w-2 border-l-2 border-t-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
           <span class="pointer-events-none absolute -top-px -right-px h-2 w-2 border-r-2 border-t-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
@@ -291,10 +273,3 @@
     onClose={() => (open = null)}
   />
 {/if}
-
-<style>
-  :global([data-card-anim]) {
-    background-color: var(--yorha-surface) !important;
-    border-color: var(--yorha-border) !important;
-  }
-</style>

@@ -10,17 +10,7 @@
   const nextProject = $derived(data.nextProject);
 
   onMount(() => {
-    if (typeof window === 'undefined') return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) return;
-
-    gsap.from('[data-project-anim]', {
-      y: 12,
-      opacity: 0,
-      duration: 0.25,
-      ease: 'power2.out',
-      clearProps: 'all'
-    });
+    // No layout animations needed
   });
 </script>
 
@@ -31,6 +21,7 @@
   <meta property="og:description" content={project.summary} />
 </svelte:head>
 
+<div class="w-full min-h-screen yorha-tech-bg">
 <section class="wrap pt-32 pb-24 min-h-screen" style="color: var(--yorha-text-primary);">
   <!-- Tactical Return Trigger on Left Edge Hover -->
   <LeftEdgeReturn />
@@ -173,3 +164,4 @@
     </div>
   </div>
 </section>
+</div>

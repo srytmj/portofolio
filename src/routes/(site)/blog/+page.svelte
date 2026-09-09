@@ -7,6 +7,10 @@
 
   let { data } = $props();
 
+  const reduce =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   // Tab navigation state: 'home' | 'categories' | 'tags' | 'archive'
   let activeTab = $state('home');
 
@@ -58,239 +62,39 @@
     }
 
     if (typeof window === 'undefined') return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
-      hasMounted = true;
-      return () => {
-        window.__lenis?.start();
-      };
-    }
-
-    const tl = gsap.timeline({
-      defaults: { ease: 'power3.out' },
-      onComplete: () => {
-        hasMounted = true;
-      }
-    });
-
-    tl.fromTo(
-      '[data-blog-header]',
-      { y: 12, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.3, clearProps: 'all' }
-    );
-
-    tl.fromTo(
-      '[data-blog-sidebar]',
-      { x: -10, opacity: 0 },
-      { x: 0, opacity: 1, duration: 0.3, clearProps: 'all' },
-      '-=0.15'
-    );
-
-    tl.fromTo(
-      '[data-blog-panel]',
-      { y: 12, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.35, clearProps: 'all' },
-      '-=0.2'
-    );
-
-    // Safety fallback to guarantee elements are 100% visible even if animation ticker was delayed
-    setTimeout(() => {
-      hasMounted = true;
-      const header = document.querySelector('[data-blog-header]');
-      const sidebar = document.querySelector('[data-blog-sidebar]');
-      const panel = document.querySelector('[data-blog-panel]');
-      if (header) header.style.opacity = '1';
-      if (sidebar) sidebar.style.opacity = '1';
-      if (panel) panel.style.opacity = '1';
-    }, 400);
-
+    hasMounted = true;
     return () => {
       window.__lenis?.start();
     };
   });
 
-  // Switch tab with instant, snappy GSAP transition (zero awkward delay)
-  let isTabSwitching = false;
-  async function switchTab(tabId) {
+  // Switch tab with instant state update
+  function switchTab(tabId) {
     if (activeTab === tabId && !selectedCategory && !selectedTag) return;
-    isTabSwitching = true;
     activeTab = tabId;
     selectedCategory = null;
     selectedTag = null;
     selectedSubcategory = null;
-    lastSubcategory = null;
-
-    await tick();
-
-    if (tabId === 'home') {
-      const cards = document.querySelectorAll('[data-home-card]');
-      if (cards.length) {
-        gsap.killTweensOf(cards);
-        gsap.fromTo(
-          cards,
-          { y: 10, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-        );
-      }
-    } else if (tabId === 'categories') {
-      const grid = document.querySelector('[data-categories-grid]');
-      const catCards = document.querySelectorAll('[data-category-card]');
-      if (grid) gsap.killTweensOf(grid);
-      if (catCards.length) gsap.killTweensOf(catCards);
-
-      if (grid) {
-        gsap.fromTo(
-          grid,
-          { y: 10, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-        );
-      }
-      if (catCards.length) {
-        gsap.fromTo(
-          catCards,
-          { y: 8, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-        );
-      }
-    } else if (tabId === 'tags') {
-      const cloud = document.querySelector('[data-tags-cloud]');
-      const tagPills = document.querySelectorAll('[data-tag-pill]');
-      if (cloud) gsap.killTweensOf(cloud);
-      if (tagPills.length) gsap.killTweensOf(tagPills);
-
-      if (cloud) {
-        gsap.fromTo(
-          cloud,
-          { y: 10, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-        );
-      }
-      if (tagPills.length) {
-        gsap.fromTo(
-          tagPills,
-          { y: 8, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-        );
-      }
-    } else if (tabId === 'archive') {
-      const items = document.querySelectorAll('[data-archive-item]');
-      if (items.length) {
-        gsap.killTweensOf(items);
-        gsap.fromTo(
-          items,
-          { y: 10, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-        );
-      }
-    }
-
-    setTimeout(() => {
-      isTabSwitching = false;
-    }, 220);
   }
 
-  // Category selection handler with immediate transition (no delay)
-  async function selectCategory(cat) {
+  // Category selection handlers
+  function selectCategory(cat) {
     selectedCategory = cat;
     selectedSubcategory = null;
-    lastSubcategory = null;
-    await tick();
-    const detail = document.querySelector('[data-category-detail]');
-    const items = document.querySelectorAll('[data-category-post-item]');
-    if (detail) gsap.killTweensOf(detail);
-    if (items.length) gsap.killTweensOf(items);
-
-    if (detail) {
-      gsap.fromTo(
-        detail,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-      );
-    }
-    if (items.length) {
-      gsap.fromTo(
-        items,
-        { y: 8, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-      );
-    }
   }
 
-  // Category back handler with immediate transition (no delay)
-  async function backToCategories() {
+  function backToCategories() {
     selectedCategory = null;
     selectedSubcategory = null;
-    lastSubcategory = null;
-    await tick();
-    const grid = document.querySelector('[data-categories-grid]');
-    const catCards = document.querySelectorAll('[data-category-card]');
-    if (grid) gsap.killTweensOf(grid);
-    if (catCards.length) gsap.killTweensOf(catCards);
-
-    if (grid) {
-      gsap.fromTo(
-        grid,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-      );
-    }
-    if (catCards.length) {
-      gsap.fromTo(
-        catCards,
-        { y: 8, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-      );
-    }
   }
 
-  // Tag selection handler with immediate transition (no delay)
-  async function selectTag(tag) {
+  // Tag selection handlers
+  function selectTag(tag) {
     selectedTag = tag;
-    await tick();
-    const detail = document.querySelector('[data-tag-detail]');
-    const items = document.querySelectorAll('[data-tag-post-item]');
-    if (detail) gsap.killTweensOf(detail);
-    if (items.length) gsap.killTweensOf(items);
-
-    if (detail) {
-      gsap.fromTo(
-        detail,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-      );
-    }
-    if (items.length) {
-      gsap.fromTo(
-        items,
-        { y: 8, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-      );
-    }
   }
 
-  // Tag back handler with immediate transition (no delay)
-  async function backToTags() {
+  function backToTags() {
     selectedTag = null;
-    await tick();
-    const cloud = document.querySelector('[data-tags-cloud]');
-    const tagPills = document.querySelectorAll('[data-tag-pill]');
-    if (cloud) gsap.killTweensOf(cloud);
-    if (tagPills.length) gsap.killTweensOf(tagPills);
-
-    if (cloud) {
-      gsap.fromTo(
-        cloud,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-      );
-    }
-    if (tagPills.length) {
-      gsap.fromTo(
-        tagPills,
-        { y: 8, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-      );
-    }
   }
 
   // Home tab pagination state (10 posts per page)
@@ -331,132 +135,36 @@
     currentPage = 1;
   });
 
-  // Navigate pagination page with animated exit and cascade entrance
-  let isPaginating = false;
-  async function goToPage(p) {
-    if (p < 1 || p > totalPages || p === currentPage || isPaginating) return;
-    isPaginating = true;
-    try {
-      const cards = document.querySelectorAll('[data-home-card]');
-      if (cards.length) {
-        await new Promise((resolve) => {
-          gsap.to(cards, {
-            opacity: 0,
-            y: -6,
-            duration: 0.12,
-            ease: 'power2.in',
-            onComplete: resolve
-          });
-        });
+  // Navigate pagination page with scroll reset
+  function goToPage(p) {
+    if (p < 1 || p > totalPages || p === currentPage) return;
+    currentPage = p;
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      if (window.__lenis) {
+        window.__lenis.scrollTo(0, { duration: 0.5 });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
-      currentPage = p;
-      await tick();
-      if (homeCardsContainer) {
-        homeCardsContainer.scrollTo({ top: 0, behavior: 'instant' });
-      }
-      const newCards = document.querySelectorAll('[data-home-card]');
-      if (newCards.length) {
-        gsap.killTweensOf(newCards);
-        gsap.fromTo(
-          newCards,
-          { y: 8, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.2,
-            ease: 'power2.out',
-            clearProps: 'all'
-          }
-        );
-      }
-    } finally {
-      isPaginating = false;
-    }
-  }
-
-  // Quick tag filter handler with guaranteed direct animation
-  async function setHomeFilterTag(tag) {
-    if (homeFilterTag === tag) return;
-    homeFilterTag = tag;
-    lastFilterTag = tag;
-    currentPage = 1;
-    await tick();
-    if (homeCardsContainer) {
+    } else if (homeCardsContainer) {
       homeCardsContainer.scrollTo({ top: 0, behavior: 'instant' });
     }
-    const cards = document.querySelectorAll('[data-home-card]');
-    if (cards.length) {
-      gsap.killTweensOf(cards);
-      gsap.fromTo(
-        cards,
-        { y: 6, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.18,
-          ease: 'power2.out',
-          clearProps: 'all'
-        }
-      );
-    }
   }
 
-  let lastFilterTag = $state('all');
-  let lastSearchQuery = $state('');
-
-  // Animate items inside Home view whenever tag filter or search query actually changes!
-  $effect(() => {
-    const currentTag = homeFilterTag;
-    const currentQuery = searchQuery;
-    if (activeTab !== 'home' || !hasMounted || typeof document === 'undefined' || isPaginating || isTabSwitching) return;
-
-    if (currentTag !== lastFilterTag || currentQuery !== lastSearchQuery) {
-      lastFilterTag = currentTag;
-      lastSearchQuery = currentQuery;
-      currentPage = 1;
-
-      tick().then(() => {
-        if (isPaginating || isTabSwitching) return;
-        if (homeCardsContainer) {
-          homeCardsContainer.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        const cards = document.querySelectorAll('[data-home-card]');
-        if (!cards.length) return;
-        gsap.killTweensOf(cards);
-        gsap.fromTo(
-          cards,
-          { y: 6, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.18,
-            ease: 'power2.out',
-            clearProps: 'all'
-          }
-        );
-      });
+  // Quick tag filter handler with scroll reset
+  function setHomeFilterTag(tag) {
+    if (homeFilterTag === tag) return;
+    homeFilterTag = tag;
+    currentPage = 1;
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      if (window.__lenis) {
+        window.__lenis.scrollTo(0, { duration: 0.5 });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else if (homeCardsContainer) {
+      homeCardsContainer.scrollTo({ top: 0, behavior: 'instant' });
     }
-  });
-
-  let lastSubcategory = $state(null);
-  // Animate items inside Categories view when subcategory filter changes (instant, no delay)
-  $effect(() => {
-    const sub = selectedSubcategory;
-    if (activeTab !== 'categories' || !selectedCategory || !hasMounted || typeof document === 'undefined') return;
-    if (sub === lastSubcategory) return;
-    lastSubcategory = sub;
-
-    tick().then(() => {
-      const items = document.querySelectorAll('[data-category-post-item]');
-      if (!items.length) return;
-      gsap.killTweensOf(items);
-      gsap.fromTo(
-        items,
-        { y: 8, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.2, ease: 'power2.out', clearProps: 'all' }
-      );
-    });
-  });
+  }
 
   // Category tab: Posts for selected category and subcategory
   const categoryPosts = $derived.by(() => {
@@ -488,6 +196,38 @@
   // Top tags for Home view quick pills
   const topTags = $derived.by(() => {
     return ['all', ...data.tagsWithCount.slice(0, 8).map((t) => t.name.toLowerCase())];
+  });
+
+  // Re-trigger animations when state changes
+  $effect(() => {
+    activeTab;
+    currentPage;
+    homeFilterTag;
+    searchQuery;
+    selectedCategory;
+    selectedSubcategory;
+    selectedTag;
+
+    if (reduce) return;
+    requestAnimationFrame(() => {
+      const selectors = [
+        '[data-home-card]',
+        '[data-category-card]',
+        '[data-category-post-item]',
+        '[data-tag-pill]',
+        '[data-tag-post-item]',
+        '[data-archive-group]'
+      ];
+      
+      for (const sel of selectors) {
+        gsap.killTweensOf(sel);
+        gsap.fromTo(
+          sel,
+          { y: sel === '[data-tag-pill]' ? 12 : 18, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.35, stagger: sel === '[data-tag-pill]' ? 0.015 : 0.04, ease: 'power2.out', clearProps: 'all' }
+        );
+      }
+    });
   });
 </script>
 
@@ -564,13 +304,13 @@
         </div>
 
         <!-- Navigation Tabs (Solid Block Invert) -->
-        <nav class="flex flex-wrap lg:flex-col gap-1.5 font-mono text-xs">
+        <nav class="flex items-center lg:items-stretch gap-1.5 font-mono text-xs overflow-x-auto lg:overflow-visible sm:flex-wrap lg:flex-col no-scrollbar pb-1 lg:pb-0">
           {#each tabs as tab}
             {@const active = activeTab === tab.id}
             <button
               type="button"
               onclick={() => switchTab(tab.id)}
-              class="group relative flex items-center justify-between px-3 py-2 rounded-none text-left transition-all duration-150 cursor-pointer border {active ? '' : 'yorha-invert-hover'}"
+              class="group relative shrink-0 lg:shrink lg:w-full flex items-center justify-between px-3.5 py-2.5 rounded-none text-left transition-colors duration-150 cursor-pointer border {active ? '' : 'yorha-invert-hover'}"
               style={active
                 ? 'background-color: var(--yorha-invert-bg); color: var(--yorha-invert-text); border-color: var(--yorha-invert-bg); font-weight: 600;'
                 : 'background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-muted);'}
@@ -611,10 +351,10 @@
     </aside>
 
     <!-- Content Panel -->
-    <main data-blog-panel bind:this={contentPanel} class="lg:col-span-9 flex flex-col h-full min-h-0 overflow-hidden">
+    <main data-blog-panel bind:this={contentPanel} class="lg:col-span-9 flex flex-col lg:h-full lg:min-h-0 lg:overflow-hidden">
       <!-- VIEW 1: HOME (Newest posts with compact search, quick filter, & pagination) -->
       {#if activeTab === 'home'}
-        <div class="flex flex-col h-full min-h-0 space-y-3">
+        <div class="flex flex-col lg:h-full lg:min-h-0 space-y-3">
           <!-- Compact Search & Filter Controls (Fixed at top of panel, shrink-0) -->
           <div class="shrink-0 space-y-2 pb-2 border-b" style="border-color: var(--blog-border);">
             <div class="relative">
@@ -622,7 +362,7 @@
                 type="search"
                 bind:value={searchQuery}
                 placeholder="Search articles by title, topic, or tech stack..."
-                class="w-full rounded-none border px-3.5 py-2 font-mono text-xs sm:text-sm outline-none transition-colors"
+                class="w-full rounded-none border px-3.5 py-2 font-mono text-base sm:text-sm outline-none transition-colors"
                 style="background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-primary);"
               />
               {#if searchQuery}
@@ -639,14 +379,14 @@
 
             <!-- Quick Tag Pills & Pagination Info Indicator -->
             <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-[10px]">
-              <div class="flex flex-wrap items-center gap-1.5">
-                <span class="uppercase tracking-wider mr-1" style="color: var(--blog-text-muted);">Filter:</span>
+              <div class="flex items-center gap-1.5 overflow-x-auto sm:flex-wrap no-scrollbar pb-1 sm:pb-0">
+                <span class="uppercase tracking-wider mr-1 shrink-0" style="color: var(--blog-text-muted);">Filter:</span>
                 {#each topTags as tag}
                   {@const isFilterActive = homeFilterTag === tag}
                   <button
                     type="button"
                     onclick={() => setHomeFilterTag(tag)}
-                    class="group inline-flex items-center gap-1.5 rounded-none px-2.5 py-0.5 uppercase tracking-wider transition-all duration-150 cursor-pointer border {isFilterActive ? '' : 'yorha-invert-hover'}"
+                    class="group shrink-0 inline-flex items-center gap-1.5 rounded-none px-2.5 py-0.5 uppercase tracking-wider transition-all duration-150 cursor-pointer border {isFilterActive ? '' : 'yorha-invert-hover'}"
                     style={isFilterActive
                       ? 'background-color: var(--yorha-invert-bg); color: var(--yorha-invert-text); border-color: var(--yorha-invert-bg); font-weight: 600;'
                       : 'background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-muted);'}
@@ -665,23 +405,23 @@
             </div>
           </div>
 
-          <!-- Posts List (flex-1 min-h-0, scrollbar hidden, smooth scrolling, zero page jump) -->
+          <!-- Posts List (natural scroll on mobile, inner scroll on desktop) -->
           {#if displayedHomePosts.length === 0}
             <div class="flex-1 flex items-center justify-center font-mono text-sm border p-8 rounded-none" style="background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-muted);">
               No articles match the current search query or tag filter.
             </div>
           {:else}
-            <div
-              bind:this={homeCardsContainer}
-              data-lenis-prevent
-              class="flex-1 min-h-0 overflow-y-auto no-scrollbar scroll-smooth pt-2.5 pb-3 px-1 space-y-3.5 overscroll-contain"
-            >
-              {#each displayedHomePosts as post (post.slug)}
-                <article
-                  data-home-card
-                  class="group relative flex flex-col justify-between gap-3.5 rounded-none border p-5 sm:p-6 transition-all duration-200 hover:-translate-y-0.5 hover:z-10 cursor-pointer"
-                  style="background-color: var(--blog-surface); border-color: var(--blog-border);"
-                >
+              <div
+                bind:this={homeCardsContainer}
+                class="lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain no-scrollbar scroll-smooth pt-2.5 pb-3 px-1 space-y-3.5"
+              >
+                {#each displayedHomePosts as post, i (post.slug)}
+                  <article
+                    
+                    data-home-card
+                    class="group relative flex flex-col justify-between gap-3.5 rounded-none border p-5 sm:p-6 transition-colors duration-150 hover:-translate-y-0.5 hover:z-10 cursor-pointer"
+                    style="background-color: var(--blog-surface); border-color: var(--blog-border);"
+                  >
                   <!-- Pixel-Perfect Corner Reticle Brackets on Hover -->
                   <span class="corner-reticle pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border-l-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
                   <span class="corner-reticle pointer-events-none absolute -top-px -right-px h-2.5 w-2.5 border-r-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
@@ -812,15 +552,15 @@
               </div>
 
               <div
-                data-lenis-prevent
-                class="flex-1 min-h-0 overflow-y-auto no-scrollbar scroll-smooth pt-2.5 pb-3 px-1 grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-max overscroll-contain"
+                class="lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain no-scrollbar scroll-smooth pt-2.5 pb-3 px-1 grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-max"
               >
-                {#each data.categoriesTree as cat}
+                {#each data.categoriesTree as cat, i}
                   <button
                     type="button"
+                    
                     data-category-card
                     onclick={() => selectCategory(cat)}
-                    class="group relative p-5 rounded-none border text-left transition-all duration-200 cursor-pointer flex flex-col justify-between gap-4"
+                    class="group relative p-5 rounded-none border text-left transition-colors duration-150 cursor-pointer flex flex-col justify-between gap-4"
                     style="background-color: var(--blog-surface); border-color: var(--blog-border);"
                   >
                     <!-- Pixel-Perfect Corner Reticle Brackets on Hover -->
@@ -859,7 +599,7 @@
             </div>
           {:else}
             <!-- 2B. Direct Category Posts Display with Back Button -->
-            <div data-category-detail class="flex flex-col h-full min-h-0 space-y-3">
+            <div data-category-detail class="flex flex-col lg:h-full lg:min-h-0 space-y-3">
               <div class="shrink-0 space-y-2 border-b pb-2.5" style="border-color: var(--blog-border);">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                   <div class="flex items-center gap-3">
@@ -915,55 +655,55 @@
               </div>
 
               <!-- Direct Posts List -->
-              <div
-                data-lenis-prevent
-                class="flex-1 min-h-0 overflow-y-auto no-scrollbar scroll-smooth pt-2.5 pb-3 px-1 space-y-3.5 overscroll-contain"
-              >
-                {#each categoryPosts as p (p.slug)}
-                  <article
-                    data-category-post-item
-                    data-list-item
-                    class="group relative p-5 rounded-none border transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between gap-3 hover:z-10 cursor-pointer"
-                    style="background-color: var(--blog-surface); border-color: var(--blog-border);"
-                  >
-                    <!-- Pixel-Perfect Corner Reticle Brackets on Hover -->
-                    <span class="corner-reticle pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border-l-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
-                    <span class="corner-reticle pointer-events-none absolute -top-px -right-px h-2.5 w-2.5 border-r-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
-                    <span class="corner-reticle pointer-events-none absolute -bottom-px -left-px h-2.5 w-2.5 border-b-2 border-l-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
-                    <span class="corner-reticle pointer-events-none absolute -bottom-px -right-px h-2.5 w-2.5 border-b-2 border-r-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                <div
+                  class="lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain no-scrollbar scroll-smooth pt-2.5 pb-3 px-1 space-y-3.5"
+                >
+                  {#each categoryPosts as p, i (p.slug)}
+                    <article
+                      
+                      data-category-post-item
+                      data-list-item
+                      class="group relative p-5 rounded-none border transition-colors duration-150 hover:-translate-y-0.5 flex flex-col justify-between gap-3 hover:z-10 cursor-pointer"
+                      style="background-color: var(--blog-surface); border-color: var(--blog-border);"
+                    >
+                      <!-- Pixel-Perfect Corner Reticle Brackets on Hover -->
+                      <span class="corner-reticle pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border-l-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                      <span class="corner-reticle pointer-events-none absolute -top-px -right-px h-2.5 w-2.5 border-r-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                      <span class="corner-reticle pointer-events-none absolute -bottom-px -left-px h-2.5 w-2.5 border-b-2 border-l-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                      <span class="corner-reticle pointer-events-none absolute -bottom-px -right-px h-2.5 w-2.5 border-b-2 border-r-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
 
-                    <span
-                      class="pointer-events-none absolute inset-x-0 top-0 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"
-                      style="background-color: var(--blog-accent);"
-                      aria-hidden="true"
-                    ></span>
+                      <span
+                        class="pointer-events-none absolute inset-x-0 top-0 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"
+                        style="background-color: var(--blog-accent);"
+                        aria-hidden="true"
+                      ></span>
 
-                    <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-[11px]" style="color: var(--blog-text-muted);">
-                      <time datetime={p.date}>{p.date}</time>
-                      <span>{p.readingTime}</span>
-                    </div>
-                    <a href={`/blog/${p.slug}`} class="block group/link">
-                      <h3 class="text-h3 font-display font-medium transition-colors" style="color: var(--blog-text-primary);">
-                        {p.title}
-                      </h3>
-                    </a>
-                    {#if p.description}
-                      <p class="font-serif italic text-caption line-clamp-2 leading-relaxed" style="color: var(--blog-text-muted);">{p.description}</p>
-                    {/if}
-                    <div class="flex items-center justify-between border-t pt-3 font-mono text-[11px]" style="border-color: var(--blog-border);">
-                      <div class="flex flex-wrap gap-1.5">
-                        {#each (p.tags || []) as t}
-                          <span class="text-[10px] px-2 py-0.5 rounded-none border transition-colors" style="background-color: var(--blog-bg); border-color: var(--blog-border); color: var(--blog-text-muted);">#{t}</span>
-                        {/each}
+                      <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-[11px]" style="color: var(--blog-text-muted);">
+                        <time datetime={p.date}>{p.date}</time>
+                        <span>{p.readingTime}</span>
                       </div>
-                      <a href={`/blog/${p.slug}`} class="inline-flex items-center gap-1 font-medium transition-colors hover:underline" style="color: var(--blog-text-primary);">
-                        <span>Read</span>
-                        <span class="transition-transform group-hover:translate-x-1" style="color: var(--blog-accent);">→</span>
+                      <a href={`/blog/${p.slug}`} class="block group/link">
+                        <h3 class="text-h3 font-display font-medium transition-colors" style="color: var(--blog-text-primary);">
+                          {p.title}
+                        </h3>
                       </a>
-                    </div>
-                  </article>
-                {/each}
-              </div>
+                      {#if p.description}
+                        <p class="font-serif italic text-caption line-clamp-2 leading-relaxed" style="color: var(--blog-text-muted);">{p.description}</p>
+                      {/if}
+                      <div class="flex items-center justify-between border-t pt-3 font-mono text-[11px]" style="border-color: var(--blog-border);">
+                        <div class="flex flex-wrap gap-1.5">
+                          {#each (p.tags || []) as t}
+                            <span class="text-[10px] px-2 py-0.5 rounded-none border transition-colors" style="background-color: var(--blog-bg); border-color: var(--blog-border); color: var(--blog-text-muted);">#{t}</span>
+                          {/each}
+                        </div>
+                        <a href={`/blog/${p.slug}`} class="inline-flex items-center gap-1 font-medium transition-colors hover:underline" style="color: var(--blog-text-primary);">
+                          <span>Read</span>
+                          <span class="transition-transform group-hover:translate-x-1" style="color: var(--blog-accent);">→</span>
+                        </a>
+                      </div>
+                    </article>
+                  {/each}
+                </div>
             </div>
           {/if}
         </div>
@@ -991,29 +731,29 @@
               </div>
 
               <!-- Tag Badges Grid -->
-              <div
-                data-lenis-prevent
-                class="flex-1 min-h-0 overflow-y-auto no-scrollbar scroll-smooth pt-2.5 pb-3 px-1 flex flex-wrap gap-2.5 content-start overscroll-contain"
-              >
-                {#each data.tagsWithCount as t}
-                  <button
-                    type="button"
-                    data-tag-pill
-                    onclick={() => selectTag(t.name)}
-                    class="group inline-flex items-center gap-2 rounded-none px-3 py-2 transition-all duration-150 cursor-pointer border yorha-invert-hover"
-                    style="background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-primary);"
-                  >
-                    <span class="font-medium">#{t.name}</span>
-                    <span class="text-[10px] px-1.5 py-0.5 rounded-none border" style="background-color: var(--blog-bg); border-color: var(--blog-border); color: var(--blog-text-muted);">
-                      {t.count}
-                    </span>
-                  </button>
-                {/each}
-              </div>
+                <div
+                  class="lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain no-scrollbar scroll-smooth pt-2.5 pb-3 px-1 flex flex-wrap gap-2.5 content-start"
+                >
+                  {#each data.tagsWithCount as t, i}
+                    <button
+                      type="button"
+                      
+                      data-tag-pill
+                      onclick={() => selectTag(t.name)}
+                      class="group inline-flex items-center gap-2 rounded-none px-3 py-2 transition-colors duration-150 cursor-pointer border yorha-invert-hover"
+                      style="background-color: var(--blog-surface); border-color: var(--blog-border); color: var(--blog-text-primary);"
+                    >
+                      <span class="font-medium">#{t.name}</span>
+                      <span class="text-[10px] px-1.5 py-0.5 rounded-none border" style="background-color: var(--blog-bg); border-color: var(--blog-border); color: var(--blog-text-muted);">
+                        {t.count}
+                      </span>
+                    </button>
+                  {/each}
+                </div>
             </div>
           {:else}
             <!-- 3B. Direct Tag Posts Display with Back Button -->
-            <div data-tag-detail class="flex flex-col h-full min-h-0 space-y-3">
+            <div data-tag-detail class="flex flex-col lg:h-full lg:min-h-0 space-y-3">
               <div class="shrink-0 flex flex-wrap items-center justify-between gap-3 border-b pb-2.5" style="border-color: var(--blog-border);">
                 <div class="flex items-center gap-3">
                   <button
@@ -1037,62 +777,62 @@
               </div>
 
               <!-- Direct Tag Posts List -->
-              <div
-                data-lenis-prevent
-                class="flex-1 min-h-0 overflow-y-auto no-scrollbar scroll-smooth pt-2.5 pb-3 px-1 space-y-3.5 overscroll-contain"
-              >
-                {#each tagPosts as p (p.slug)}
-                  <article
-                    data-tag-post-item
-                    data-list-item
-                    class="group relative p-5 rounded-none border transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between gap-3 hover:z-10 cursor-pointer"
-                    style="background-color: var(--blog-surface); border-color: var(--blog-border);"
-                  >
-                    <!-- Pixel-Perfect Corner Reticle Brackets on Hover -->
-                    <span class="corner-reticle pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border-l-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
-                    <span class="corner-reticle pointer-events-none absolute -top-px -right-px h-2.5 w-2.5 border-r-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
-                    <span class="corner-reticle pointer-events-none absolute -bottom-px -left-px h-2.5 w-2.5 border-b-2 border-l-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
-                    <span class="corner-reticle pointer-events-none absolute -bottom-px -right-px h-2.5 w-2.5 border-b-2 border-r-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                <div
+                  class="lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain no-scrollbar scroll-smooth pt-2.5 pb-3 px-1 space-y-3.5"
+                >
+                  {#each tagPosts as p, i (p.slug)}
+                    <article
+                      
+                      data-tag-post-item
+                      data-list-item
+                      class="group relative p-5 rounded-none border transition-colors duration-150 hover:-translate-y-0.5 flex flex-col justify-between gap-3 hover:z-10 cursor-pointer"
+                      style="background-color: var(--blog-surface); border-color: var(--blog-border);"
+                    >
+                      <!-- Pixel-Perfect Corner Reticle Brackets on Hover -->
+                      <span class="corner-reticle pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border-l-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                      <span class="corner-reticle pointer-events-none absolute -top-px -right-px h-2.5 w-2.5 border-r-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                      <span class="corner-reticle pointer-events-none absolute -bottom-px -left-px h-2.5 w-2.5 border-b-2 border-l-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
+                      <span class="corner-reticle pointer-events-none absolute -bottom-px -right-px h-2.5 w-2.5 border-b-2 border-r-2 opacity-0 group-hover:opacity-100 transition-opacity" style="border-color: var(--blog-accent);" aria-hidden="true"></span>
 
-                    <span
-                      class="pointer-events-none absolute inset-x-0 top-0 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"
-                      style="background-color: var(--blog-accent);"
-                      aria-hidden="true"
-                    ></span>
+                      <span
+                        class="pointer-events-none absolute inset-x-0 top-0 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"
+                        style="background-color: var(--blog-accent);"
+                        aria-hidden="true"
+                      ></span>
 
-                    <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-[11px]" style="color: var(--blog-text-muted);">
-                      <time datetime={p.date}>{p.date}</time>
-                      <span>{p.readingTime}</span>
-                    </div>
-                    <a href={`/blog/${p.slug}`} class="block group/link">
-                      <h3 class="text-h3 font-display font-medium transition-colors" style="color: var(--blog-text-primary);">
-                        {p.title}
-                      </h3>
-                    </a>
-                    {#if p.description}
-                      <p class="font-serif italic text-caption line-clamp-2 leading-relaxed" style="color: var(--blog-text-muted);">{p.description}</p>
-                    {/if}
-                    <div class="flex items-center justify-between border-t pt-3 font-mono text-[11px]" style="border-color: var(--blog-border);">
-                      <div class="flex flex-wrap gap-1.5">
-                        {#each (p.tags || []) as t}
-                          <span class="text-[10px] px-2 py-0.5 rounded-none border transition-colors" style="background-color: var(--blog-bg); border-color: var(--blog-border); color: var(--blog-text-muted);">#{t}</span>
-                        {/each}
+                      <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-[11px]" style="color: var(--blog-text-muted);">
+                        <time datetime={p.date}>{p.date}</time>
+                        <span>{p.readingTime}</span>
                       </div>
-                      <a href={`/blog/${p.slug}`} class="inline-flex items-center gap-1 font-medium transition-colors hover:underline" style="color: var(--blog-text-primary);">
-                        <span>Read</span>
-                        <span class="transition-transform group-hover:translate-x-1" style="color: var(--blog-accent);">→</span>
+                      <a href={`/blog/${p.slug}`} class="block group/link">
+                        <h3 class="text-h3 font-display font-medium transition-colors" style="color: var(--blog-text-primary);">
+                          {p.title}
+                        </h3>
                       </a>
-                    </div>
-                  </article>
-                {/each}
-              </div>
+                      {#if p.description}
+                        <p class="font-serif italic text-caption line-clamp-2 leading-relaxed" style="color: var(--blog-text-muted);">{p.description}</p>
+                      {/if}
+                      <div class="flex items-center justify-between border-t pt-3 font-mono text-[11px]" style="border-color: var(--blog-border);">
+                        <div class="flex flex-wrap gap-1.5">
+                          {#each (p.tags || []) as t}
+                            <span class="text-[10px] px-2 py-0.5 rounded-none border transition-colors" style="background-color: var(--blog-bg); border-color: var(--blog-border); color: var(--blog-text-muted);">#{t}</span>
+                          {/each}
+                        </div>
+                        <a href={`/blog/${p.slug}`} class="inline-flex items-center gap-1 font-medium transition-colors hover:underline" style="color: var(--blog-text-primary);">
+                          <span>Read</span>
+                          <span class="transition-transform group-hover:translate-x-1" style="color: var(--blog-accent);">→</span>
+                        </a>
+                      </div>
+                    </article>
+                  {/each}
+                </div>
             </div>
           {/if}
         </div>
 
       <!-- VIEW 4: ARCHIVE (Chronological timeline layout by year & date) -->
       {:else if activeTab === 'archive'}
-        <div class="flex flex-col h-full min-h-0 space-y-3">
+        <div class="flex flex-col lg:h-full lg:min-h-0 space-y-3">
           <div class="shrink-0 border-b pb-2.5 flex items-center justify-between" style="border-color: var(--blog-border);">
             <div>
               <h2 class="font-mono text-sm uppercase tracking-widest font-semibold" style="color: var(--blog-text-primary);">
@@ -1108,65 +848,69 @@
           </div>
 
           <!-- Chronological Timeline Scrollable Container with left padding to prevent clipping -->
-          <div
-            bind:this={archiveContainer}
-            data-lenis-prevent
-            class="flex-1 min-h-0 overflow-y-auto no-scrollbar scroll-smooth pl-4 pr-2 pt-3 space-y-10 overscroll-contain"
-          >
-            {#each data.archiveByYear as yearGroup}
-              <div class="relative ml-4 pl-6 sm:pl-8 border-l space-y-4" style="border-color: var(--blog-border);">
-                <!-- Year Pill on Timeline (with ✦ symbol - with ml-4 & pl-4 this is 28px away from left edge, completely unclipped!) -->
-                <div class="absolute -left-3 top-0 flex items-center gap-2">
-                  <span
-                    class="h-6 w-6 rounded-none border flex items-center justify-center font-mono text-[10px] font-bold"
-                    style="border-color: var(--blog-accent); background-color: var(--blog-bg); color: var(--blog-accent);"
-                  >
-                    ✦
-                  </span>
-                </div>
+            <div
+              bind:this={archiveContainer}
+              class="lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain no-scrollbar scroll-smooth pl-4 pr-2 pt-3 space-y-10"
+            >
+              {#each data.archiveByYear as yearGroup, i}
+                <div
+                  
+                  data-archive-group class="relative ml-4 pl-6 sm:pl-8 border-l space-y-4"
+                  style="border-color: var(--blog-border);"
+                >
+                  <!-- Year Pill on Timeline (with ✦ symbol - with ml-4 & pl-4 this is 28px away from left edge, completely unclipped!) -->
+                  <div class="absolute -left-[12.5px] top-0.5 flex items-center gap-2">
+                    <span
+                      class="h-6 w-6 rounded-none border flex items-center justify-center font-mono text-[10px] font-bold"
+                      style="border-color: var(--blog-accent); background-color: var(--blog-bg); color: var(--blog-accent);"
+                    >
+                      ✦
+                    </span>
+                  </div>
 
-                <div class="flex items-baseline gap-3 pt-0.5">
-                  <h3 class="font-mono text-xl font-bold tracking-tight" style="color: var(--blog-text-primary);">
-                    {yearGroup.year}
-                  </h3>
-                  <span class="font-mono text-[11px] uppercase tracking-wider" style="color: var(--blog-text-muted);">
-                    ({yearGroup.count} {yearGroup.count === 1 ? 'publication' : 'publications'})
-                  </span>
-                </div>
+                  <div class="flex items-baseline gap-3 pt-0.5">
+                    <h3 class="font-mono text-xl font-bold tracking-tight" style="color: var(--blog-text-primary);">
+                      {yearGroup.year}
+                    </h3>
+                    <span class="font-mono text-[11px] uppercase tracking-wider" style="color: var(--blog-text-muted);">
+                      ({yearGroup.count} {yearGroup.count === 1 ? 'publication' : 'publications'})
+                    </span>
+                  </div>
 
-                <!-- Articles in Year -->
-                <ul class="space-y-2.5">
-                  {#each yearGroup.posts as p (p.slug)}
-                    <li data-archive-item data-list-item>
-                      <a
-                        href={`/blog/${p.slug}`}
-                        class="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-none border transition-all duration-150 hover:translate-x-1 cursor-pointer"
-                        style="background-color: var(--blog-surface); border-color: var(--blog-border);"
-                      >
-                        <div class="flex items-center gap-3">
-                          <span class="font-mono text-[11px] shrink-0" style="color: var(--blog-text-muted);">
-                            {p.date ? p.date.slice(5) : '—'}
-                          </span>
-                          <span class="text-body transition-colors" style="color: var(--blog-text-primary);">
-                            {p.title}
-                          </span>
-                        </div>
-
-                        <div class="flex items-center gap-3 font-mono text-[10px] shrink-0" style="color: var(--blog-text-muted);">
-                          {#if p.categories && p.categories.length > 0}
-                            <span class="border px-2 py-0.5 rounded-none uppercase tracking-wider transition-colors" style="background-color: var(--blog-bg); border-color: var(--blog-border); color: var(--blog-text-muted);">
-                              {p.categories[0]}
+                  <!-- Articles in Year -->
+                  <ul class="space-y-2.5">
+                    {#each yearGroup.posts as p (p.slug)}
+                      <li data-archive-item data-list-item>
+                        <a
+                          href={`/blog/${p.slug}`}
+                          class="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-none border transition-all duration-150 hover:translate-x-1 cursor-pointer"
+                          style="background-color: var(--blog-surface); border-color: var(--blog-border);"
+                        >
+                          <div class="flex items-center gap-3">
+                            <span class="font-mono text-[11px] shrink-0" style="color: var(--blog-text-muted);">
+                              {p.date ? p.date.slice(5) : '—'}
                             </span>
-                          {/if}
-                          <span class="transition-all group-hover:translate-x-1" style="color: var(--blog-accent);">→</span>
-                        </div>
-                      </a>
-                    </li>
-                  {/each}
-                </ul>
-              </div>
-            {/each}
-          </div>
+                            <span class="text-body transition-colors" style="color: var(--blog-text-primary);">
+                              {p.title}
+                            </span>
+                          </div>
+
+                          <div class="flex items-center gap-3 font-mono text-[10px] shrink-0" style="color: var(--blog-text-muted);">
+                            {#if p.categories && p.categories.length > 0}
+                              <span class="hidden sm:inline-block px-1.5 py-0.5 border uppercase tracking-wider" style="background-color: var(--blog-bg); border-color: var(--blog-border);">
+                                {p.categories[0]}
+                              </span>
+                            {/if}
+                            <span>{p.readingTime}</span>
+                            <span class="transition-transform group-hover:translate-x-1" style="color: var(--blog-accent);">→</span>
+                          </div>
+                        </a>
+                      </li>
+                    {/each}
+                  </ul>
+                </div>
+              {/each}
+            </div>
         </div>
       {/if}
     </main>

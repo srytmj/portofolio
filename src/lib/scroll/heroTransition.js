@@ -43,14 +43,17 @@ export function createHeroTransition(cfg) {
   }
 
   const gentle = mode === 'lite';
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const isTablet = typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth < 1024;
+  const endDistance = isMobile ? '+=40%' : isTablet ? '+=60%' : (gentle ? '+=75%' : '+=90%');
 
   const ctx = gsap.context(() => {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger,
         start: 'top top',
-        end: gentle ? '+=110%' : '+=140%',
-        scrub: 0.6,
+        end: endDistance,
+        scrub: isMobile ? 0.3 : 0.6,
         pin: pinTarget,
         pinSpacing: true,
         anticipatePin: 1,

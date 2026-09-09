@@ -211,7 +211,8 @@
 </script>
 
 <div
-  class="relative aspect-[3/4] w-full overflow-hidden rounded-lg border border-white/10 bg-black"
+  class="relative aspect-[3/4] w-full overflow-hidden rounded-none border"
+  style="border-color: var(--yorha-border); background-color: var(--yorha-surface);"
 >
   <canvas bind:this={canvas} class="h-full w-full" aria-hidden="true"></canvas>
   <span class="sr-only">Auto-playing snake — placeholder for a portrait</span>

@@ -97,8 +97,9 @@
     class="group flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] opacity-70 hover:opacity-100 transition-opacity focus:outline-none"
     style="color: var(--yorha-text-primary);"
   >
+    <span class="sm:hidden border border-current/20 bg-black/20 px-2 py-1 backdrop-blur-sm font-semibold tracking-wider">[ MENU ]</span>
     <span class="hidden sm:inline">MENU</span>
-    <span class="flex items-center border border-current/20 bg-black/20 px-2 py-0.5 backdrop-blur-sm transition-colors group-hover:border-current/40">
+    <span class="hidden sm:flex items-center border border-current/20 bg-black/20 px-2 py-0.5 backdrop-blur-sm transition-colors group-hover:border-current/40">
       <span>⌘K</span>
     </span>
   </button>

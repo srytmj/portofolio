@@ -16,7 +16,7 @@
 
 <div
   aria-live="polite"
-  class="fixed bottom-6 left-6 sm:bottom-7 sm:left-14 z-40 font-mono select-none pointer-events-none"
+  class="hidden sm:block fixed bottom-6 left-6 sm:bottom-7 sm:left-14 z-40 font-mono select-none pointer-events-none"
 >
   <div class="relative flex items-end min-h-[42px]">
     <!-- Constellation Figure & Celestial Coordinates (Visible in Main Hero Section) -->

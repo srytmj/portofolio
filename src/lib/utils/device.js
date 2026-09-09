@@ -55,9 +55,9 @@ export function detectTier() {
   const coarse = isTouchDevice();
   const weakGpu = hasWeakGpu(gl);
 
-  // Bail straight to CSS on genuinely weak hardware.
-  if (cores <= 4 || mem <= 3) return 'static';
-  if (effectiveType === '3g' && coarse) return 'static';
+  // Bail straight to CSS only on genuinely unusable hardware (e.g. single core or slow 2G)
+  if (cores < 2 || (mem && mem <= 1)) return 'static';
+  if (effectiveType === 'slow-2g' || effectiveType === '2g') return 'static';
 
   if (coarse || smallViewport || cores <= 6 || weakGpu) return 'lite';
   return 'full';
