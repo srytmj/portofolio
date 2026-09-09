@@ -95,51 +95,34 @@
 {#if isSupported}
   <div
     bind:this={cursorEl}
-    class="custom-cursor-wrapper pointer-events-none fixed top-0 left-0 z-[999999] will-change-transform select-none"
+    class="cursor-root pointer-events-none fixed top-0 left-0 z-[999999] select-none"
     class:is-hovering={isHovering}
     class:is-down={isDown}
-    style="opacity: {isVisible ? 1 : 0};"
+    style:opacity={isVisible ? 1 : 0}
+    style:will-change="transform"
     aria-hidden="true"
   >
     <div class="custom-cursor-cross">
       <svg
-        width="20"
-        height="20"
-        viewBox="0 0 20 20"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        class="overflow-visible"
+        class="overflow-visible text-white"
       >
-        <!-- Horizontal line -->
-        <line
-          x1="3"
-          y1="10"
-          x2="17"
-          y2="10"
-          stroke="#ffffff"
-          stroke-width="2"
-          stroke-linecap="square"
-        />
-        <!-- Vertical line -->
-        <line
-          x1="10"
-          y1="3"
-          x2="10"
-          y2="17"
-          stroke="#ffffff"
-          stroke-width="2"
-          stroke-linecap="square"
-        />
+        <!-- Tactical Crosshair with center dot -->
+        <path d="M12 2 L12 8 M12 16 L12 22 M2 12 L8 12 M16 12 L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="square" />
+        <circle cx="12" cy="12" r="1.5" fill="currentColor" />
       </svg>
     </div>
   </div>
 {/if}
 
 <style>
-  .custom-cursor-wrapper {
-    margin-left: -10px;
-    margin-top: -10px;
-    mix-blend-mode: difference;
+  .cursor-root {
+    margin-left: -12px;
+    margin-top: -12px;
     transition: opacity 0.15s ease;
   }
 
@@ -148,25 +131,24 @@
     align-items: center;
     justify-content: center;
     transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Stark drop-shadow guarantees visibility on both Dark (black) and Light (white) themes */
+    filter: drop-shadow(0px 0px 1px rgba(0,0,0,0.9)) drop-shadow(0px 0px 3px rgba(0,0,0,0.6));
   }
 
-  /* When hovering interactive elements, subtly scale up for responsive targeting feedback */
-  .custom-cursor-wrapper.is-hovering .custom-cursor-cross {
-    transform: scale(1.4);
+  /* When hovering interactive elements, spin 45deg and scale up for tactical lock-on */
+  .is-hovering .custom-cursor-cross {
+    transform: scale(1.2) rotate(45deg);
   }
 
-  /* When mouse is pressed down, scale down slightly */
-  .custom-cursor-wrapper.is-down .custom-cursor-cross {
-    transform: scale(0.85);
+  /* When mouse is pressed down, scale down slightly and spin back */
+  .is-down .custom-cursor-cross {
+    transform: scale(0.85) rotate(0deg);
   }
 
   /* Strictly hide on touch devices */
   @media (hover: none), (pointer: coarse) {
-    .custom-cursor-wrapper {
+    .custom-cursor-cross {
       display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
     }
   }
 </style>

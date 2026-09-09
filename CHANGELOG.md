@@ -6,6 +6,36 @@ Format changelog ini mengacu pada [Keep a Changelog](https://keepachangelog.com/
 
 ---
 
+## [Unreleased] - 2026-09-10
+
+### Added
+- **[01:20 WIB] Sistem Opening Sequence Baru Berbasis Kalibrasi Optik YoRHa (`lib/components/intro/`, `(site)/+page.svelte`):**
+  - Menambahkan direktori `src/lib/components/intro/` berisi tiga konsep opening sequence: `IntroCalibration.svelte` (dipakai di produksi), `IntroTacticalCalibration.svelte`, dan `IntroConstellation.svelte`.
+  - `IntroCalibration.svelte` menjalankan koreografi lima fase murni tanpa teks: scanline vertikal menyapu layar, reticle HUD dan crosshair menyala, rotasi ratchet 45 derajat dengan pulsa aperture radar, double-pulse lock-on, lalu shutter expansion yang membuka empat sudut bracket ke luar layar.
+  - Timeline disinkronkan dengan status muat browser sungguhan (`window.load`) plus durasi tampil minimum 1200ms, sehingga intro tidak selesai sebelum halaman benar-benar siap.
+  - Halaman utama beralih dari `IntroSequence.svelte` (konsep dot-field lama) ke `IntroCalibration.svelte`.
+- **[01:20 WIB] Tombol Return to Hero pada Telemetri Sudut (`CornerTelemetry.svelte`):**
+  - Menambahkan tombol `← RETURN TO HERO` yang muncul lewat animasi `grid-template-rows: 0fr → 1fr` hanya ketika pengunjung berada di subhalaman (`/blog`, `/projects`), tepat di atas LiveClock.
+- **[01:20 WIB] Marquee Telemetri pada Seam Transisi Hero (`(site)/+page.svelte`, `app.css`):**
+  - Mengganti seam HUD statis menjadi marquee horizontal berulang (`@keyframes marquee`, kelas `.animate-marquee`, siklus 20 detik) berisi empat blok telemetri: `SYS_ENGAGE // SECTOR_02_MONITOR`, `HUD_MATRIX_ONLINE`, `ORBIT → TERRESTRIAL`, dan `DATA_LINK_ESTABLISHED [0x00FF9]`.
+  - Menambahkan keyframe `crtTurnOn` dan kelas `.animate-crt-on` untuk efek nyala layar CRT.
+- **[01:20 WIB] Hook Animasi Header Section (`Section.svelte`):**
+  - Menambahkan penanda `data-anim-badge` pada kode `SEC // 0x`, `data-anim-line` pada hairline, dan `data-anim-scan` pada berkas sapuan cahaya, agar `sectionAnim.js` dapat mengoreografikan header tiap section.
+- **[01:20 WIB] Route Eksperimen (`(site)/sandbox/`, `(site)/test-intro/`):**
+  - Menambahkan dua route lokal untuk membandingkan konsep opening sequence dan menguji komponen secara terisolasi.
+
+### Changed
+- **[01:20 WIB] Perombakan Custom Cursor Taktis (`CustomCursor.svelte`):**
+  - Mengganti dua elemen `<line>` SVG 20px dengan satu `<path>` crosshair 24px bercelah plus titik pusat (`<circle r=1.5>`).
+  - Meninggalkan `mix-blend-mode: difference` dan beralih ke `currentColor` putih dengan dua lapis `drop-shadow`, sehingga kursor tetap terbaca di atas permukaan terang maupun gelap tanpa bergantung pada mode blending.
+  - Interaksi hover kini memutar crosshair 45 derajat (`scale(1.2) rotate(45deg)`) sebagai umpan balik lock-on, dan kembali lurus saat ditekan.
+- **[01:20 WIB] Penyeragaman Tipografi Prosa ke Sans (`About.svelte`, `Hero.svelte`):**
+  - Mengubah paragraf intro dan body About dari `font-serif italic` (Baskervville) menjadi `font-sans tracking-wide` (Epilogue) demi keterbacaan pada layar kecil.
+  - Mengubah margin note rasi bintang di hero dari serif italic 13px menjadi sans 11px dengan opacity 70.
+  - Menghapus empat corner bracket pada kartu Availability agar kartu tidak bersaing dengan kartu proyek.
+
+---
+
 ## [Unreleased] - 2026-09-09
 
 ### Fixed

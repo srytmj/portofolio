@@ -6,7 +6,6 @@
   import { gsap } from 'gsap';
   import { ease, dur } from '$lib/motion.js';
   import { portal } from '$lib/actions/portal.js';
-  import LeftEdgeReturn from '$lib/components/LeftEdgeReturn.svelte';
   import { blogTheme } from '$lib/blog/blogTheme.js';
 
   let { data } = $props();
@@ -363,9 +362,6 @@
 </svelte:head>
 
 <div class="blog-reading-view min-h-screen pt-24 sm:pt-28 pb-28 yorha-tech-bg-reader">
-  <!-- Tactical Return Trigger on Left Edge Hover -->
-  <LeftEdgeReturn />
-
   <div class="wrap relative z-10">
     <!-- Top Navigation / Breadcrumb & Quick Search Trigger (Non-Sticky, Traditional Flow) -->
     <nav

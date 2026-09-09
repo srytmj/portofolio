@@ -2,16 +2,17 @@
   import { page } from '$app/state';
   import { constellation } from '$lib/stores/constellation.svelte.js';
   import LiveClock from './LiveClock.svelte';
+  import { returnToMainPage } from '$lib/utils/navigationState.js';
 
   /** @type {{ activeId?: string }} */
   let { activeId = '' } = $props();
 
-  // On home page ('/'): show constellation info when in hero section (activeId === ''),
-  // and smoothly fade in LiveClock when entering About and subsequent sections (activeId !== '').
-  // On subpages ('/projects', '/blog', etc.): always show LiveClock.
   const isHome = $derived(!page?.url || page.url.pathname === '/');
   const showClock = $derived(!isHome || activeId !== '');
   const figure = $derived(constellation.figure);
+  
+  // Animate the button in only when we're definitively on a subpage (blog, projects, etc)
+  const isSubpage = $derived(!isHome);
 </script>
 
 <div
@@ -31,10 +32,30 @@
       </span>
     </div>
 
-    <!-- Realtime Regional Clock HUD (Fades in when entering About section & beyond) -->
+    <!-- Realtime Regional Clock HUD & Return Button (Fades in when entering About section & beyond) -->
     <div
       class="absolute bottom-0 left-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] {showClock ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-2 pointer-events-none'}"
     >
+      <!-- Return Button container (animates height and opacity when navigating to subpages) -->
+      <div
+        class="grid transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-auto"
+        style="grid-template-rows: {isSubpage ? '1fr' : '0fr'}; opacity: {isSubpage ? '1' : '0'}; margin-bottom: {isSubpage ? '12px' : '0px'};"
+      >
+        <div class="overflow-hidden">
+          <button
+            type="button"
+            onclick={returnToMainPage}
+            title="Return to Hero"
+            class="flex items-center gap-2 px-3 py-1.5 border transition-colors yorha-invert-hover cursor-pointer font-mono"
+            style="background-color: var(--yorha-surface); border-color: var(--yorha-border); color: var(--yorha-text-primary);"
+          >
+            <span style="color: var(--yorha-accent);">←</span>
+            <span class="text-[10px] uppercase tracking-widest font-semibold whitespace-nowrap">RETURN TO HERO</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Clock -->
       <LiveClock />
     </div>
   </div>

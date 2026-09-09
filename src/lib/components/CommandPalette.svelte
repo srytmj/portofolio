@@ -168,6 +168,9 @@
       import('$lib/panel/services.js').then((m) => (svcGroups = m.groups));
   });
 
+  let typedPlaceholder = $state('');
+  let typeInterval;
+
   function openPalette() {
     if (show) return;
     owner = isOwner();
@@ -176,6 +179,18 @@
     closing = false;
     restoreFocus = document.activeElement;
     show = true;
+    
+    // Typewriter effect
+    typedPlaceholder = '';
+    clearInterval(typeInterval);
+    const targetText = owner ? 'SEARCH SERVICES AND NODES_' : 'AWAITING_COMMAND_INPUT_';
+    let i = 0;
+    typeInterval = setInterval(() => {
+      typedPlaceholder += targetText.charAt(i);
+      i++;
+      if (i >= targetText.length) clearInterval(typeInterval);
+    }, 25);
+
     tick().then(() => {
       input?.focus();
     });
@@ -184,6 +199,7 @@
   function close() {
     if (!show || closing) return;
     closing = true;
+    clearInterval(typeInterval);
     /** @type {HTMLElement} */ (restoreFocus)?.focus?.();
     show = false;
   }
@@ -249,8 +265,7 @@
     role="presentation"
   >
     <div
-      transition:fly={{ y: -8, duration: 150 }}
-      class="relative flex max-h-[62vh] w-full max-w-lg flex-col overflow-hidden rounded-none border font-sans bg-black"
+      class="animate-crt-on relative flex max-h-[62vh] w-full max-w-lg flex-col overflow-hidden rounded-none border font-sans bg-black"
       style="background-color: var(--yorha-surface); border-color: var(--yorha-border); color: var(--yorha-text-primary);"
       onclick={(e) => e.stopPropagation()}
       role="dialog"
@@ -258,11 +273,10 @@
       aria-label="Command palette"
       tabindex="-1"
     >
-      <!-- Tactical Corner Brackets -->
-      <span class="pointer-events-none absolute -top-px -left-px h-3 w-3 border-l-2 border-t-2 z-30" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
-      <span class="pointer-events-none absolute -top-px -right-px h-3 w-3 border-r-2 border-t-2 z-30" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
-      <span class="pointer-events-none absolute -bottom-px -left-px h-3 w-3 border-b-2 border-l-2 z-30" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
-      <span class="pointer-events-none absolute -bottom-px -right-px h-3 w-3 border-b-2 border-r-2 z-30" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
+      <span class="pointer-events-none absolute top-[-1px] left-[-1px] h-3 w-3 border-l-2 border-t-2 z-30" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
+      <span class="pointer-events-none absolute top-[-1px] right-[-1px] h-3 w-3 border-r-2 border-t-2 z-30" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
+      <span class="pointer-events-none absolute bottom-[-2px] left-[-1px] h-3 w-3 border-b-2 border-l-2 z-30" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
+      <span class="pointer-events-none absolute bottom-[-2px] right-[-1px] h-3 w-3 border-b-2 border-r-2 z-30" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
 
       <div data-m class="flex items-center gap-3 border-b px-4" style="border-color: var(--yorha-border); background-color: var(--yorha-bg);">
         <span class="font-mono text-xs font-bold" style="color: var(--yorha-accent);" aria-hidden="true">&gt;_</span>
@@ -271,8 +285,8 @@
           bind:value={query}
           oninput={() => (sel = 0)}
           type="text"
-          placeholder={owner ? 'SEARCH SERVICES AND NODES' : 'SEARCH PAGES, ARCHIVES, OR SYSTEMS'}
-          class="w-full rounded-none bg-transparent py-3.5 font-mono text-xs uppercase placeholder:normal-case focus:outline-none"
+          placeholder={typedPlaceholder}
+          class="w-full rounded-none bg-transparent py-3.5 font-mono text-xs uppercase placeholder:normal-case focus:outline-none placeholder:opacity-50"
           style="color: var(--yorha-text-primary);"
           autocomplete="off"
           autocapitalize="off"

@@ -167,7 +167,7 @@
         </a>
 
         <div
-          class="flex flex-col gap-2.5 border-t border-current/15 pt-3.5 font-serif text-caption italic leading-[1.6] opacity-60 lg:text-right"
+          class="flex flex-col gap-2.5 border-t border-current/15 pt-3.5 font-sans text-[11px] leading-[1.6] opacity-70 lg:text-right tracking-wide"
           style="color: var(--yorha-text-primary);"
         >
           {#each identity.trivia as line}

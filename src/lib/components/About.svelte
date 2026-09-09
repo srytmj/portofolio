@@ -80,10 +80,7 @@
       <!-- Availability Card (Tablet / Desktop only) -->
       {#if availability}
         <div class="hidden sm:block relative rounded-none border border-current/15 p-3.5 bg-current/[0.02] font-mono text-[11px] space-y-2 transition-all duration-200 hover:border-current/40 group">
-          <span class="pointer-events-none absolute -top-px -left-px h-1.5 w-1.5 border-l border-t border-current opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
-          <span class="pointer-events-none absolute -top-px -right-px h-1.5 w-1.5 border-r border-t border-current opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
-          <span class="pointer-events-none absolute -bottom-px -left-px h-1.5 w-1.5 border-b border-l border-current opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
-          <span class="pointer-events-none absolute -bottom-px -right-px h-1.5 w-1.5 border-b border-r border-current opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></span>
+
 
           <div class="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] leading-none font-semibold" style="color: var(--yorha-accent);">
             <span class="h-1.5 w-1.5 shrink-0 rounded-full group-hover:scale-125 transition-transform duration-200 -translate-y-[0.5px]" style="background-color: var(--yorha-accent);"></span>
@@ -115,11 +112,11 @@
     </div>
 
     <div class="space-y-6">
-      <p data-anim class="max-w-[var(--measure)] text-balance text-lead font-medium font-serif italic leading-relaxed" style="color: var(--yorha-text-primary);">
+      <p data-anim class="max-w-[var(--measure)] text-balance text-lead font-medium font-sans leading-relaxed tracking-wide" style="color: var(--yorha-text-primary);">
         {about.intro}
       </p>
       {#each about.body as para}
-        <p data-anim class="max-w-[var(--measure)] text-body font-serif leading-relaxed" style="color: var(--yorha-text-primary); opacity: 0.85;">
+        <p data-anim class="max-w-[var(--measure)] text-body font-sans leading-relaxed tracking-wide" style="color: var(--yorha-text-primary); opacity: 0.85;">
           {para}
         </p>
       {/each}

@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@threlte/core": "^8.6.0",
+    "animejs": "^4.5.0",
     "gray-matter": "^4.0.3",
     "gsap": "^3.12.5",
     "js-yaml": "^5.4.1",

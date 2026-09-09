@@ -3,7 +3,7 @@
   import { page } from '$app/state';
   import { gsap } from 'gsap';
   import { ease, dur } from '$lib/motion.js';
-  import LeftEdgeReturn from '$lib/components/LeftEdgeReturn.svelte';
+
 
   let { data } = $props();
 
@@ -251,9 +251,6 @@
 
 <div data-lenis-prevent class="w-full min-h-screen lg:h-screen lg:max-h-screen lg:overflow-hidden yorha-tech-bg flex flex-col">
   <section class="wrap pt-20 lg:pt-20 pb-6 lg:pb-3 flex-1 min-h-0 flex flex-col justify-between">
-  <!-- Tactical Return Trigger on Left Edge Hover -->
-  <LeftEdgeReturn />
-
   <!-- Breadcrumb & Compact Header with Theme Switcher -->
   <header data-blog-header class="shrink-0 mb-3 space-y-1.5 border-b border-white/10 pb-2.5">
     <div class="flex items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.2em]">

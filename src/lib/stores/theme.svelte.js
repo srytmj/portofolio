@@ -53,6 +53,7 @@ class ThemeManager {
     if (!browser) return;
     const next = this.current === 'dark' ? 'light' : 'dark';
 
+    // Safe, professional smooth transition to avoid flash/epilepsy
     document.documentElement.classList.add('theme-transitioning');
     this.set(next);
 

@@ -6,6 +6,7 @@
   import CornerTelemetry from '$lib/components/CornerTelemetry.svelte';
   import CommandPalette from '$lib/components/CommandPalette.svelte';
   import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+  import CustomCursor from '$lib/components/CustomCursor.svelte';
   import { theme } from '$lib/stores/theme.svelte.js';
 
   let { children } = $props();
@@ -108,6 +109,7 @@
 <SideNav {activeId} />
 <CornerTelemetry {activeId} />
 <CommandPalette />
+<CustomCursor />
 
 <main id="top">
   {@render children()}

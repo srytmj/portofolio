@@ -2,7 +2,7 @@
   import { onMount, tick } from 'svelte';
   import { gsap } from 'gsap';
   import ProjectModal from '$lib/components/ProjectModal.svelte';
-  import LeftEdgeReturn from '$lib/components/LeftEdgeReturn.svelte';
+  import { sectionAnim } from '$lib/scroll/sectionAnim.js';
 
   let { data } = $props();
 
@@ -118,11 +118,8 @@
 
 <div class="w-full min-h-screen yorha-tech-bg">
   <section class="wrap pt-32 pb-28 min-h-screen" style="color: var(--yorha-text-primary);">
-  <!-- Tactical Return Trigger on Left Edge Hover -->
-  <LeftEdgeReturn />
-
   <!-- Header -->
-  <header class="mb-12 max-w-[var(--measure)] space-y-4">
+  <header use:sectionAnim class="mb-12 max-w-[var(--measure)] space-y-4">
     <div class="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em]" style="color: var(--yorha-text-muted);">
       <a href="/" class="hover:underline transition-colors" style="color: var(--yorha-text-muted);">Home</a>
       <span>/</span>
@@ -206,11 +203,19 @@
             class="group relative flex flex-col justify-between gap-6 rounded-none border border-transparent hover:border-current/40 hover:bg-current/[0.02] p-5 sm:p-7 sm:p-8 transition-all duration-150 hover:-translate-y-0.5 cursor-pointer"
             style="background-color: var(--yorha-surface);"
           >
-          <!-- Tactical Reticle Brackets on Hover -->
-          <span class="pointer-events-none absolute -top-px -left-px h-2 w-2 border-l-2 border-t-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
-          <span class="pointer-events-none absolute -top-px -right-px h-2 w-2 border-r-2 border-t-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
-          <span class="pointer-events-none absolute -bottom-px -left-px h-2 w-2 border-b-2 border-l-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
-          <span class="pointer-events-none absolute -bottom-px -right-px h-2 w-2 border-b-2 border-r-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" style="border-color: var(--yorha-accent);" aria-hidden="true"></span>
+          <!-- Tactical Corner Reticle Brackets (SVG for perfect pixel alignment) -->
+          <svg class="pointer-events-none absolute -top-px -left-px w-2 h-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" style="color: var(--yorha-accent);" viewBox="0 0 8 8" fill="none">
+            <path d="M0 8V0H8" stroke="currentColor" stroke-width="2" />
+          </svg>
+          <svg class="pointer-events-none absolute -top-px -right-px w-2 h-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" style="color: var(--yorha-accent);" viewBox="0 0 8 8" fill="none">
+            <path d="M0 0H8V8" stroke="currentColor" stroke-width="2" />
+          </svg>
+          <svg class="pointer-events-none absolute -bottom-px -left-px w-2 h-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" style="color: var(--yorha-accent);" viewBox="0 0 8 8" fill="none">
+            <path d="M0 0V8H8" stroke="currentColor" stroke-width="2" />
+          </svg>
+          <svg class="pointer-events-none absolute -bottom-px -right-px w-2 h-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" style="color: var(--yorha-accent);" viewBox="0 0 8 8" fill="none">
+            <path d="M8 0V8H0" stroke="currentColor" stroke-width="2" />
+          </svg>
 
           <span
             class="pointer-events-none absolute inset-x-0 top-0 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"

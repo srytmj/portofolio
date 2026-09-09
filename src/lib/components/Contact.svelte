@@ -66,20 +66,9 @@
     <header class="relative mb-6 sm:mb-10 pb-3 sm:pb-4">
       <div class="flex items-end justify-between gap-4 pb-1">
         <h2
-          class="flex flex-wrap gap-x-[0.28em] text-h2 font-semibold uppercase tracking-tight font-display"
+          class="text-h2 font-semibold uppercase tracking-tight font-display"
         >
-          {#each words as word, i}
-            <span class="inline-block overflow-hidden pb-1">
-              <span
-                data-anim-word
-                data-dir={i % 2 === 0 ? 'left' : 'right'}
-                data-glitch={word}
-                class="chromatic-glitch inline-block origin-bottom will-change-transform"
-              >
-                {word}
-              </span>
-            </span>
-          {/each}
+          {headings.contact}
         </h2>
         <div class="overflow-hidden pb-1">
           <span
@@ -109,7 +98,7 @@
     <!-- Intro Prose (Baskervville) & Blog Link Navigation -->
     <div data-anim class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6">
       <div class="max-w-[var(--measure)]">
-        <p class="font-serif text-lead italic leading-relaxed" style="color: var(--yorha-text-primary); opacity: 0.85;">
+        <p class="font-sans text-lead leading-relaxed tracking-wide" style="color: var(--yorha-text-primary); opacity: 0.85;">
           {contact.body}
         </p>
       </div>
@@ -132,11 +121,10 @@
         class="group relative flex flex-col justify-between border border-current/15 p-4 sm:p-6 sm:p-7 transition-all duration-150 hover:-translate-y-0.5 hover:border-current/40"
         style="background-color: var(--yorha-surface);"
       >
-        <!-- Pixel-Perfect Corner Reticle Brackets -->
-        <span class="pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border-l-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute -top-px -right-px h-2.5 w-2.5 border-r-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute -bottom-px -left-px h-2.5 w-2.5 border-b-2 border-l-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute -bottom-px -right-px h-2.5 w-2.5 border-b-2 border-r-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute top-[-1px] left-[-1px] h-2.5 w-2.5 border-l-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute top-[-1px] right-[-1px] h-2.5 w-2.5 border-r-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute bottom-[-2px] left-[-1px] h-2.5 w-2.5 border-b-2 border-l-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute bottom-[-2px] right-[-1px] h-2.5 w-2.5 border-b-2 border-r-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
 
         <!-- Top Sweep Line on Hover -->
         <span
@@ -158,7 +146,7 @@
             EMAIL DISPATCH
           </h3>
 
-          <p class="mt-1.5 sm:mt-2 font-serif text-caption opacity-70 italic leading-relaxed line-clamp-2 sm:line-clamp-none">
+          <p class="mt-1.5 sm:mt-2 font-sans text-[11px] opacity-70 leading-relaxed line-clamp-2 sm:line-clamp-none tracking-wide">
             Fastest channel for infrastructure architecture, cloud contracts, or direct consulting.
           </p>
         </div>
@@ -188,11 +176,10 @@
         class="group relative flex flex-col justify-between border border-current/15 p-4 sm:p-6 sm:p-7 transition-all duration-150 hover:-translate-y-0.5 hover:border-current/40"
         style="background-color: var(--yorha-surface);"
       >
-        <!-- Pixel-Perfect Corner Reticle Brackets -->
-        <span class="pointer-events-none absolute -top-px -left-px h-2.5 w-2.5 border-l-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute -top-px -right-px h-2.5 w-2.5 border-r-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute -bottom-px -left-px h-2.5 w-2.5 border-b-2 border-l-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
-        <span class="pointer-events-none absolute -bottom-px -right-px h-2.5 w-2.5 border-b-2 border-r-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute top-[-1px] left-[-1px] h-2.5 w-2.5 border-l-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute top-[-1px] right-[-1px] h-2.5 w-2.5 border-r-2 border-t-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute bottom-[-2px] left-[-1px] h-2.5 w-2.5 border-b-2 border-l-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
+        <span class="pointer-events-none absolute bottom-[-2px] right-[-1px] h-2.5 w-2.5 border-b-2 border-r-2 border-current/40 group-hover:border-current transition-colors" aria-hidden="true"></span>
 
         <!-- Top Sweep Line on Hover -->
         <span
@@ -211,7 +198,7 @@
             CODESPACE & PROFILES
           </h3>
 
-          <p class="mt-1.5 sm:mt-2 font-serif text-caption opacity-70 italic leading-relaxed line-clamp-2 sm:line-clamp-none">
+          <p class="mt-1.5 sm:mt-2 font-sans text-[11px] opacity-70 leading-relaxed line-clamp-2 sm:line-clamp-none tracking-wide">
             Open-source infrastructure code repositories and professional career trajectory.
           </p>
         </div>
