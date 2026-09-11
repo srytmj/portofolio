@@ -6,6 +6,15 @@ Format changelog ini mengacu pada [Keep a Changelog](https://keepachangelog.com/
 
 ---
 
+## [Unreleased] - 2026-09-11
+
+### Added
+- **[12:40 WIB] Dockerfile & Nginx Config untuk Deployment Homelab (`Dockerfile`, `nginx.conf`):**
+  - Mengimplementasikan **Opsi 3** dari panduan deployment yang sudah ada di `README.md`/`AI_GUIDELINES.md` (sebelumnya baru didokumentasikan, belum ada berkasnya di repo).
+  - `Dockerfile` multi-stage: stage `builder` (`node:20-alpine`) menjalankan `npm ci` + `npm run build` menghasilkan folder `build/` statis (adapter-static), lalu stage runtime (`nginx:alpine`) hanya menyalin hasil build tersebut — image akhir tidak membawa toolchain Node.js sama sekali.
+  - `nginx.conf` dipisah dari `Dockerfile` (bukan `COPY <<EOF` heredoc seperti di dokumentasi) supaya tidak bergantung pada BuildKit heredoc syntax dan lebih mudah diedit terpisah. Isinya sama persis dengan konfigurasi Nginx yang sudah didokumentasikan: security headers, gzip, cache-control untuk `_app/immutable/` dan `assets/`, fallback `try_files` ke `404.html`.
+  - Dipicu oleh setup homelab (`homelab-ops` repo, sesi Claude Code terpisah) yang butuh berkas ini nyata untuk `docker compose up --build` di `docker-host` — bukan perubahan UI/fitur situs itu sendiri.
+
 ## [Unreleased] - 2026-09-10
 
 ### Fixed
