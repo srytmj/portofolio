@@ -10,6 +10,7 @@
   let selectedKind = $state('all');
   let openProject = $state(null);
   let openIndex = $state(0);
+  /** @type {HTMLInputElement | null} */ let searchInput = $state(null);
 
   const ITEMS_PER_PAGE = 6;
   let currentPage = $state(1);
@@ -21,7 +22,7 @@
   onMount(() => {
     window.scrollTo(0, 0);
     window.__lenis?.scrollTo(0, { immediate: true });
-    
+
     // Initial animation
     if (!reduce) {
       gsap.fromTo(
@@ -30,6 +31,15 @@
         { y: 0, opacity: 1, duration: 0.4, stagger: 0.05, ease: 'power2.out', clearProps: 'transform,opacity' }
       );
     }
+
+    function onKey(e) {
+      if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        searchInput?.focus();
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   });
 
   // Explicit handler when category filter is clicked
@@ -138,6 +148,7 @@
   <div class="mb-10 space-y-4 max-w-4xl">
     <div class="relative">
       <input
+        bind:this={searchInput}
         type="search"
         bind:value={searchQuery}
         placeholder="Search projects, architecture, tech stack (Laravel, Docker, AWS, Go, PostgreSQL)..."

@@ -1,10 +1,10 @@
 <script>
   import { tick, onMount } from 'svelte';
   import { fade, fly } from 'svelte/transition';
+  import { page } from '$app/state';
   import { portal } from '$lib/actions/portal.js';
   import { contact, projects } from '$lib/content/site.js';
   import { trivia } from '$lib/palette/trivia.js';
-  import { isOwner, unlock } from '$lib/palette/owner.js';
 
   const reduce =
     typeof window !== 'undefined' &&
@@ -13,8 +13,6 @@
   let show = $state(false);
   let query = $state('');
   let sel = $state(0);
-  let owner = $state(false);
-  /** @type {any[] | null} */ let svcGroups = $state(null);
   let closing = false;
 
   /** @type {HTMLElement | null} */ let backdrop = $state(null);
@@ -50,19 +48,6 @@
 
   const entries = $derived.by(() => {
     /** @type {any[]} */ const list = [];
-    if (owner) {
-      // Owner mode is just the homelab: nothing else.
-      for (const g of svcGroups ?? [])
-        for (const s of g.items)
-          list.push({
-            section: g.label,
-            label: s.name,
-            hint: s.url ? s.url.replace(/^https?:\/\//, '') : 'no url set',
-            disabled: !s.url,
-            run: () => s.url && openExternal(s.url)
-          });
-      return list;
-    }
     for (const n of nav)
       list.push({
         section: 'Navigate',
@@ -161,29 +146,21 @@
     );
   });
 
-  // Load the homelab service list only when the owner opens the palette, so it
-  // stays out of the main bundle.
-  $effect(() => {
-    if (show && owner && !svcGroups)
-      import('$lib/panel/services.js').then((m) => (svcGroups = m.groups));
-  });
-
   let typedPlaceholder = $state('');
   let typeInterval;
 
   function openPalette() {
     if (show) return;
-    owner = isOwner();
     query = '';
     sel = 0;
     closing = false;
     restoreFocus = document.activeElement;
     show = true;
-    
+
     // Typewriter effect
     typedPlaceholder = '';
     clearInterval(typeInterval);
-    const targetText = owner ? 'SEARCH SERVICES AND NODES_' : 'AWAITING_COMMAND_INPUT_';
+    const targetText = 'AWAITING_COMMAND_INPUT_';
     let i = 0;
     typeInterval = setInterval(() => {
       typedPlaceholder += targetText.charAt(i);
@@ -204,16 +181,16 @@
     show = false;
   }
 
-  function flashUnlock() {
-    if (!input || reduce) return;
-    input.classList.add('ring-2', 'ring-white/55');
-    setTimeout(() => {
-      input.classList.remove('ring-2', 'ring-white/55');
-    }, 400);
+  // /blog and /projects have their own local search input bound to Ctrl+K;
+  // the global palette stays out of the way on those routes.
+  function scopedElsewhere() {
+    const path = page.url.pathname;
+    return path.startsWith('/blog') || path.startsWith('/projects');
   }
 
   function onKey(e) {
     if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+      if (scopedElsewhere()) return;
       e.preventDefault();
       show ? close() : openPalette();
       return;
@@ -230,13 +207,6 @@
       sel = Math.max(sel - 1, 0);
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (unlock(query)) {
-        owner = true;
-        query = '';
-        sel = 0;
-        flashUnlock();
-        return;
-      }
       filtered[sel]?.run?.();
     }
   }
@@ -292,13 +262,6 @@
           autocapitalize="off"
           spellcheck="false"
         />
-        {#if owner}
-          <span
-            class="shrink-0 rounded-none border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
-            style="border-color: var(--yorha-accent-border); background-color: var(--yorha-accent-subtle); color: var(--yorha-accent);"
-            >HOMELAB</span
-          >
-        {/if}
       </div>
 
       <div

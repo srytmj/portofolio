@@ -17,6 +17,7 @@
   // Home tab state
   let searchQuery = $state('');
   let homeFilterTag = $state('all');
+  /** @type {HTMLInputElement | null} */ let searchInput = $state(null);
 
   // Categories tab state: selected category object
   let selectedCategory = $state(null);
@@ -61,8 +62,18 @@
 
     if (typeof window === 'undefined') return;
     hasMounted = true;
+
+    function onKey(e) {
+      if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        activeTab = 'home';
+        searchInput?.focus();
+      }
+    }
+    window.addEventListener('keydown', onKey);
     return () => {
       window.__lenis?.start();
+      window.removeEventListener('keydown', onKey);
     };
   });
 
@@ -389,6 +400,7 @@
           <div class="shrink-0 space-y-2 pb-2 border-b" style="border-color: var(--blog-border);">
             <div class="relative">
               <input
+                bind:this={searchInput}
                 type="search"
                 bind:value={searchQuery}
                 placeholder="Search articles by title, topic, or tech stack..."
