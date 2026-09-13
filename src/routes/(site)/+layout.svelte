@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { onNavigate } from '$app/navigation';
+  import { page } from '$app/state';
   import { identity } from '$lib/content/site.js';
   import SideNav from '$lib/components/SideNav.svelte';
   import CornerTelemetry from '$lib/components/CornerTelemetry.svelte';
@@ -13,6 +14,10 @@
   let activeId = $state('');
 
   const sectionIds = ['about', 'skills', 'portfolio', 'contact'];
+
+  const paletteScopedAway = $derived(
+    page.url.pathname.startsWith('/blog') || page.url.pathname.startsWith('/projects')
+  );
 
   onNavigate((navigation) => {
     if (!document.startViewTransition) {
@@ -86,23 +91,25 @@
 <div class="fixed right-4 top-4 sm:right-10 sm:top-7 z-40 flex items-center gap-2 sm:gap-3 pointer-events-auto">
   <ThemeToggle />
 
-  <button
-    type="button"
-    aria-label="Open Command Palette"
-    onclick={() => {
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('open-command-palette'));
-      }
-    }}
-    class="group flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] opacity-70 hover:opacity-100 transition-opacity focus:outline-none"
-    style="color: var(--yorha-text-primary);"
-  >
-    <span class="sm:hidden border border-current/20 bg-black/20 px-2 py-1 backdrop-blur-sm font-semibold tracking-wider">[ MENU ]</span>
-    <span class="hidden sm:inline">MENU</span>
-    <span class="hidden sm:flex items-center border border-current/20 bg-black/20 px-2 py-0.5 backdrop-blur-sm transition-colors group-hover:border-current/40">
-      <span>⌘K</span>
-    </span>
-  </button>
+  {#if !paletteScopedAway}
+    <button
+      type="button"
+      aria-label="Open Command Palette"
+      onclick={() => {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('open-command-palette'));
+        }
+      }}
+      class="group flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] opacity-70 hover:opacity-100 transition-opacity focus:outline-none"
+      style="color: var(--yorha-text-primary);"
+    >
+      <span class="sm:hidden border border-current/20 bg-black/20 px-2 py-1 backdrop-blur-sm font-semibold tracking-wider">[ MENU ]</span>
+      <span class="hidden sm:inline">MENU</span>
+      <span class="hidden sm:flex items-center border border-current/20 bg-black/20 px-2 py-0.5 backdrop-blur-sm transition-colors group-hover:border-current/40">
+        <span>⌘K</span>
+      </span>
+    </button>
+  {/if}
 </div>
 
 <SideNav {activeId} />

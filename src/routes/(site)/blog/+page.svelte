@@ -67,7 +67,7 @@
       if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         activeTab = 'home';
-        searchInput?.focus();
+        tick().then(() => searchInput?.focus());
       }
     }
     window.addEventListener('keydown', onKey);
