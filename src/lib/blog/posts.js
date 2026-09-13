@@ -299,6 +299,9 @@ export function getAllPosts() {
     // Skip Jekyll template post
     if (slug === 'template') continue;
 
+    // Skip unpublished/draft posts
+    if (data.published === false) continue;
+
     // Ensure tags and categories are arrays
     const categories = Array.isArray(data.categories) ? data.categories : [];
     const tags = Array.isArray(data.tags) ? data.tags : [];
@@ -349,6 +352,7 @@ export function getPostBySlug(slug) {
     const postSlug = extractSlug(path);
     if (postSlug === slug) {
       const { data, content } = parseFrontMatter(raw);
+      if (data.published === false) return null;
       const mediaSubpath = data.media_subpath || '';
       const processedContent = preprocessMarkdown(content, mediaSubpath);
 
