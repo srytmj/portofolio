@@ -7,3 +7,7 @@ node_modules
 !.env.example
 .DS_Store
 Thumbs.db
+
+# AWS resource drafts, cross-checked but not committed
+src/posts/resource
+static/assets/img/posts/resource
